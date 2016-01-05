@@ -1,0 +1,42 @@
+#+TITLE: Marco Teorico
+#+AUTHOR:  Ruben Ezequiel Torti Lopez
+#+EMAIL:   ret0110@famaf.unc.edu.ar
+#+OPTIONS: H:5 title:nil date:nil author:nil email:nil creator:nil timestamp:nil skip:nil toc:nil
+#+STARTUP: indent hideblocks
+#+TAGS: noexport(n)
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+PROPERTY: session *R* 
+
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage{ifthen,figlatex}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{wrapfig}
+#+LATEX_HEADER: \usepackage{subfigure}
+#+LATEX_HEADER: \usepackage{xspace}
+#+LATEX_HEADER: \usepackage[american]{babel}
+#+LATEX_HEADER: \usepackage{url}\urlstyle{sf}
+#+LATEX_HEADER: \usepackage{amscd}
+#+LATEX_HEADER: \usepackage{wrapfig}
+
+* Estructura de la tesis
+** TODO establecer deadlines
+
+** Lineamientos generales
+1. Establecer un marco teorico: Bibliografia para leer, temas que toca
+   la tesis.
+2. Conseguir datasets
+3. Demo con MNIST: reproducir resultados del paper
+4. Demo con cada una de las otras opciones. Comparar resultados.
+5. Aporte: imagenes satelitales? modificaciones a las redes? En el
+   paper dicen que solo probaron con una red "standar" para fines
+   demostrativos, tal vez con otras arquitecturas se obtengan
+   distintos resultados.
+
+
+* Experimentos
+** TODO detalles de cada experimento
+
+* Aporte
