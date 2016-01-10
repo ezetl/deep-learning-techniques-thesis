@@ -84,8 +84,31 @@ Para finetuning: 4K iteraciones con un learning rate constante de
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo en cuenta el error en la clasificación de dígitos.
 Se utilizan conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training set de MNIST (sin transformaciones).
 El test set que viene con MNIST se utiliza para testing.
+** Experimentos con KITTI y SF
+*** Preprocesamiento KITTI
+Tiene 20501 imágenes. Se calculan las transformaciones entre las
+imágenes cercanas utilizando los datos odométricos del dataset.
+Similar a MNIST: se crean 20 clases para las transformaciones en X,Y,Z
+(el paper no explica como). Se toman imágenes que estén separadas a lo
+sumo por +-7 frames.  Para el entrenamiento se extraen patches de
+227x227 de las imágenes (Caffe tiene la opcion de cropear la imagen a
+la hora de entrenar, pero no se como se aplica a redes siamesas,
+probablemente tenga que hacerlo como parte del preprocesamiento).
 
-** Demo con cada una de las otras opciones. Comparar resultados.
+Para SFA, el threshold para imágenes temporalmente cercanas (T) es
+también de +-7
+
+*** TODO Preprocesamiento SF
+Análogo a KITTI, solo que además de las transformaciones en X,Y,Z
+agregan los 3 "euler angles" (no entendí eso).
+
+*** Arquitectura
+*** Evaluación
+**** Scene Recognition
+**** Object Recognition
+**** Intra-Class Keypoint Matching
+**** Visual Odometry
+
 ** Aporte: imagenes satelitales? modificaciones a las redes?
    En el paper dicen que solo probaron con una red "standard" para
    fines demostrativos, tal vez con otras arquitecturas se obtengan
