@@ -24,11 +24,67 @@
 * Introducción
 ** Trabajo Relacionado/State of the art, Hipótesis, Key words (de arxiv)
 ** Conceptos generales sobre los cuales parte el trabajo (deep learning)
+*** Deep learning general
+*** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
+*** Egomotion
+*** SFA
 ** Justificación de la tesis: para que la hago, que aportes podría lograr
 
 * Plan de Trabajo
 ** Conseguir datasets
-** Demo con MNIST: reproducir resultados del paper
+MINST: http://yann.lecun.com/exdb/mnist/
+KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
+SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
+
+** Prueba de Concepto con MNIST
+*** Preprocesamiento
+El dataset tiene unas 60K imágenes. A cada dígito se le aplican dos
+conjuntos de transformaciones aleatorias diferentes para generar los
+pares (rotación y traslación).
+
+*** Egomotion
+Para pretraining de la red, hay que hacer un preprocesamiento del dataset:
+
+  1. Traslación relativa en un rango de [-3,3]
+  2. Rotación relativa en un rango de [-30°,30°].
+
+La predicción es clasificación con tres capas soft-max loss (para
+traslaciones en X,Y y rotacion en Z respectivamente). Cada SCNN
+minimiza la suma de estas tres "losses".
+
+Para que se pueda utilizar clasificación, hay que dividir los rangos
+de traslación en en 7 classes y las rotaciones en 20 clases (donde
+cada una corresponde a 3°)
+
+*** Slow Feature Analysis (SFA)
+Ellos comparan sus resultados (egomotion) contra SFA. En el paper
+formulan SFA como un Contrastive Loss.
+
+Para MNIST, hay que tomar a las imágenes cuya traslación relativa esté
+entre [-1,1] y rotación relativa entre [-3°,3°] como temporalmente
+cercanas (es el parámetro T de la ecuación en la sección 3.3 del
+paper).
+
+*** Arquitectura
+BCCN: C96-P-C256-P
+TCCN: F1000-D-Op
+
+Para finetuning: BCCN-F500-D-Op
+
+Para SFA, los valores optimos del parámetro m fueron 10 y 100.
+
+*** Entrenamiento
+Para pretraining: 40K iteraciones con learning rate inicial de 0.01,
+reducido en un factor de 2 cada 10K iteraciones.
+
+Para finetuning: 4K iteraciones con un learning rate constante de
+0.01.
+
+*** Evaluación
+Las features obtenidas de las BCNN preentrenadas se evaluan teniendo en cuenta el error en la clasificación de dígitos.
+Se utilizan conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training set de MNIST (sin transformaciones).
+El test set que viene con MNIST se utiliza para testing.
+
 ** Demo con cada una de las otras opciones. Comparar resultados.
 ** Aporte: imagenes satelitales? modificaciones a las redes?
    En el paper dicen que solo probaron con una red "standard" para
