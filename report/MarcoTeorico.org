@@ -167,9 +167,11 @@ Para finetuning: 4K iteraciones con un learning rate constante de
 0.01.
 
 *** Evaluación
-Las features obtenidas de las BCNN preentrenadas se evaluan teniendo en cuenta el error en la clasificación de dígitos.
-Se utilizan conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training set de MNIST (sin transformaciones).
-El test set que viene con MNIST se utiliza para testing.
+Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
+en cuenta el error en la clasificación de dígitos.  Se utilizan
+conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training
+set de MNIST (sin transformaciones).  El test set que viene con MNIST
+se utiliza para testing.
 ** Experimentos con KITTI y SF
 *** Preprocesamiento KITTI
 Tiene 20501 imágenes. Se calculan las transformaciones entre las
@@ -183,23 +185,47 @@ probablemente tenga que hacerlo como parte del preprocesamiento).
 
 Para SFA, el threshold para imágenes temporalmente cercanas (T) es
 también de +-7
+El numero total de imagenes usadas para entrenamiento es 20501
 
-*** TODO Preprocesamiento SF
+*** Preprocesamiento SF
 Análogo a KITTI, solo que además de las transformaciones en X,Y,Z
-agregan los 3 "euler angles" (no entendí eso).
+agregan los 3 "euler angles" (no entendi eso).
 
 *** Arquitectura
+BCNN: C96-P-C256-P-C384-C384-C256-P (dice que estan inspiradas en las
+primeras capas de AlexNet, extraer tamaño de filtros de esa red)
+TCNN: C256-C128-F500-D-Op. Los kernels convolucionales con 3x3.
+
+*** Entrenamiento
+Se entrena por 60K iteraciones con batch size de 128, learning rate
+inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
+
 *** Evaluación
+Los modelos KITTI-Net y SF-Net deben ser entrenados utilizando
+alrededor de 20K imagenes unicas. Para hacer la comparacion mas justa
+con las redes entrenadas con clases de imagenes, un model con AlexNet
+sera entrenado con 20K imagenes tomadas de ILSVRC12 (20 ejemplos por
+clase).  Las secciones de evaluacion en Intra-Class Keypoint Matching
+y Visual Odometry los dejo para mas adelante.
 **** Scene Recognition
+Utilizar SUN database para el finetuning de las redes (SF-Net,
+KITTI-Net y AlexNet-20K). El paper no aporta informacion sobre la
+cantidad de iteraciones ni el learning rate usado.  Referirse al paper
+para comparar resultados obtenidos.
 **** Object Recognition
-**** Intra-Class Keypoint Matching
-**** Visual Odometry
+Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
+clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
+(AlexNet con pesos inicializados de manera aleatoria). Nuevamente el
+paper no explica las iteraciones ni el learning rate utilizados.
 
-** Aporte: imagenes satelitales? modificaciones a las redes?
-   En el paper dicen que solo probaron con una red "standard" para
-   fines demostrativos, tal vez con otras arquitecturas se obtengan
-   distintos resultados.
+* Datasets
+1. MINST: http://yann.lecun.com/exdb/mnist/
 
+2. KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
+
+3. SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
+
+4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
 * Herramientas   
 Obtener acceso a algun server con Caffe+Ubuntu.
 
