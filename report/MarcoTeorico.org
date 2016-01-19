@@ -16,19 +16,105 @@
 #+LATEX_HEADER: \usepackage{wrapfig}
 #+LATEX_HEADER: \usepackage{subfigure}
 #+LATEX_HEADER: \usepackage{xspace}
-#+LATEX_HEADER: \usepackage[american]{babel}
+#+LATEX_HEADER: \usepackage[spanish]{babel}
 #+LATEX_HEADER: \usepackage{url}\urlstyle{sf}
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
 
+#+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
+#+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
+#+LATEX_HEADER: \newcommand{\dl}{\textit{deep learning}}
+#+LATEX_HEADER: \newcommand{\DL}{\textit{Deep Learning}}
+#+LATEX_HEADER: \newcommand{\cnn}{\textit{convolutional neural networks}}
+#+LATEX_HEADER: \newcommand{\CNN}{\textit{Convolutional Neural Networks}}
+
 * Introducción
-** Trabajo Relacionado/State of the art, Hipótesis, Key words (de arxiv)
-** Conceptos generales sobre los cuales parte el trabajo (deep learning)
-*** Deep learning general
+** Que es computer vision
+
+Para los seres humanos, percibir el mundo que nos rodea es una tarea
+fácil. Millones de años de evolución nos han dotado con un sistema
+visual altamente sofisticado que nos permite reconocer patrones muy
+complejos del mundo tridimensional en el que vivimos. Distinguir
+sombras, color, formas, o incluso cosas más generales, como
+movimiento, potenciales amenazas o rostros de conocidos, son algunas
+de las actividades que nuestros cerebros realizan casi de manera
+inconsciente. Y si bien estas tareas pueden ser fáciles para nosotros,
+no es tal el caso para las computadoras.
+
+Richard Szeliski caracteriza a la visión por computadoras como un
+\textit{problema inverso}, es decir, se busca describir el mundo que
+uno ve en una o más imágenes y reconstruir sus propiedades tales como
+forma, iluminación y distribuciones de color \cite{szeliski}
+
+Una de las areas que más impulso ha tomado en los últimos años dentro
+de la visión por computadoras es la clasificación de imágenes. Es
+decir, dada una imagen y un conjunto de categorías, determinar a cual
+de las categorías pertenece esa imagen. 
+*** TODO definir mejor clasificación
+*** TODO poner ejemplo de clasificación.
+Inicialmente, para clasificar imágenes se usaba ....
+
+** Gran cantidad de datos
+
+Para 2016, Cisco estima que el 51\% del trafico de Internet va a
+provenir de dispositivos WiFi, tales como celulares, \textit{tablets},
+\textit{smart TV's}, etc.  Más aún, se estima que para el 2019 el 80\%
+del tráfico IP va a ser video, superando al 67\% que existente en 2014
+\cite{ciscostats}. Como tendencia podemos nombrar a Youtube, donde la
+mitad de los videos son subidos desde dispositivos móviles
+\cite{youtustats}.
+ 
+Por otro lado, las redes sociales más populares como Facebook, Flickr
+o Instagram almacenan una gigantesca cantidad de imágenes, contando la
+última con más de 80 millones de imágenes subidas por día
+\cite{instastats}. 
+
+Con tantos videos, imágenes y demás contenido multimedia, no hay
+posibilidades para el hombre de contar con los recursos suficientes
+para anotar y clasificar cada uno de estos elementos. Para ello
+debemos contar con herramientas de visión por computadoras para
+filtrar, procesar y dar un sentido semántico a las imágenes.
+
+** Introduccion de neural networks
+
+Con la aparición de las redes neuronales en los '70s .... pero no se logró
+imponer hasta que no se contara con un hardware que pudiera llevar a
+cabo los entrenamientos en un tiempo razonable...
+
+** Convolutional neural networks y deep learning
+Deep learning es.... Convolutional neural networks provienen de...
+
+** tomar cosas del paper
+Trabajo Relacionado/State of the art, Hipótesis, Key words (de arxiv)
+
+* Marco Teórico
+Para establecer un marco teórico que ayude a este trabajo especial ser
+un poco más autocontenido, comenzaremos por explorar algunos conceptos
+básicos de \ml, luego nos introduciremos en \dl mientras se explican
+conceptos de visión por computadoras.
+** Definir conceptos generales de Machine learning
+
+*** Objetivos y definicion de machine learning
+usar diapositivas
+*** Hiperparametros, significado
+*** Medir correctitud de modelos aprendidos con distintos medidores (falsos positivos, falsos negativos, etc.)
+** introduccion a neural networks
+ Usar libro online de deeplearning, Usar libro del MIT.
+ Componentes de una red neuronal
+ Entrenamiento de una red neuronal: feed forward, back propagation, SGD, dropout, fine tuning. etc.
+** redes convolucionales y deep learning
+ diferencias con redes normales
+** capas de una red 
+** arquitecturas conocidas
+(LeNet5, AlexNet, VGG, etc)
+** redes siamesas
+
+
+* Entrenamiento de redes siamesas utilizando información odométrica
+** Conceptos generales sobre los cuales parte el trabajo
 *** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
 *** Egomotion
 *** SFA
-** Justificación de la tesis: para que la hago, que aportes podría lograr
 
 * Plan de Trabajo
 ** Conseguir datasets
@@ -118,3 +204,5 @@ agregan los 3 "euler angles" (no entendí eso).
 Obtener acceso a algun server con Caffe+Ubuntu.
 
 * Bibliografía
+#+LaTeX: \bibliographystyle{abbrv}
+#+LaTex: \bibliography{MarcoTeorico}
