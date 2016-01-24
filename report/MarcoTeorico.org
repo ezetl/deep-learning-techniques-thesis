@@ -21,6 +21,18 @@
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
 
+#+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
+#+LATEX_HEADER: \newcommand{\loss}{\textit{funciones de pérdida}}
+#+LATEX_HEADER: \newcommand{\dg}{\textit{descenso de gradiente}}
+#+LATEX_HEADER: \newcommand{\back}{\textit{backpropagation}}
+#+LATEX_HEADER: \newcommand{\nn}{\textit{redes neuronales}}
+#+LATEX_HEADER: \newcommand{\svms}{\textit{Support Vector Machines}}
+#+LATEX_HEADER: \newcommand{\bow}{\textit{Bag of Words}}
+#+LATEX_HEADER: \newcommand{\features}{\textit{features}}
+#+LATEX_HEADER: \newcommand{\sift}{\textit{SIFT}}
+
+
+
 #+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
 #+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
 #+LATEX_HEADER: \newcommand{\dl}{\textit{deep learning}}
@@ -29,7 +41,7 @@
 #+LATEX_HEADER: \newcommand{\CNN}{\textit{Convolutional Neural Networks}}
 
 * Introducción
-** Que es computer vision
+** Qué es la visión por computadoras
 
 Para los seres humanos, percibir el mundo que nos rodea es una tarea
 fácil. Millones de años de evolución nos han dotado con un sistema
@@ -46,20 +58,71 @@ Richard Szeliski caracteriza a la visión por computadoras como un
 uno ve en una o más imágenes y reconstruir sus propiedades tales como
 forma, iluminación y distribuciones de color \cite{szeliski}
 
-Una de las areas que más impulso ha tomado en los últimos años dentro
-de la visión por computadoras es la clasificación de imágenes. Es
-decir, dada una imagen y un conjunto de categorías, determinar a cual
-de las categorías pertenece esa imagen. 
-*** TODO definir mejor clasificación
-*** TODO poner ejemplo de clasificación.
-Inicialmente, para clasificar imágenes se usaba ....
+Una de las áreas principales de de la visión por computadoras es la
+clasificación de imágenes. Es decir, dada una imagen y un conjunto de
+categorías, determinar a cual de las categorías pertenece esa
+imagen. Tener un buen entendimiento de los algoritmos de clasificación
+es crucial para desarrollar otras tareas dentro de la visión por
+computadoras, dado que muchos problemas pueden ser reducidos a
+clasificación: detección de objetos, \textit{captioning} de imágenes,
+segmentación, etc.
+
+Sin embargo, es un problema más difícil de lo que aparenta. Una
+fotografía es solamente un conjunto de números (píxeles), entonces
+¿cómo darle significado semántico a un conjunto de números? Se podría
+pensar en elaborar alguna métrica de distancia con los píxeles otra
+imagen la cual sepamos está en la misma categoría, y si la distancia
+es menor a un cierto umbral sabríamos que ambas pertenecen a la misma
+clase. Sin embargo este enfoque carece de robustez, ya que el menor
+cambio de \textit{iluminación} en las fotos podría alterar las
+métricas y confundir a nuestro modelo. No solamente eso, los objetos
+en las imágenes podrían estar ocultos por el ambiente
+(\textit{oclusión}), o en una posición diferente
+(\textit{deformación}), o ser exactamente iguales, pero variar en
+colores y pequeños detalles (\textit{variación intraclase}).
+
+Diferentes métodos se han utilizado a lo largo de la historia para
+taclear este problema: \svms, árboles de decisión, \bow, etc. En la
+mayoría de los casos las \features y descriptores que se extraían de
+las imágenes debían ser implementadas manualmente (por ejemplo: histogramas de
+colores o descriptores \sift \cite{Lowe-SIFT}).
+
+En los últimos años toda la parafernalia relativa a la clasificación
+de imágenes fue ampliamente superada por las Redes Neuronales
+Convolucionales. Desde el año 2010, todos los equipos ganadores del
+desafío Imagenet usaron Redes Neuronales Convolucionales, cada vez con
+resultados más precisos \cite{imagenet}.
+
+A pesar de haber tenido su golpe de popularidad en los últimos 6 años,
+los primeros esbozos de modelar redes neuronales artificiales datan de
+1958, cuando Frank Rosenblatt ideó el \textit{perceptron}, un
+algoritmo para reconocimiento de patrones basado en una red de dos
+capas de aprendizaje \cite{perceptron}. Sin embargo, en 1969 se
+estableció que el poder de cómputo disponible en ese entonces no
+bastaba para poder entrenar y correr grandes redes neuronales,
+implicando que el área se estancara durante años \cite{minsky}. Tan
+así es, que recién en 2006, con el abaratamiento de costos en hardware
+de alto desempeño se pudieron implementar arquitecturas más complejas
+(no necesariamente nuevas) y redes neuronales más profundas, algo que
+se conoce como \DL, y que explicaremos más adelante.
+
+
+
 
 ** Gran cantidad de datos
 
-Para 2016, Cisco estima que el 51\% del trafico de Internet va a
-provenir de dispositivos WiFi, tales como celulares, \textit{tablets},
-\textit{smart TV's}, etc.  Más aún, se estima que para el 2019 el 80\%
-del tráfico IP va a ser video, superando al 67\% que existente en 2014
+Para poder entrenar Redes Neuronales Profundas, es necesario contar
+con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
+de los miles hasta los cientos de millones de imágenes. En la mayoría de los
+casos, se requiere un gran esfuerzo humano para etiquetar tantas
+imágenes.
+
+La buena noticia es que actualmente contamos con una increíble
+cantidad de imágenes para etiquetar. Para 2016, Cisco estima que el
+51\% del trafico de Internet va a provenir de dispositivos WiFi, tales
+como celulares, \textit{tablets}, \textit{smart TV's}, etc.  Más aún,
+se estima que para el 2019 el 80\% del tráfico IP va a ser en forma de
+píxeles (multimedia), superando al 67\% que existente en 2014
 \cite{ciscostats}. Como tendencia podemos nombrar a Youtube, donde la
 mitad de los videos son subidos desde dispositivos móviles
 \cite{youtustats}.
@@ -69,39 +132,40 @@ o Instagram almacenan una gigantesca cantidad de imágenes, contando la
 última con más de 80 millones de imágenes subidas por día
 \cite{instastats}. 
 
-Con tantos videos, imágenes y demás contenido multimedia, no hay
-posibilidades para el hombre de contar con los recursos suficientes
-para anotar y clasificar cada uno de estos elementos. Para ello
+Es practicamente imposible contar con los recursos suficientes para
+anotar tantos videos, imágenes y demás contenido multimedia. Para ello
 debemos contar con herramientas de visión por computadoras para
 filtrar, procesar y dar un sentido semántico a las imágenes.
 
-** Introduccion de neural networks
+Pero no podemos clasificar las imágenes si no contamos con una
+herramienta poderosa que nos ayude, de la misma manera que no podemos
+entrenar una herramienta poderosa si no tenemos la suficiente cantidad
+de datos anotados.
 
-Con la aparición de las redes neuronales en los '70s .... pero no se logró
-imponer hasta que no se contara con un hardware que pudiera llevar a
-cabo los entrenamientos en un tiempo razonable...
+Una posible solución a esto es la propuesta por \cite{LSM2015}, en
+donde en vez de utilizar un gran dataset anotado a mano, proponen
+utilizar información odométrica disponible en cámaras (giróscopos,
+acelerómetros, etc) para pre-entrenar redes neuronales profundas, y
+luego entrenarlas utilizando el dataset que se desee, obteniendo la
+ventaja de no necesitar un dataset tan grande para lograr buena
+precisión.
 
-** Convolutional neural networks y deep learning
-Deep learning es.... Convolutional neural networks provienen de...
+En este trabajo final nos proponemos reproducir este paper, analizando
+cada paso para luego proponer mejoras y aplicaciones al mundo real.
 
-** tomar cosas del paper
-Trabajo Relacionado/State of the art, Hipótesis, Key words (de arxiv)
+El trabajo está organizado como sigue:
+*** TODO organizacion del trabajo
 
-* Marco Teórico
+** Marco Teórico
+
 Para establecer un marco teórico que ayude a este trabajo especial ser
 un poco más autocontenido, comenzaremos por explorar algunos conceptos
-básicos de \ml, luego nos introduciremos en \dl mientras se explican
-conceptos de visión por computadoras.
-** Definir conceptos generales de Machine learning
+que conforman la base de /dl, tales como \cl, \loss, \dg, \back, luego
+introduciremos lo que son las redes neuronales para terminar en \dl y
+redes siamesas.
 
-*** Objetivos y definicion de machine learning
-usar diapositivas
-*** Hiperparametros, significado
-*** Medir correctitud de modelos aprendidos con distintos medidores (falsos positivos, falsos negativos, etc.)
-** introduccion a neural networks
- Usar libro online de deeplearning, Usar libro del MIT.
- Componentes de una red neuronal
- Entrenamiento de una red neuronal: feed forward, back propagation, SGD, dropout, fine tuning. etc.
+** Clasificadores lineales
+Vamos a encarar el problema de clasificación de imágenes de una manera paramétrica
 ** redes convolucionales y deep learning
  diferencias con redes normales
 ** capas de una red 
