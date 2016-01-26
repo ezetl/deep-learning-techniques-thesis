@@ -3,6 +3,7 @@
 #+EMAIL:   ret0110@famaf.unc.edu.ar
 #+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:nil
 #+STARTUP: indent hideblocks
+#+STARTUP: latexpreview
 #+TAGS: noexport(n)
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
@@ -29,9 +30,12 @@
 #+LATEX_HEADER: \newcommand{\svms}{\textit{Support Vector Machines}}
 #+LATEX_HEADER: \newcommand{\bow}{\textit{Bag of Words}}
 #+LATEX_HEADER: \newcommand{\features}{\textit{features}}
+#+LATEX_HEADER: \newcommand{\scores}{\textit{scores}}
 #+LATEX_HEADER: \newcommand{\sift}{\textit{SIFT}}
-
-
+#+LATEX_HEADER: \newcommand{\weigths}{\(\boldsymbol{W}\)}
+#+LATEX_HEADER: \newcommand{\img}{\(\boldsymbol{x_i}\)}
+#+LATEX_HEADER: \newcommand{\bias}{\(\boldsymbol{b}\)}
+#+LATEX_HEADER: \newcommand{\func}{\(\boldsymbol{f}\)}
 
 #+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
 #+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
@@ -156,16 +160,46 @@ cada paso para luego proponer mejoras y aplicaciones al mundo real.
 El trabajo está organizado como sigue:
 *** TODO organizacion del trabajo
 
-** Marco Teórico
+* Marco Teórico
 
 Para establecer un marco teórico que ayude a este trabajo especial ser
 un poco más autocontenido, comenzaremos por explorar algunos conceptos
-que conforman la base de /dl, tales como \cl, \loss, \dg, \back, luego
-introduciremos lo que son las redes neuronales para terminar en \dl y
-redes siamesas.
+que conforman la base de \dl{}, tales como \cl{}, \loss{}, \dg{}, \back{}, luego
+introduciremos lo que son las redes neuronales para terminar en redes
+convolucionales, \dl{} y redes siamesas.
 
 ** Clasificadores lineales
-Vamos a encarar el problema de clasificación de imágenes de una manera paramétrica
+
+Dado que clasificar una imagen es asignar una etiqueta a un conjunto
+de píxeles, vamos a definir una función \func{} que mapee píxeles
+\(\boldsymbol{x}\) a probablidades de cada etiqueta
+(\textit{scores}). Supongamos que contamos con un conjunto de datos de
+imágenes \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), donde \(\boldsymbol{i =
+1\cdots N}\), \(\boldsymbol{D}\) es la dimensión de cada imagen y
+\(\boldsymbol{y_i = 1\cdots K}\) es la etiqueta asociada. Es decir,
+tenemos \(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
+
+Vamos a definir nuestra función \(\boldsymbol{f\colon R^{D} \mapsto
+R^{K}}\) como un mapeo lineal entre píxeles y \scores:
+
+\begin{equation}
+     \boldsymbol{f(x_i, W, b)= W x_i + b}
+\end{equation}
+
+Estamos asumiendo que la imagen \img{} es un vector de una sola columna
+\([D \times 1]\), \weights{} es una matriz \([K \times D]\) y \bias{} es
+otro vector \([K \times 1]\). A menudo la matriz \weights{} es llamada
+los \textit{pesos} de \func{}, y a \bias{} el \textit{vector de sesgo}
+dado que influencia los \scores{} de salida, pero sin interactuar con
+\img{}.
+
+Notar que en realidad, la multiplicación \(W x_i\) está evaluado \(K\)
+clasificadores en paralelo, donde cada uno es una fila de \weights{}.
+
+*** TODO Interpretacion de los clasificadores lineales
+** Función de Pérdida
+** Optimización
+
 ** redes convolucionales y deep learning
  diferencias con redes normales
 ** capas de una red 
