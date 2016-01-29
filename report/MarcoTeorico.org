@@ -3,7 +3,6 @@
 #+EMAIL:   ret0110@famaf.unc.edu.ar
 #+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:nil
 #+STARTUP: indent hideblocks
-#+STARTUP: latexpreview
 #+TAGS: noexport(n)
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
@@ -194,10 +193,153 @@ dado que influencia los \scores{} de salida, pero sin interactuar con
 \img{}.
 
 Notar que en realidad, la multiplicación \(W x_i\) está evaluado \(K\)
-clasificadores en paralelo, donde cada uno es una fila de \weights{}.
+clasificadores en paralelo, donde cada uno es una fila de
+\weights{}. Para entender mejor a los clasificadores lineales, podemos
+verlos de la siguiente manera: si la imagen tiene \(32\times32\)
+píxeles y la representamos con un vector columna de dimensión \(D\),
+entonces en ese espacio \textit{D-dimensional} la imagen es solamente
+un punto. Nuestro clasificador lineal entonces define una "línea" que
+separa cada clase dentro de ese espacio multidimensional.
 
-*** TODO Interpretacion de los clasificadores lineales
-** Función de Pérdida
+Todavía no mencionamos nada sobre como se definen \weights{} y
+\bias{}. Un approach \textit{n\ddot{a}ive} sería probar diferentes
+combinaciones para los parámetros de \weights{} y \bias{} hasta lograr
+una buena precisión. Pero en general \weights{} y \bias{} tienen
+muchas dimensiones (millones o miles de millones en redes neuronales,
+como ya veremos) y elegirlos por prueba y error no es una opción.
+
+En cambio, analizaremos cómo definir una función que, a medida que
+entrenemos nuestro modelo, nos permita \textit{optimizar} esos
+parámetros.
+
+** Función de costo
+
+A menudo también llamada función de pérdida o función objetivo, nos
+ayuda a saber que tan bien o mal está actuando nuestro
+clasificador. Es decir, si la tasa de error del clasificador es muy
+alta, la \textit{pérdida} será muy alta y viceversa. Hay muchos tipos
+de funciones de costo, analizaremos dos de las más conocidas: función
+de pérdida de SVM Multiclase y Sofmax. En particular, esta última es
+ampliamente usada en redes neuronales por sus propiedades.
+
+*** Multiclass Support Vector Machine loss
+
+La función de pérdida de SVM multiclase busca que la clase correcta de
+cada imagen tenga un puntaje más alto que las otras clases por un
+margen \(\Delta\). Más precisamente, dado el \textit{i}-ésimo ejemplo con
+su respectiva etiqueta \(\boldsymbol{y_i}\), llamemos
+\(\boldsymbol{s}\) al puntaje computado por el clasificador
+lineal. Dado que es un vector columna, \(\boldsymbol{s_j}\) va a ser
+el puntaje otorgado a la clase \(\boldsymbol{j} \in 1\cdots
+\boldsymbol{K}\) (recordemos que \(K\) es la cantidad de
+clases). Formalizamos a la función de perdida entonces de la siguiente
+manera:
+
+\begin{equation}
+     \boldsymbol{L_i = \sum_{j \neq y_i} \max{(0, s_j - s_{y_{i}} + \Delta) }}
+\end{equation}
+
+Dado que en este caso particular estamos trabajando con clasificadores lineales:
+
+\begin{equation}
+     \boldsymbol{L_i = \sum_{j \neq y_i} \max{(0, w_{j}^{T}x_i -  w_{y_{i}}^{T}x_i + \Delta) }}
+\end{equation}
+
+Notemos que la funcion no necesariamente va a ser la misma una vez que
+contemplemos clasificadores más complejos.
+
+Cuando tenemos una función como la que acabamos de ver, en donde el
+umbral se establece en cero (\( \max{(0,_)} \)), a menudo se las llama
+funciones de pérdida \textit{hinge} (\textit{bisagra}), o por su
+nombre en ingles, hinge loss.
+
+¿Que pasaria si tuvieramos un \weights{} que clasifica correctamente
+cada ejemplo? Es decir, si la perdida calculada fuera cero. Si
+observamos bien la funcion de pérdida, notaremos que ese \weights{} no
+necesariamente es único. Una forma de verlo es que si los parametros
+de un \weights{} clasifican correctamente todos los ejemplos (pérdida
+cero) entonces hay multiplicadores \(\lambda\) de esos parametros con
+\(\lambda > 1\) que tambien van a dar pérdida cero, dado que la
+transformación va a ser lineal (lo podemos ver como si estuvieramos
+"agitando" la red entre valores positivos o negativos, dependiendo del
+\(\lambda\)).
+
+**** TODO ampliar explicacion
+
+*** Regularización
+
+Lo que queremos hacer es elegir mejores parámetros de \weights{} para evitar esta ambiguedad,
+y eso lo podemos hacer agregando una penalidad de regularización
+\(R(W)\). Lo que buscamos con esto es poner preferencias para algunos
+conjuntos de \weights{} sobre otros.
+
+La forma más común de regularización es la norma \(L2\), que penaliza los
+pesos más grandes mediante una suma de los cuadrados de los mismos:
+
+\begin{equation}
+     \boldsymbol{ R(W) = \sum_{k} \sum_{l} W_{k,l}^{2}}
+\end{equation}
+
+De esta manera, nuestra función de pérdida ahora cuenta con dos
+componentes: \textit{pérdida de los datos} y \textit{pérdida de
+regularización}:
+
+\begin{equation}
+     \boldsymbol{ L =\frac{1}{N} \sum_{i} L_i + \lambda R(W)}
+\end{equation}
+
+O bien:
+
+\begin{equation}
+     \boldsymbol{ L =\frac{1}{N} \sum_{i} \sum_{j \neq y_i} \max{[0, f(x_i;W)_{j} -  f(x_i;W)_{y_{i}} + \Delta] } + \lambda R(W)}
+\end{equation}
+
+Notar que la pérdida total es el promedio de las pérdidas de cada
+imagen, y que la penalización de la regularización sólo se suma una
+vez.
+
+Una buena propiedad de la regularizacion es que al penalizar los pesos
+grandes, obliga a \weights{} a generalizar y contemplar todas las
+clases a la hora de clasificar. De esa manera, nuestro clasificador
+final va a tomar en cuenta todas las dimensiones de entrada (algunas
+con más o menos probabilidad) sin dar prioridad a una sola.
+
+*** Softmax
+
+El clasificador Softmax tiene una función de pérdida diferente. En vez
+de tratar a la salida del clasificador como puntajes para cada clase
+(lo cual puede ser confuso y dificíl de comparar), Softmax devuelve
+probabilidades normalizadas para cada clase.
+
+Un clasificador Softmax no modifica la funcion \func{} que ya conocemos,
+pero sí interpreta los puntajes como probabilidades logarítmicas sin
+normalizar, reemplazando la \textit{hinge loss} por una \textit{cross entropy loss}:
+
+**** TODO explicar por que es el -logaritmo
+
+\begin{equation}
+     \boldsymbol{ L_i = - \log \bigg( \frac{\exp{f_{y_{i}}}} {\sum_j \exp{f_j}}\bigg)}
+\end{equation}
+
+Que es equivalente a:
+
+\begin{equation}
+     \boldsymbol{ L_i = - f_{y_{i}} + \log \Big( \sum_j \exp{f_j}}\Big)}
+\end{equation}
+
+Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
+de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
+promedio de las pérdidas de cada imagen más la suma del término de
+regularización \(R(W)\).
+
+La \textit{función softmax} \(\frac{\exp{f_{j}}} {\sum_{k}
+\exp{f_{k}}}\) toma un vector de valores reales arbitrarios y los
+transforma en un vector de probabilidades normalizadas (cuya suma da
+uno).
+
+**** TODO Interpretacion estadistica de softmax:
+
+
 ** Optimización
 
 ** redes convolucionales y deep learning
