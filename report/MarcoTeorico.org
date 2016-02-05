@@ -339,9 +339,36 @@ uno).
 
 **** TODO Interpretacion estadistica de softmax:
 
+** Optimización: Descenso de Gradiente
 
-** Optimización
+Ya contamos con una función para medir que tan bien o que tan mal está
+comportándose nuestro modelo, la \textit{función de pérdida}. Como se
+puede observar, esta función depende de nuestro \weights{} y las
+imágenes (o \features{} que estemos usando). Nosotros no tenemos
+control sobre nuestro conjunto de datos de entrenamiento, pero sí
+podemos modificar los parámetros de \weights para producir la menor
+pérdida posible. Ahora bien, ¿de que manera podemos minimizar la
+pérdida?
 
+Una posible opción es probar diferentes parámetros de \weights{} y
+quedarnos con la mejor combinación. Pero en las \nn{} estos parámetros
+suelen ser decenas de millones, así que no es una buena idea probarlos
+por fuerza bruta.
+
+Otra opción podría ser una búsqueda local: variar \weights{}
+ligeramente en un factor \(\delta \W\) y si \(W + \delta W\) resulta
+en una menor pérdida, actualizar sus parámetros.
+
+Sin embargo, ambos métodos mencionados son poco eficientes, por no
+decir que no logran optimizar adecuadamente. Basta con ver que ambos
+se basan en actualizaciones de \weights{} aleatorias hasta lograr
+minimizar la pérdida.
+
+Vamos ahora a analizar uno de los métodos más usados en \nn{} para
+optimizar la pérdida: descenso de gradiente.
+
+** \textit{Backpropagation}
+** Redes Neuronales
 ** redes convolucionales y deep learning
  diferencias con redes normales
 ** capas de una red 
