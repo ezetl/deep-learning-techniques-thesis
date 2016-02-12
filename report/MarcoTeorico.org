@@ -35,6 +35,7 @@
 #+LATEX_HEADER: \newcommand{\img}{\(\boldsymbol{x_i}\)}
 #+LATEX_HEADER: \newcommand{\bias}{\(\boldsymbol{b}\)}
 #+LATEX_HEADER: \newcommand{\func}{\(\boldsymbol{f}\)}
+#+LATEX_HEADER: \newcommand{\loss}{\(\boldsymbol{L}\)}
 
 #+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
 #+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
@@ -339,6 +340,7 @@ uno).
 
 **** TODO Interpretacion estadistica de softmax:
 
+** TODO optimizacion de un problema, mejorar descripcion
 ** Optimización: Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
@@ -367,7 +369,77 @@ minimizar la pérdida.
 Vamos ahora a analizar uno de los métodos más usados en \nn{} para
 optimizar la pérdida: descenso de gradiente.
 
+Tomemos un escenario hipotético: imaginemos por un momento que una
+persona con los ojos vendados está atrapada entre montañas y busca
+llegar al valle. Una manera de llegar al valle es probar dando un
+pequeño paso a su alrededor, y "sentir" hacia donde desciende más
+rápido la montaña, sólo valiéndose de la información local para
+moverse. Cuando finalmente esté seguro hacia donde descender, dará
+varios pasos en esa dirección, se detendrá y volverá a
+observar. Sabemos que eventualmente llegará al fondo del valle, pues
+lo único que tiene que hacer es seguir bajando por la pendiente de la
+montaña.
+
+Formalmente, la pendiente de la montaña es la pendiente de la función
+de pérdida \loss{} que estemos utilizando, la elección de hacia donde
+bajar se corresponde con el cálculo de la derivada de la función de
+pérdida, mientras que la cantidad de pasos que realice se corresponde
+con la \textit{tasa de aprendizaje}. En otras palabras, lo que estamos
+haciendo es buscar el mínimo de \loss{}, y en consecuencia, el conjunto
+de parámetros de \weights{} que minimicen el error.
+
+*** TODO Explayar sobre gradient descent
+
+
 ** \textit{Backpropagation}
+
+Notemos que \loss{} es una función que depende de las imágenes de
+entrada \img{}, \weights{} y \bias{}. Sin embargo el conjunto de datos
+de entrenamiento es algo fijo en nuestro modelo, por lo que sólo nos
+interesa calcular el gradiente sobre \weights{} y \bias{} para poder
+actualizar sus parámetros.
+
+En una función de una dimensión, la derivada se expresa como:
+ TODO funcion de la derivada
+
+Cuando la función toma un vector de números en vez de uno solo, a las
+derivadas las llamamos derivadas parciales y el \textit{gradiente} es
+simplemente un vector de esas derivadas.
+
+Usualmente podemos diferenciar con métodos numéricos, asignando a
+\(h\) números muy pequeños por ejemplo, pero esto requiere de muchos
+cálculos, es lento y es tan sólo una aproximación. Veremos más
+adelante que la funcion \loss{} de las redes neuronales suele tener
+decenas de millones de parámetros, por lo que realizar tantas
+operaciones para una sola actualización de los parámetros no es
+conveniente. En la práctica usaremos el cálculo analítico del
+gradiente, en el cual derivamos una fórmula directa que es muy rápida
+de computar valiéndonos de la \textit{regla de la cadena}.
+
+TODO: ejemplo de calculo de gradiente tal vez
+
+Una vez que contamos con el gradiente, el proceso de actualizar los parámetros tiene la siguiente forma
+
+TODO: pseudocodigo de gradient descent
+
+En un mundo ideal, computaríamos el gradiente sobre todo el conjunto
+de datos, actualizaríamos los parámetros, y repetiríamos el ciclo
+hasta conseguir un buen resultado. Sin embargo los conjuntos de datos
+para entrenar las redes neuronales suelen tener cientos de miles o
+incluso millones de imágenes, por lo cual se utiliza una técnica
+llamada \textit{Descenso de Gradiente Estocástico} o \textit{SGD} por
+sus siglas en inglés, en el cual se calcula el gradiente para una
+cantidad predeterminada de imágenes (\textit{batches}), se actualizan
+los parámetros y se vuelve a repetir el ciclo con otro subconjunto
+distinto. Esto parte de la suposición de que todas las imágenes del
+conjunto de datos estan correlacionadas entre sí. En realidad
+\textit{SGD} utiliza una imagen por batch en teoría, pero dada la alta
+paralelización que provee el hardware hoy en día, conviene hacer loter
+de imágenes de 62, 128, 512 imágenes. No es estrictamente un
+hiperparámetro que uno pueda \textit{cross-}validar, sino que más bien
+depende del hardware sobre el que se esté entrenando la red.
+
+TODO: empezar con backprop
 ** Redes Neuronales
 ** redes convolucionales y deep learning
  diferencias con redes normales
@@ -375,7 +447,6 @@ optimizar la pérdida: descenso de gradiente.
 ** arquitecturas conocidas
 (LeNet5, AlexNet, VGG, etc)
 ** redes siamesas
-
 
 * Entrenamiento de redes siamesas utilizando información odométrica
 ** Conceptos generales sobre los cuales parte el trabajo
