@@ -22,7 +22,7 @@
 #+LATEX_HEADER: \usepackage{wrapfig}
 
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
-#+LATEX_HEADER: \newcommand{\loss}{\textit{funciones de pérdida}}
+#+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
 #+LATEX_HEADER: \newcommand{\dg}{\textit{descenso de gradiente}}
 #+LATEX_HEADER: \newcommand{\back}{\textit{backpropagation}}
 #+LATEX_HEADER: \newcommand{\nn}{\textit{redes neuronales}}
@@ -390,7 +390,6 @@ de parámetros de \weights{} que minimicen el error.
 
 *** TODO Explayar sobre gradient descent
 
-
 ** \textit{Backpropagation}
 
 Notemos que \loss{} es una función que depende de las imágenes de
@@ -400,46 +399,94 @@ interesa calcular el gradiente sobre \weights{} y \bias{} para poder
 actualizar sus parámetros.
 
 En una función de una dimensión, la derivada se expresa como:
- TODO funcion de la derivada
+\begin{equation}
+     \boldsymbol{\frac{df(x)}{dx} = \lim_{h\to 0} \frac{f(x + h) - f(x)}{h} }
+\end{equation}
 
 Cuando la función toma un vector de números en vez de uno solo, a las
 derivadas las llamamos derivadas parciales y el \textit{gradiente} es
-simplemente un vector de esas derivadas.
+simplemente un vector de esas derivadas. Por ejemplo, sea \(f\) una
+función que toma dos parámetros \(x\) e \(y\), entonces el gradiente
+de \(f\) es \(\nabla f = [\frac{\partial f}{\partial x},
+\frac{\partial f}{\partial y}]\)
 
 Usualmente podemos diferenciar con métodos numéricos, asignando a
 \(h\) números muy pequeños por ejemplo, pero esto requiere de muchos
-cálculos, es lento y es tan sólo una aproximación. Veremos más
-adelante que la funcion \loss{} de las redes neuronales suele tener
-decenas de millones de parámetros, por lo que realizar tantas
+cálculos, es lento y tan sólo una aproximación. Veremos más
+adelante que la función \loss{} de las redes neuronales suele tener
+decenas de millones de parámetros, y realizar tantas
 operaciones para una sola actualización de los parámetros no es
 conveniente. En la práctica usaremos el cálculo analítico del
 gradiente, en el cual derivamos una fórmula directa que es muy rápida
 de computar valiéndonos de la \textit{regla de la cadena}.
 
-TODO: ejemplo de calculo de gradiente tal vez
+La \textit{regla de la cadena} nos ayuda a descomponer el cálculo del
+gradiente de expresiones complejas en pequeños pasos. Por ejemplo,
+tomemos la función:
 
-Una vez que contamos con el gradiente, el proceso de actualizar los parámetros tiene la siguiente forma
+\begin{equation}
+    f(x,y,z) = \frac{x}{y^2} + z
+\end{equation}
 
-TODO: pseudocodigo de gradient descent
+Si quisieramos obtener su gradiente en \(x\) de la manera tradicional,
+calculando el cociente de \(f(x+h) - f(x)\) con \(h\) cuando \({h \to
+0}\) deberíamos realizar muchos cálculos computacionalmente
+costosos. En cambio, podemos ver a \(f\) como una composición de
+funciones:
 
-En un mundo ideal, computaríamos el gradiente sobre todo el conjunto
-de datos, actualizaríamos los parámetros, y repetiríamos el ciclo
-hasta conseguir un buen resultado. Sin embargo los conjuntos de datos
-para entrenar las redes neuronales suelen tener cientos de miles o
-incluso millones de imágenes, por lo cual se utiliza una técnica
-llamada \textit{Descenso de Gradiente Estocástico} o \textit{SGD} por
-sus siglas en inglés, en el cual se calcula el gradiente para una
-cantidad predeterminada de imágenes (\textit{batches}), se actualizan
-los parámetros y se vuelve a repetir el ciclo con otro subconjunto
+\begin{equation}
+    f(x,y,z) = \frac{x}{y^2} + z = q + z
+\end{equation}
+
+Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
+
+\begin{equation}
+\frac{\partial f}{\partial z} = q
+\frac{\partial f}{\partial q} = z
+
+\frac{\partial f}{\partial x} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial x} = \frac{z}{y^2}
+\frac{\partial f}{\partial y} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
+\end{equation}
+
+TODO: graficar el grafo de computacion de la funcion de arriba.
+
+Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
+en dos pasos: primero, evaluamos nuestra función \loss{} en los
+parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
+resultado calculamos el gradiente en cada variable utilizando la
+\texit{regla de la cadena}. De esta manera "propagamos" el error de la
+predicción hacia atrás (\textit{backpropagation}) y corregimos
+ligeramente los pesos para mejorar las futuras predicciones.
+
+Una vez que contamos con el gradiente, actualizamos los parámetros de
+\loss{} restándole un porcentaje del gradiente negativo calculado
+(negativo porque queremos ir en dirección opuesta a donde crece la
+función, o sea, ir a su mínimo). Ese porcentaje es llamado
+\textit{tasa de aprendizaje} (\textit{learning rate}) y suele ser uno
+de los parámetros más difíciles de elegir, ya que la calidad y rapidez
+de aprendizaje dependen de él.
+
+TODO: pseudocódigo de optimizacion
+
+Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
+actualizaríamos los parámetros, y repetiríamos el ciclo hasta
+conseguir un buen resultado. Sin embargo los conjuntos de datos para
+entrenar las redes neuronales suelen tener cientos de miles o incluso
+millones de imágenes, por lo cual se utiliza una técnica llamada
+\textit{Descenso de Gradiente Estocástico} o \textit{SGD} por sus
+siglas en inglés, en el cual se calcula el gradiente para una cantidad
+predeterminada de imágenes (\textit{batches}), se actualizan los
+parámetros y se vuelve a repetir el ciclo con otro subconjunto
 distinto. Esto parte de la suposición de que todas las imágenes del
-conjunto de datos estan correlacionadas entre sí. En realidad
-\textit{SGD} utiliza una imagen por batch en teoría, pero dada la alta
-paralelización que provee el hardware hoy en día, conviene hacer loter
-de imágenes de 62, 128, 512 imágenes. No es estrictamente un
-hiperparámetro que uno pueda \textit{cross-}validar, sino que más bien
-depende del hardware sobre el que se esté entrenando la red.
+conjunto de datos estan correlacionadas entre sí. En teoría
+\textit{SGD} utiliza una sola imagen por batch, pero dada la alta
+paralelización que provee el hardware actual, conviene hacer lotes de
+imágenes de 62, 128, 512 imágenes. El tamaño de los \textit{batches}
+no es estrictamente un hiperparámetro que uno pueda
+\textit{cross-}validar, sino que más bien depende del hardware sobre
+el que se esté entrenando la red (en general se eligen potencias de
+dos por cuestiones de eficiencia).
 
-TODO: empezar con backprop
 ** Redes Neuronales
 ** redes convolucionales y deep learning
  diferencias con redes normales
