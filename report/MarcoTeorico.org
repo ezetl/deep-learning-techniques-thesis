@@ -312,11 +312,12 @@ de tratar a la salida del clasificador como puntajes para cada clase
 (lo cual puede ser confuso y dificíl de comparar), Softmax devuelve
 probabilidades normalizadas para cada clase.
 
-Un clasificador Softmax no modifica la funcion \func{} que ya conocemos,
-pero sí interpreta los puntajes como probabilidades logarítmicas sin
-normalizar, reemplazando la \textit{hinge loss} por una \textit{cross entropy loss}:
+Un clasificador Softmax no modifica la funcion \func{} que ya
+conocemos, pero sí interpreta los puntajes como probabilidades
+logarítmicas sin normalizar, reemplazando la \textit{hinge loss} por
+una \textit{cross entropy loss}:
 
-**** TODO explicar por que es el -logaritmo
+TODO explicar por que es el -logaritmo
 
 \begin{equation}
      \boldsymbol{ L_i = - \log \bigg( \frac{\exp{f_{y_{i}}}} {\sum_j \exp{f_j}}\bigg)}
@@ -338,7 +339,7 @@ La \textit{función softmax} \(\frac{\exp{f_{j}}} {\sum_{k}
 transforma en un vector de probabilidades normalizadas (cuya suma da
 uno).
 
-**** TODO Interpretacion estadistica de softmax:
+TODO Interpretacion estadistica de softmax:
 
 ** TODO optimizacion de un problema, mejorar descripcion
 ** Optimización: Descenso de Gradiente
@@ -571,12 +572,116 @@ una mejor alternativa en los últimos años, las ReLU, o
 \textit{Rectifier Linear Unit} en inglés, que son más fáciles de
 calcular y obtienen mejores resultados.
 
-** TODO Funciones de activación comunes
+** Funciones de activación comunes
 *** Sigmoide
-*** Tanh
-*** ReLU
-*** Leaky ReLU
-*** Maxout
+
+\begin{equation}
+\sigma(x) = \frac{1}{1+\exp{-x}}
+\end{equation}
+
+TODO grafico de la funcion
+
+Como se puede ver en la Figura XX, la fución sigmoide toma valores
+reales y los "comprime" en el rango \((0,1)\). En particular, los
+números muy pequeños se transforman en 0 y los muy grandes
+en 1. Durante mucho tiempo esta función fue utilizada como activadora
+dado que simula el comportamiento de una neurona bastante bien (desde
+no activarse hasta saturarse) y porque además cuenta con una derivada
+fácil de calcular:
+
+\begin{equation}
+    \tilde{\sigma(x)} = \sigma(x) (1 - \sigma(x))
+\end{equation}
+
+Sin embargo, al analizar la derivada descubrimos un problema: el
+sigmoide satura los gradientes. Supongamos que durante la etapa
+\texit{feed-forward} que la salida de \(\sigma\) fue muy cercano a
+\(0\) ó \(1\). Entonces el gradiente local durante
+\textit{backpropagation} va a ser muy cercano a \(0\), por lo que al
+multiplicarlo por el gradiente de la salida de \(\sigma\) lo va a
+anular y casi nada de la señal original va a ser retrasmitida a los
+pesos a la hora de actualizarlos. Adicionalmente si los pesos
+iniciales de la red fueran muy grandes, \(\sigma\) también se va a
+saturar y vamos a tener el mismo problema.
+
+Otro potencial inconveniente de usar \(\sigma\) es que los resultados
+no están centrados en \(0\) (de hecho, siempre son
+positivos). Supongamos que la entrada \(\boldsymbol{x}\) a una neurona
+es positiva en todos sus elementos, entonces el gradiente en
+\weights{} de \(f=Wx+b\) va a ser todo positivo o negativo durante
+\textit{backpropagation}, dependiendo del gradiente de la expresion
+\(f\). Esto podría introducir un \textit{zig-zag} en la actualización
+de los pesos, aunque una vez que se suman todos los gradientes a lo
+largo de un \textit{batch} de datos los pesos pueden tener signos
+variables, por lo que este problema no tiene consecuencias tan
+severas.
+
+*** Tangente Hiperbólica
+\begin{equation}
+f(x) = \tanh(x)
+\end{equation}
+
+Analogamente al sigmoide, la tangente hiperbólica transforma números
+reales al rango \([-1,1]\). Notemos que también sufre del problema de
+la saturación, pero su salida está centrada en cero, por lo que se la
+prefiere sobre la sigmoide.
+
+TODO Grafico de tanh
+
+*** \textit{ReLU}
+
+\begin{equation}
+f(x) = \max{(0,x)}
+\end{equation}
+
+Básicamente es poner un umbral en \(0\) a la salida de la
+neurona. Comparada con \(\sigma\) y \(\tanh\), requiere menos
+operaciones y además no es saturante.
+
+Las \textit{ReLU} pueden provocar la "muerte" de neuronas durante el
+entrenamiento. Si un gran gradiente fluye a través de una \texit{ReLU}
+durante \textit{backpropagation} entonces va a actualizar los pesos de
+tal manera que no se vuelva a activar la neurona. Pensemos que el
+proceso de actualización de \weights{} implica restar un porcentaje
+del gradiente en \weights{}. Esto se puede agravar si nuestra tasa de
+aprendizaje es muy grande.
+
+Luego de esa actualización, la neurona va a permanecer apagada
+siempre, pues su entrada va a ser siempre negativa.
+
+TODO explicar mejor,
+https://www.quora.com/What-is-the-dying-ReLU-problem-in-neural-networks
+
+*** \textit{Leaky ReLU}
+
+Se puede solucionar el problema de la "muerte" de neuronas agregando
+una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
+negativos.
+
+Es decir, la función queda:
+
+\begin{equation}
+f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
+\end{equation}
+
+De esa manera podemos evitar la muerte de una neurona para el caso
+antes mencionado.
+
+*** \texit{Maxout}
+
+\begin{equation}
+f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
+\end{equation}
+
+Es una generalización de las funciones \textit{ReLU}, y obtiene lo
+mejor de los dos mundos: la forma lineal y no saturante de las
+\textit{ReLUs} y evita el problema de las neuronas que se mueren. A
+pesar de eso tiene el problema de duplicar los parámetros para cada
+neurona, lo cual no siempre es deseable (más tiempo de entrenamiento,
+más consumo de memoria y de recursos, sobre todo en redes profundas).
+
+Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
+con \(w_1,b_1 = 0\).
 
 ** Entrenamiento de redes neuronales
 
@@ -624,7 +729,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** Inicialización de pesos
+*** TODO Inicialización de pesos
 
 Una primer 
 *** Regularización
