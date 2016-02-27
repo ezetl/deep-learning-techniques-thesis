@@ -488,6 +488,147 @@ el que se esté entrenando la red (en general se eligen potencias de
 dos por cuestiones de eficiencia).
 
 ** Redes Neuronales
+
+Hasta ahora vimos clasificadores lineales. Si conectaramos la salida
+de un clasificador lineal \(s_1=W_1x+b_1\) con la entrada de otro
+clasificador \(s_2=W_2y+b_2\), entonces obtendríamos un tercero:
+
+\begin{equation}
+s_3 = W_2 (W_1x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1) + b_2
+s_3 = W_3 x + b_3
+\end{equation}
+
+Es fácil hacer un chequeo de dimensiones para ver que efectivamente
+podemos "colapsar" las matrices \(W_2\) y \(W_1\) en una sola, por lo
+cual terminamos con otro clasificador lineal.
+
+Notemos que por más que combinemos miles de clasificadores lineales
+vamos a obtener un nuevo clasificador también lineal.  Una manera de
+romper la linealidad de estas "capas" de clasificadores es, por
+ejemplo, agregar lo que se llama \textit{función de activación}:
+ 
+\begin{equation}
+    s = W_2 \max{0, W_1 x + b_1} + b_2
+\end{equation}
+ 
+ 
+Lo que acabamos de definir es una red neuronal básica de dos capas, de
+una neurona cada una.
+
+Una sola neurona puede funcionar como un clasificador también (notar
+el parecido con los clasificadores lineales), siempre que se eliga la
+función de pérdida adecuada.
+ 
+** Inspiración biológica de las neuronas
+
+Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
+sin embargo nos centraremos en el tipo estándar de neurona, un modelo
+\textit{näive}:
+
+TODO: dibujo clasico de neurona
+
+El cuerpo de la neurona esta compuesto de tres partes principales, el
+arbol dendrítico, el cuerpo celular o soma y una extension llamada
+axón.  El arbol dendrítico se conecta con los axones de otras neuronas
+y recibe impulsos de estas.  Una neurona puede estar conectada a
+cientos o miles de otras neuronas desde las cuales recibe impulsos,
+los cuales pueden o no activar a la neurona.  Si la neurona se activa,
+entonces retransmite el impulso a través de su axón.
+
+Notar que en realidad las conexiones del arbol dendrítico no son todas
+iguales.  Los axones y las extremidades del arbol dendritico tienen un
+pequeño espacio entre ellos llamado espacio sináptico. Si la exitación
+que proviene de un axón es suficiente, entonces el impulso se
+transmite a la neurona, caso contrario no. Decimos que la primera es
+una transmision exitadora, pues aumenta la posibilidad de transmitir
+el impulso, mientras que el otro caso se denomina transmisión
+inhibidora, dado que reduce esa posibilidad.  De esta manera surge la
+noción de \textit{pesos sinápticos}, que determinan cuando se activan
+las conexiones y cuando no.  Otro aspecto a tener en cuenta es el
+\textit{estímulo acumulativo}, en donde los estimulos de varios
+receptores del arbol dendrítico se combinan de alguna manera para
+activar o no la neurona (no hay punto intermedio). A esa función que
+toma los impulsos de entrada y determina si emitir el impulso de
+salida la llamaremos \textit{función de activación}, y representa la
+frecuencia a la que se activa la neurona.
+
+Ahora podemos dar un modelo más formal de como se comporta una
+neurona.
+
+TODO grafica de neurona con inputs, weights, sumatoria, funcion de activacion, etc.
+
+En la Figura, las entradas \(x_i\) interactúan multiplicativamente con
+los pesos. En nuestra analogía con la neurona biológica, esas son las
+sinapsis. Luego, el el cuerpo de la célula, esos resultados se suma
+junto con un \textit{bias}, y luego se calcula la función de
+activación para decidir si activar o no el axón.
+
+Historicamente se usaba la función sigmoide ( \(\sigma\) ) como
+función de activación, por tener la propiedad de transformar la
+entrada a un rango entre 0 y 1, y tener además una derivada fácil de
+calcular (útil para \textit{backpropagation}), pero fue desplazada por
+una mejor alternativa en los últimos años, las ReLU, o
+\textit{Rectifier Linear Unit} en inglés, que son más fáciles de
+calcular y obtienen mejores resultados.
+
+** TODO Funciones de activación comunes
+*** Sigmoide
+*** Tanh
+*** ReLU
+*** Leaky ReLU
+*** Maxout
+
+** Entrenamiento de redes neuronales
+
+Antes de comenzar a entrenar una red neuronal es necesario tener en
+cuenta aspectos referidos al preprocesamiento de los datos, como inicializar los pesos, que función de pérdida se va a
+utilizar y que métodos de regularización se van a utilizar.
+
+*** Preprocesamiento de datos
+
+Las dos técnicas más comunes de preprocesamiento de datos para redes
+neuronales son la substracción de la media y la normalización.
+
+**** Substracción de la media
+
+Como su nombre lo indica, se le resta la media a cada elemento del
+conjunto de datos con el objetivo de \textit{centrar} los datos
+alrededor del origen en todas las dimensiones. En las redes
+convolucionales esto equivale a restarle el valor medio de los píxeles
+a cada píxel de la imagen de entrada.
+
+**** Normalización
+
+Una manera de normalizar los datos es dividir cada dimensión por su
+desviación estándar una vez que haya sido centrada en cero. De esta
+manera se logra que las dimensiones tengan aproximadamente la misma
+escala. Notar que en general los píxeles tienen valores en el rango de
+0 a 255, por lo que sus dimensiones ya se encuentran en escalas
+parecidas y cuando se trabaja con redes convolucionales no es
+estrictamente necesario normalizar los datos de entrada.
+
+**** Otras maneras de preprocesar datos
+
+A la hora de entrenar redes convolucionales importan dos cosas: la
+calidad de los datos y la cantidad. Es necesario que además de
+normalizar las imágenes a un bajo nivel, se normalicen aspectos más
+generales. Por ejemplo, si estuvieramos entrenando una red de
+reconocimiento de rostros, es mucho mejor contar con un dataset de
+caras alineadas en vez de un dataset de caras en diferentes posiciones
+y ángulos. De esa manera vamos a lograr que la red aprenda mejor que
+\textit{features} extraer de las imágenes.
+
+Además no siempre se puede contar con un dataset de millones de
+imágenes para entrenar nuestra red, por lo que hay que aumentar
+nuestros datos con técnicas de \textit{data augmentation}: repetir la
+misma imagen pero con diferentes variaciones en el color, brillo,
+saturación, incluso hacer leves desplazamientos y rotaciones.
+
+*** Inicialización de pesos
+
+Una primer 
+*** Regularización
+*** Funciones de pérdida
 ** redes convolucionales y deep learning
  diferencias con redes normales
 ** capas de una red 
