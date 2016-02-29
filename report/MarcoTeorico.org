@@ -686,8 +686,9 @@ con \(w_1,b_1 = 0\).
 ** Entrenamiento de redes neuronales
 
 Antes de comenzar a entrenar una red neuronal es necesario tener en
-cuenta aspectos referidos al preprocesamiento de los datos, como inicializar los pesos, que función de pérdida se va a
-utilizar y que métodos de regularización se van a utilizar.
+cuenta aspectos referidos al preprocesamiento de los datos, como
+inicializar los pesos, que función de pérdida se va a utilizar y que
+métodos de regularización se van a utilizar.
 
 *** Preprocesamiento de datos
 
@@ -729,11 +730,84 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** TODO Inicialización de pesos
+*** Inicialización de pesos
 
-Una primer 
+TODO expicar por que queremos valores cercanos a cero
+
+A la hora de inicializar los pesos es escencial romper con la
+simetría. Imaginemos que inicializamos todos los pesos en \(0\), algo
+que podría parecer razonable. En una capa completamente conectada,
+entonces todas las neuronas van a recibir el mismo valor de entrada
+\(0\) (\(f(x)=\sum_i w_i x\) con \(w_i=0\)) por lo que sus salidas van
+a ser todas iguales y por ende los gradientes que se calculen serán
+los mismos, produciendo que los pesos se actualicen todos iguales y la
+red no aprenda.
+
+En cambio podemos inicializar los pesos con pequeños números
+aleatorios cercanos a cero. Una opción común es utilizar una
+distribución gaussiana con media cero y desviación estándar 0.01.
+
+TODO regularizacion de la varianza
+
 *** Regularización
-*** Funciones de pérdida
+
+Como ya se mencionó, hay varias maneras de prevenir
+\textit{overfitting} en nuestra red mediante técnicas de
+regularización. Las más usadas son:
+
+**** L2
+
+Para cada peso de la red se calcula \(\frac{1}{2} \lambda w^2\) donde
+\(\lambda\) es la tasa de regularización y se le suma a la función
+objetivo. La regularización L2 penaliza los grandes valores de \(w\)
+logrando una distribución más difusa de los pesos (en vez de unos
+pocos pesos grandes).
+
+**** L1
+
+Similar a la aterior, sólo que se le adiciona \(\lambda |w|\) a la
+función objetivo. Los pesos tienden a converger a cero bajo la
+regularización L1 y las redes tienden a usar un subconjunto de los
+datos de entrada, convirtiendose en invariantes al ruido. En general
+se prefiere la regularización L2 por obtenerse mejores resultados.
+
+**** \texit{Dropout}
+
+En pocas palabras, la técnica de \textout{dropout} \cite{dropout}
+consiste en mantener activa una neurona con una probabilidad
+\(\boldsymbol{p}\), o establecer su salida a cero en caso contrario.
+
+TODO explayar mas dropout
+
+*** TODO Funciones de pérdida
+
+El objetivo de las funciones de pérdida es comparar los resultados de
+la red contra los resultados esperados para luego optimizar los pesos
+y minimizar los errores. La función de pérdida calcula un promedio de
+las pérdidas de cada elemento del dataset (en general cada elemento de
+un \textit{batch}).
+
+*** Organización y entrenamiento de redes neuronales
+
+Las redes neuronales estan organizadas como un grafo acíclico de
+neuronas, donde las salidas de unas se transforma en la entrada de
+otras. Las neuronas se organizan en distintas capas conectadas, de esa
+manera los cálculos se hacen con operaciones entre matrices, algo que
+no podríamos hacer tan fácil si tuvieramos neuronas conectadas
+aleatoriamente entre ellas.
+
+El tipo más común de capa de neuronas es la capa \textit{totalmente
+conectada}, en donde cada neurona de la capa anterior se conecta con
+todas las neuronas de la capa siguiente, pero no comparten conexiones
+dentro de la misma capa.
+
+Usualmente no se cuenta a la capa de entrada de las redes como una
+capa más, y la capa de salida no tiene funciones de activación, dado
+que generalmente representan las puntuaciones de cada clase (en
+clasificación) o alguna métrica (en regresión).
+
+
+
 ** redes convolucionales y deep learning
  diferencias con redes normales
 ** capas de una red 
