@@ -807,9 +807,30 @@ que generalmente representan las puntuaciones de cada clase (en
 clasificación) o alguna métrica (en regresión).
 
 
-
-** redes convolucionales
+** Redes Convolucionales
 *** Diferencias con redes neuronales convencionales
+Las redes convolucionales cuentan con los mismos artefactos que las
+redes convencionales que ya discutimos (neuronas con pesos, funciones
+de pérdida, capas completamente conectadas). Incluso los mismos
+métodos de entrenamiento pueden ser aplicados. La diferencia radica en
+que las redes convolucionales asumen que están trabajando con
+imágenes, lo que permite optimizar la arquitectura de las mismas,
+reduciendo parámetros y mejorando el proceso de aprendizaje.
+
+Imaginemos por un momento que quisieramos aprender a clasificar un
+conjunto de imágenes de 200x200 píxeles con 3 canales de colores. Eso
+nos da una dimensión de entrada de 200x200x3, por lo que una neurona
+completamente conectada en la primer capa oculta tendría 120000
+conexiones y por ende esa misma cantidad de pesos a entrenar. Si
+tenemos en cuenta que seguramente vamos a requerir más de una neurona (a
+veces cientos de ellas en una misma capa) podemos concluir que este
+enfoque no escala bien para el procesamiento de imágenes.
+
+A diferencia de las redes convencionales, una red neuronal
+convolucional se aprovecha de la ventaja de que los datos de entrada
+son imágenes y organiza las neuronas en 3 dimensiones: ancho, alto y
+profundidad, como se verá en la siguiente sección.
+
 *** Capas de una red convolucional
 **** Capas Convolucionales
 **** Pooling
