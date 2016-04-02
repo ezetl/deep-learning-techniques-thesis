@@ -787,7 +787,7 @@ y minimizar los errores. La función de pérdida calcula un promedio de
 las pérdidas de cada elemento del dataset (en general cada elemento de
 un \textit{batch}).
 
-*** Organización y entrenamiento de redes neuronales
+*** TODO Organización y entrenamiento de redes neuronales
 
 Las redes neuronales estan organizadas como un grafo acíclico de
 neuronas, donde las salidas de unas se transforma en la entrada de
@@ -808,11 +808,15 @@ clasificación) o alguna métrica (en regresión).
 
 
 
-** redes convolucionales y deep learning
- diferencias con redes normales
-** capas de una red 
-** arquitecturas conocidas
-(LeNet5, AlexNet, VGG, etc)
+** redes convolucionales
+*** Diferencias con redes neuronales convencionales
+*** Capas de una red convolucional
+**** Capas Convolucionales
+**** Pooling
+**** Capas Completamente conectadas (Fully-connected)
+*** Arquitecturas
+**** Patrones de capas, patrones de tamaños de capas.
+**** Ejemplos 
 ** redes siamesas
 
 * Entrenamiento de redes siamesas utilizando información odométrica
