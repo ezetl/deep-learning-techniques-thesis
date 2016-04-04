@@ -822,22 +822,83 @@ conjunto de imágenes de 200x200 píxeles con 3 canales de colores. Eso
 nos da una dimensión de entrada de 200x200x3, por lo que una neurona
 completamente conectada en la primer capa oculta tendría 120000
 conexiones y por ende esa misma cantidad de pesos a entrenar. Si
-tenemos en cuenta que seguramente vamos a requerir más de una neurona (a
-veces cientos de ellas en una misma capa) podemos concluir que este
-enfoque no escala bien para el procesamiento de imágenes.
+tenemos en cuenta que seguramente vamos a requerir más de una neurona
+(comunmente cientos de ellas en una misma capa) podemos concluir que
+este enfoque no escala bien para el procesamiento de imágenes.
 
-A diferencia de las redes convencionales, una red neuronal
-convolucional se aprovecha de la ventaja de que los datos de entrada
-son imágenes y organiza las neuronas en 3 dimensiones: ancho, alto y
-profundidad, como se verá en la siguiente sección.
+Una red neuronal convolucional se aprovecha de la ventaja de que los
+datos de entrada son imágenes y organiza las neuronas en 3
+dimensiones: ancho, alto y profundidad, como se verá en la siguiente
+sección.
 
 *** Capas de una red convolucional
 **** Capas Convolucionales
-**** Pooling
-**** Capas Completamente conectadas (Fully-connected)
+
+Una capa convolucional consta de un conjunto de filtros (o
+\textit{kernels}) cuyos parametros se pueden aprender. En general cada
+filtro es pequeño a lo ancho y alto, pero se aplica a toda la
+profundidad del volumen de entrada. Notar que el volumen de entrada
+puede bien ser una imagen o las activaciones de otra capa.
+
+Durante el entrenamiento o la clasificacion de imagenes, estos filtros
+se convolucionan a traves del ancho y alto de la imagen, produciendo
+un mapa de activaciones en 2-D para cada filtro. Si "apilamos" los
+mapas de activaciones de todos los filtros de una capa convolucional,
+obtenemos un \textit{volumen} de salida.  En otras palabras, se
+computa un producto punto entre el filtro y las distintas regiones de
+la entrada. De esta manera cada elemento en el volumen de salida puede
+ser interpretado como la salida de una neurona conectada a una pequeña
+region de los datos de entrada, la cual comparte parametros (pesos)
+con las otras neuronas que corresponden al mismo filtro.
+
+Esta conexion a una pequeña region en los datos de entrada es un
+hiperparametro de la red llamado campo receptivo. Es importante notar
+que los campos receptivos son locales en una pequeña area en cuanto al
+ancho y alto de la entrada, pero abarcan la totalidad de la
+profundidad del volumen de entrada.
+
+Otros hiperparametros relacionados con las capas convolucionales son
+la cantidad de filtros (\textit{K}), el espacio en pixeles entre cada
+aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
+con ceros o \textit{zero-padding}, donde se le agrega un "marco" de 1
+o mas ceros a la entrada de la capa.
+
+***** TODO imagenes
+
+**** \textit{Pooling}
+
+Las capas de \textit{pooling} reducen la dimension espacial de sus
+entradas y por ende reducen la cantidad de parametros en la red,
+ayudando a controlar el \textit{overfitting}. Lo mas comun es
+insertar capas de \textit{pooling} luego de capas convolucionales.
+
+La forma mas comun de \textit{pooling} es \textit{MAX Pooling}, en la
+cual se calcula el maximo de un area local (generalmente 2x2 o 3x3) en
+el ancho y largo del volumen de entrada y a traves de cada una de las
+"rodajas" que conforman la profundidad del volumen. De esta manera se
+reduce espacialmente la entrada, pero no su profundidad.
+
+***** TODO imagenes
+
+**** Capas Completamente Conectadas (Fully-Connected)
+
+Como su nombre lo indica, cada neurona de esta capa tiene conexiones a
+todas las salidas (o activaciones) de la capa anterior. Por lo tanto
+sus activaciones se pueden calcular con una multiplicacion de matrices
+junto con el calculo del \textit{bias}, como ya se vio para las redes
+neuronales convencionales.
+
+***** TODO explicacion. ecuacion.
+
 *** Arquitecturas
-**** Patrones de capas, patrones de tamaños de capas.
+**** TODO Patrones de capas, patrones de tamaños de capas.
 **** Ejemplos 
+LeNet
+AlexNet
+ZFNet
+GoogleNet
+VGGNet
+ResNet
 ** redes siamesas
 
 * Entrenamiento de redes siamesas utilizando información odométrica
