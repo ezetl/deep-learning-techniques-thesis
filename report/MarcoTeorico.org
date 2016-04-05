@@ -890,15 +890,51 @@ neuronales convencionales.
 
 ***** TODO explicacion. ecuacion.
 
-*** Arquitecturas
-**** TODO Patrones de capas, patrones de tamaños de capas.
-**** Ejemplos 
-LeNet
-AlexNet
-ZFNet
-GoogleNet
-VGGNet
-ResNet
+**** TODO Arquitecturas (agregar bibliografia e imagen)
+
+Normalmente una red convolucional esta compuesta de varias capas
+convolucionales (CONV), capas de \textit{pooling} (POOL), capas
+completamente conectadas (FC por sus siglas en ingles) y funciones de
+activacion, generalmente rectificadores lineales (RELU).
+
+El patron usual en redes convolucionales es una capa CONV seguida de
+una capa RELU seguida de una capa de \textit{pooling}. Esto se repite
+una o varias veces hasta reducir espacialmente las dimensiones de la
+entrada de la red. Luego es comun utilizar capas FC hasta reducir las
+dimensiones a las dimensiones de salida, que en el caso de
+clasificacion son las probabilidades de cada clase.
+
+TODO: imagen ejemplo de red neuronal con [CONV-RELU-POOL]* FC FC etc.
+
+A lo largo de los años ha habido varias arquitecturas de redes
+convolucionales que cuentan con nombre propio, como por ejemplo LeNet,
+creada en los 90 por Yann LeCun y utilizada para el reconocimiento de
+digitos manuscriptos. Esta red fue utilizada con exito para leer
+codigos postales y cheques bancarios.
+
+En 2012, el ganador del desafio ImageNet ILSVRC, Alex Krizhevsky,
+obtuvo un 16% de error utilizando una arquitectura llamada AlexNet. Su
+arquitectura es muy similar a la de LeNet, aunque mas profunda y fue
+una de las primeras en concatenar varias capas CONV antes de una capa
+de \textit{pooling}.
+
+Los ganadores del ISLVRC 2013 utilizaron una red llamada ZFNet, que
+era basicamente una modificacion de AlexNet, con cambios en los
+hiperparametros y las capas convolucionales.
+
+En la misma competencia ILSVRC del 2014 se dieron a conocer dos redes,
+GoogLeNet y VGGNet. Ambas demostraron que la profundidad de la red es
+una caracteristica critica a la hora de obtener buenos resultados.
+
+Si bien GoogLeNet fue la ganadora ese año, luego se demostro que
+VGGNet es superior en muchas tareas de transferencia de aprendizaje,
+por lo que es mas popular que GoogLeNet y se pueden encontrar muchos
+modelos ya preentrenados.
+
+Finalmente, ResNet (Residual Network), la red ganadora del ILSRVC
+2015, cuenta con nada menos que 152 capas (VGGNet cuenta con 19) y
+obteniendo un error de 3.57% en el top-5.
+
 ** redes siamesas
 
 * Entrenamiento de redes siamesas utilizando información odométrica
