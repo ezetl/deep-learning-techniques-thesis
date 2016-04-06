@@ -806,6 +806,7 @@ capa más, y la capa de salida no tiene funciones de activación, dado
 que generalmente representan las puntuaciones de cada clase (en
 clasificación) o alguna métrica (en regresión).
 
+*** TODO Transferencia de aprendizaje
 
 ** Redes Convolucionales
 *** Diferencias con redes neuronales convencionales
