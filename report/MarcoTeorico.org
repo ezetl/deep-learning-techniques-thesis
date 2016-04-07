@@ -162,12 +162,6 @@ El trabajo está organizado como sigue:
 
 * Marco Teórico
 
-Para establecer un marco teórico que ayude a este trabajo especial ser
-un poco más autocontenido, comenzaremos por explorar algunos conceptos
-que conforman la base de \dl{}, tales como \cl{}, \loss{}, \dg{}, \back{}, luego
-introduciremos lo que son las redes neuronales para terminar en redes
-convolucionales, \dl{} y redes siamesas.
-
 ** Aprendizaje Automatico
 *** Introduccion
 
@@ -200,12 +194,11 @@ algun identificador de cada persona y nuestro clasificador aprenderia
 a diferenciar las caras tomando como referencia las anotaciones.
 
 Por otro lado, cuando los datos no estan categorizados de antemano
-pero se cuenta con otro tipo de informacion, hablamos de aprendizaje
-no supervisado. Por ejemplo, si se contara con una lista de casas con
-sus respectivos precios, su area en metros cubicos y cantidad de
-habitaciones y se quisiera encontrar alguna relacion entre ellas. Los
-algoritmos no supervisados trabajan netamente sobre los datos
-\textit{tal como estan}.
+hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
+una lista de casas con sus respectivos precios, su area en metros
+cubicos y cantidad de habitaciones y quisieramos encontrar alguna
+relacion entre ellas. Los algoritmos no supervisados trabajan
+netamente sobre los datos \textit{tal como estan}.
 
 **** Aprendizaje pasivo vs. activo
 
@@ -214,18 +207,32 @@ existentes. El aprendizaje activo se refiere a interactuar con el
 ambiente para obtener informacion, como por ejemplo preguntar a un
 usuario si un rostro es de cierta persona.
 
+**** Aprendizaje \textit{online} vs. estadistico (\textit{batch learning})
 
+En el aprendizaje \textit{online} los datos estan disponibles de
+manera secuencial, actualizando el modelo en cada paso para lograr
+mejores predicciones/clasificaciones. En el aprendizaje estadistico
+primero se analiza una gran cantidad de datos (tal vez la totalidad
+del conjunto) y recien ahi se pueden obtener conclusiones o un modelo
+final.
 
 *** Clasificadores lineales
+
+Dentro del paradigma del aprendizaje supervisado, vamos a dar una
+pequeña introduccion a los clasificadores lineales orientada a
+imagenes, junto con varias tecnicas de entrenamiento que ya veremos
+tambien son ampliamente usadas en el entrenamiento de redes
+neuronales.
 
 Dado que clasificar una imagen es asignar una etiqueta a un conjunto
 de píxeles, vamos a definir una función \func{} que mapee píxeles
 \(\boldsymbol{x}\) a probablidades de cada etiqueta
 (\textit{scores}). Supongamos que contamos con un conjunto de datos de
-imágenes \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), donde \(\boldsymbol{i =
-1\cdots N}\), \(\boldsymbol{D}\) es la dimensión de cada imagen y
-\(\boldsymbol{y_i = 1\cdots K}\) es la etiqueta asociada. Es decir,
-tenemos \(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
+imágenes \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), donde
+\(\boldsymbol{i = 1\cdots N}\), \(\boldsymbol{D}\) es la dimensión de
+cada imagen y \(\boldsymbol{y_i = 1\cdots K}\) es la etiqueta
+asociada. Es decir, tenemos \(\boldsymbol{N}\) imágenes y
+\(\boldsymbol{K}\) categorías.
 
 Vamos a definir nuestra función \(\boldsymbol{f\colon R^{D} \mapsto
 R^{K}}\) como un mapeo lineal entre píxeles y \scores:
