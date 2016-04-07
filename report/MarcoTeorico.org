@@ -216,7 +216,7 @@ primero se analiza una gran cantidad de datos (tal vez la totalidad
 del conjunto) y recien ahi se pueden obtener conclusiones o un modelo
 final.
 
-*** Clasificadores lineales
+*** TODO --> (RESUMIR) Clasificadores lineales
 
 Dentro del paradigma del aprendizaje supervisado, vamos a dar una
 pequeña introduccion a los clasificadores lineales orientada a
@@ -268,7 +268,7 @@ En cambio, analizaremos cómo definir una función que, a medida que
 entrenemos nuestro modelo, nos permita \textit{optimizar} esos
 parámetros.
 
-*** Entrenamiento
+*** TODO --> (RESUMIR) Entrenamiento
 **** Función de costo
 
 A menudo también llamada función de pérdida o función objetivo, nos
@@ -397,7 +397,6 @@ uno).
 
 TODO Interpretacion estadistica de softmax:
 
-**** TODO optimizacion de un problema, mejorar descripcion
 **** Optimización: Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
@@ -446,7 +445,6 @@ haciendo es buscar el mínimo de \loss{}, y en consecuencia, el conjunto
 de parámetros de \weights{} que minimicen el error.
 
 ***** TODO Explayar sobre gradient descent
-
 **** \textit{Backpropagation}
 
 Notemos que \loss{} es una función que depende de las imágenes de
@@ -576,7 +574,7 @@ Una sola neurona puede funcionar como un clasificador también (notar
 el parecido con los clasificadores lineales), siempre que se eliga la
 función de pérdida adecuada.
  
-** TODO --> (Tal vez se pueda borrar esta seccion) Inspiración biológica de las neuronas
+** TODO --> (RESUMIR. Tal vez se pueda borrar esta seccion) Inspiración biológica de las neuronas
 
 Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
 sin embargo nos centraremos en el tipo estándar de neurona, un modelo
@@ -628,7 +626,7 @@ una mejor alternativa en los últimos años, las ReLU, o
 \textit{Rectifier Linear Unit} en inglés, que son más fáciles de
 calcular y obtienen mejores resultados.
 
-** Funciones de activación comunes
+** TODO --> (TAL VEZ RESUMIR. o describir solamente ReLU en profundidad) Funciones de activación comunes
 *** Sigmoide
 
 \begin{equation}
@@ -786,7 +784,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** Inicialización de pesos
+*** TODO --> (BORRAR Y EXPLICAR BREVEMENTE EN OTRA SECCION)Inicialización de pesos
 
 TODO expicar por que queremos valores cercanos a cero
 
