@@ -168,7 +168,55 @@ que conforman la base de \dl{}, tales como \cl{}, \loss{}, \dg{}, \back{}, luego
 introduciremos lo que son las redes neuronales para terminar en redes
 convolucionales, \dl{} y redes siamesas.
 
-** Clasificadores lineales
+** Aprendizaje Automatico
+*** Introduccion
+
+Las tecnicas de aprendizaje automatico tienen como objetivo
+identificar patrones en conjuntos de datos utilizando herramientas de
+la estadistica, teoria de la informacion, calculo y optimizacion entre
+otras. De esta manera se pueden automatizar tareas, como por ejemplo
+del filtro de correo basura (\textit{spam}), la verificacion de
+rostros o incluso prediccion de precios en el mercado.
+
+El aprendizaje automatico adquiere relevancia cuando las tareas que se
+desean automatizar son demasiado complejas para programarse
+directamente. Por ejemplo la verificacion de rostros debe tener en
+cuenta detalles como variaciones en sombra, color, orientacion, por no
+mencionar las diferentes caracteristicas que hay que extraer de una
+cara para diferenciarla de otra (arrugas, prominencias y otros
+rasgos).  Otro caso es el analisis de grandes volumenes de datos, como
+estadisticas del clima para crear nuevos modelos.
+
+Hay varios paradigmas o ejes dentro del aprendizaje automatico que
+definen las caracteristicas de los algoritmos, las tecnicas de
+entrenamiento y las potenciales aplicaciones de esos modelos:
+
+**** Aprendizaje supervisado vs. no supervisado
+
+Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
+datos a aprender, hablamos de aprendizaje supervisado. Retomando el
+caso del verificador de rostros, las etiquetas serian el nombre o
+algun identificador de cada persona y nuestro clasificador aprenderia
+a diferenciar las caras tomando como referencia las anotaciones.
+
+Por otro lado, cuando los datos no estan categorizados de antemano
+pero se cuenta con otro tipo de informacion, hablamos de aprendizaje
+no supervisado. Por ejemplo, si se contara con una lista de casas con
+sus respectivos precios, su area en metros cubicos y cantidad de
+habitaciones y se quisiera encontrar alguna relacion entre ellas. Los
+algoritmos no supervisados trabajan netamente sobre los datos
+\textit{tal como estan}.
+
+**** Aprendizaje pasivo vs. activo
+
+El aprendizaje pasivo implica utilizar solamente los datos ya
+existentes. El aprendizaje activo se refiere a interactuar con el
+ambiente para obtener informacion, como por ejemplo preguntar a un
+usuario si un rostro es de cierta persona.
+
+
+
+*** Clasificadores lineales
 
 Dado que clasificar una imagen es asignar una etiqueta a un conjunto
 de píxeles, vamos a definir una función \func{} que mapee píxeles
@@ -213,7 +261,8 @@ En cambio, analizaremos cómo definir una función que, a medida que
 entrenemos nuestro modelo, nos permita \textit{optimizar} esos
 parámetros.
 
-** Función de costo
+*** Entrenamiento
+**** Función de costo
 
 A menudo también llamada función de pérdida o función objetivo, nos
 ayuda a saber que tan bien o mal está actuando nuestro
@@ -223,7 +272,7 @@ de funciones de costo, analizaremos dos de las más conocidas: función
 de pérdida de SVM Multiclase y Sofmax. En particular, esta última es
 ampliamente usada en redes neuronales por sus propiedades.
 
-*** Multiclass Support Vector Machine loss
+***** Multiclass Support Vector Machine loss
 
 La función de pérdida de SVM multiclase busca que la clase correcta de
 cada imagen tenga un puntaje más alto que las otras clases por un
@@ -265,9 +314,9 @@ transformación va a ser lineal (lo podemos ver como si estuvieramos
 "agitando" la red entre valores positivos o negativos, dependiendo del
 \(\lambda\)).
 
-**** TODO ampliar explicacion
+****** TODO ampliar explicacion
 
-*** Regularización
+***** Regularización
 
 Lo que queremos hacer es elegir mejores parámetros de \weights{} para evitar esta ambiguedad,
 y eso lo podemos hacer agregando una penalidad de regularización
@@ -305,7 +354,7 @@ clases a la hora de clasificar. De esa manera, nuestro clasificador
 final va a tomar en cuenta todas las dimensiones de entrada (algunas
 con más o menos probabilidad) sin dar prioridad a una sola.
 
-*** Softmax
+***** Softmax
 
 El clasificador Softmax tiene una función de pérdida diferente. En vez
 de tratar a la salida del clasificador como puntajes para cada clase
@@ -341,8 +390,8 @@ uno).
 
 TODO Interpretacion estadistica de softmax:
 
-** TODO optimizacion de un problema, mejorar descripcion
-** Optimización: Descenso de Gradiente
+**** TODO optimizacion de un problema, mejorar descripcion
+**** Optimización: Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
@@ -389,9 +438,9 @@ con la \textit{tasa de aprendizaje}. En otras palabras, lo que estamos
 haciendo es buscar el mínimo de \loss{}, y en consecuencia, el conjunto
 de parámetros de \weights{} que minimicen el error.
 
-*** TODO Explayar sobre gradient descent
+***** TODO Explayar sobre gradient descent
 
-** \textit{Backpropagation}
+**** \textit{Backpropagation}
 
 Notemos que \loss{} es una función que depende de las imágenes de
 entrada \img{}, \weights{} y \bias{}. Sin embargo el conjunto de datos
@@ -520,7 +569,7 @@ Una sola neurona puede funcionar como un clasificador también (notar
 el parecido con los clasificadores lineales), siempre que se eliga la
 función de pérdida adecuada.
  
-** Inspiración biológica de las neuronas
+** TODO --> (Tal vez se pueda borrar esta seccion) Inspiración biológica de las neuronas
 
 Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
 sin embargo nos centraremos en el tipo estándar de neurona, un modelo
@@ -880,7 +929,6 @@ el ancho y largo del volumen de entrada y a traves de cada una de las
 reduce espacialmente la entrada, pero no su profundidad.
 
 ***** TODO imagenes
-
 **** Capas Completamente Conectadas (Fully-Connected)
 
 Como su nombre lo indica, cada neurona de esta capa tiene conexiones a
@@ -890,7 +938,6 @@ junto con el calculo del \textit{bias}, como ya se vio para las redes
 neuronales convencionales.
 
 ***** TODO explicacion. ecuacion.
-
 **** TODO Arquitecturas (agregar bibliografia e imagen)
 
 Normalmente una red convolucional esta compuesta de varias capas
@@ -936,9 +983,7 @@ Finalmente, ResNet (Residual Network), la red ganadora del ILSRVC
 2015, cuenta con nada menos que 152 capas (VGGNet cuenta con 19) y
 obteniendo un error de 3.57% en el top-5.
 
-** redes siamesas
-
-* Entrenamiento de redes siamesas utilizando información odométrica
+* Redes neuronales siamesas
 ** Conceptos generales sobre los cuales parte el trabajo
 *** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
 *** Egomotion
