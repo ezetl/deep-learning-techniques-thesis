@@ -161,7 +161,7 @@ El trabajo está organizado como sigue:
 
 * Marco Teórico
 ** Aprendizaje Automatico
-*** Introduccion
+*** Introducción
 
 Las tecnicas de aprendizaje automatico tienen como objetivo
 identificar patrones en conjuntos de datos utilizando herramientas de
@@ -258,82 +258,74 @@ Mas adelante veremos como definir \weights{} y \bias{} para obtener un
 buen clasificador.
 
 *** Entrenamiento
-**** TODO --> (PONER UNA SOLA FUNCION GENERAL y HABLAR DE SOFTAMX. NO HACER DOS SUBSECCIONES) Función objetivo
+**** Función de costo
 
-A menudo también llamada función de pérdida o de costo, nos ayuda a
-saber que tan bien o mal está actuando nuestro clasificador. Es decir,
-si la tasa de error del clasificador es muy alta, la \textit{pérdida}
-será muy alta y viceversa. Hay muchos tipos de funciones objetivo,
-analizaremos dos de las más conocidas: función de pérdida de SVM
-Multiclase y Softmax. En particular, esta última sera la que usemos
-para entrenar redes neuronales por sus propiedades.
-
-***** Multiclass Support Vector Machine loss
-
-La función de pérdida de SVM multiclase busca que la clase correcta de
-cada imagen tenga un puntaje más alto que las otras clases por un
-margen \(\Delta\). Más precisamente, dado el \textit{i}-ésimo ejemplo con
-su respectiva etiqueta \(\boldsymbol{y_i}\), llamemos
-\(\boldsymbol{s}\) al puntaje computado por el clasificador
-lineal. Dado que es un vector columna, \(\boldsymbol{s_j}\) va a ser
-el puntaje otorgado a la clase \(\boldsymbol{j} \in 1\cdots
-\boldsymbol{K}\) (recordemos que \(K\) es la cantidad de
-clases). Formalizamos a la función de perdida entonces de la siguiente
-manera:
+Una función de costo nos ayuda a saber que tan bien o mal está
+actuando nuestro clasificador. Es decir, si la tasa de error del
+clasificador es muy alta, el costo o la \textit{pérdida} será muy alta
+y viceversa. Hay muchos tipos de funciones de costo, pero la idea
+subyacente es la misma y puede ser expresada en la siguiente ecuación:
 
 \begin{equation}
-     \boldsymbol{L_i = \sum_{j \neq y_i} \max{(0, s_j - s_{y_{i}} + \Delta) }}
+\boldsymbol{L}(\theta) = \frac{1}{N} \sum^{N}_{i} L(f(x_i;\theta), y_i)
 \end{equation}
 
-Dado que en este caso particular estamos trabajando con clasificadores lineales:
+donde \(L\) es la función de pérdidad individual de cada muestra en el
+conjunto de datos, \(f(x_i;\theta)\) es la predicción del modelo sobre
+una muestra \(x_i\) con parámetros \(\theta\), \(y_i\) es el objetivo
+(por ejemplo, la etiqueta de cada muestra del conjunto de datos en una
+tarea de clasificación).
+
+Un ejemplo de función de perdidad popular es la función de pérdida de
+\texit{máquinas de vectores de soporte multiclase}:
 
 \begin{equation}
-     \boldsymbol{L_i = \sum_{j \neq y_i} \max{(0, w_{j}^{T}x_i -  w_{y_{i}}^{T}x_i + \Delta) }}
+     L_i = \sum_{j \neq i} \max{(0, f(x_i; \theta) - y_{i} + \Delta) }
 \end{equation}
 
-Notemos que la funcion no necesariamente va a ser la misma una vez que
-contemplemos clasificadores más complejos.
+Se puede observar que esta función de pérdida busca que la clase
+correcta tenga un puntaje más alto que las otras por un margen
+\(\Delta\)
 
-Cuando tenemos una función como la que acabamos de ver, en donde el
-umbral se establece en cero (\( \max{(0,_)} \)), a menudo se las llama
-funciones de pérdida \textit{hinge} (\textit{bisagra}), o por su
-nombre en ingles, hinge loss.
+Cuando tenemos una función con la forma \( \max{(0,\_)} \) a menudo se
+la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 
-***** Softmax
+**** Clasificador \textit{Softmax}
 
-El clasificador Softmax tiene una función de pérdida diferente. En vez
-de tratar a la salida del clasificador como puntajes para cada clase
-(lo cual puede ser confuso y dificíl de comparar), Softmax devuelve
-probabilidades normalizadas para cada clase.
+La función \textit{Softmax} tiene la siguiente forma:
+
+\begin{equation}
+    \sigma(x)_j =  \frac{e^{f(x;\theta)_{j}}} {\sum_{k} e^{f(x;\theta)_{k}}}
+\end{equation}
+
+Actúa tomando un vector de valores reales arbitrarios y
+transformándolos en un vector de probabilidades normalizadas (cuya
+suma da uno).
+
+Por lo tanto el clasificador Softmax tiene una función de pérdida
+diferente. En vez de tratar a los resultados como puntajes para cada
+clase (lo cual puede ser confuso y dificíl de comparar), Softmax
+devuelve probabilidades normalizadas para cada clase.
 
 Un clasificador Softmax no modifica la funcion \func{} que ya
 conocemos, pero sí interpreta los puntajes como probabilidades
-logarítmicas sin normalizar, reemplazando la \textit{hinge loss} por
-una \textit{cross entropy loss}:
-
-TODO explicar por que es el -logaritmo
+logarítmicas sin normalizar, reemplazando la pérdida bisagra por una
+\textit{entropía cruzada}:
 
 \begin{equation}
-     \boldsymbol{ L_i = - \log \bigg( \frac{\exp{f_{y_{i}}}} {\sum_j \exp{f_j}}\bigg)}
+     L_i = - \log \bigg( \frac{\exp{f_{y_{i}}}} {\sum_j \exp{f_j}}\bigg)
 \end{equation}
 
 Que es equivalente a:
 
 \begin{equation}
-     \boldsymbol{ L_i = - f_{y_{i}} + \log \Big( \sum_j \exp{f_j}}\Big)}
+     L_i = - f_{y_{i}} + \log {\Big( \sum_j \exp{f_j}}\Big)}
 \end{equation}
 
 Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
 de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
-promedio de las pérdidas de cada imagen más la suma del término de
-regularización \(R(W)\).
+promedio de las pérdidas de cada imagen.
 
-La \textit{función softmax} \(\frac{\exp{f_{j}}} {\sum_{k}
-\exp{f_{k}}}\) toma un vector de valores reales arbitrarios y los
-transforma en un vector de probabilidades normalizadas (cuya suma da
-uno).
-
-TODO Interpretacion estadistica de softmax:
 **** Optimización: Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
@@ -341,11 +333,11 @@ comportándose nuestro modelo, la \textit{función de pérdida}. Como se
 puede observar, esta función depende de nuestro \weights{} y las
 imágenes (o \features{} que estemos usando). Nosotros no tenemos
 control sobre nuestro conjunto de datos de entrenamiento, pero sí
-podemos modificar los parámetros de \weights para producir la menor
+podemos modificar los parámetros de \weights{} para producir la menor
 pérdida posible.
 
-Vamos ahora a analizar uno de los métodos más usados en \nn{} para
-optimizar la pérdida: descenso de gradiente.
+Vamos ahora a analizar uno de los métodos más usados en redes
+neuronales para optimizar la pérdida: descenso de gradiente.
 
 Tomemos un escenario hipotético: imaginemos por un momento que una
 persona con los ojos vendados está atrapada entre montañas y busca
@@ -367,7 +359,7 @@ haciendo es buscar el mínimo de \loss{}, y en consecuencia, el conjunto
 de parámetros de \weights{} que minimicen el error.
 
 ***** TODO AGREGAR FORMULA MATEMATICA DE COMO UPDATEAR LOS PESOS Wn  = Wanterior - gradiente
-**** TODO --> (RESUMIR) \textit{Backpropagation}
+**** \textit{Backpropagation}
 
 Notemos que \loss{} es una función que depende de las imágenes de
 entrada \img{}, \weights{} y \bias{}. Sin embargo el conjunto de datos
