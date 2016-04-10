@@ -496,59 +496,7 @@ Una sola neurona puede funcionar como un clasificador también (notar
 el parecido con los clasificadores lineales), siempre que se eliga la
 función de pérdida adecuada.
  
-** TODO --> (RESUMIR. Tal vez se pueda borrar esta seccion) Inspiración biológica de las neuronas
-
-Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
-sin embargo nos centraremos en el tipo estándar de neurona, un modelo
-\textit{näive}:
-
-TODO: dibujo clasico de neurona
-
-El cuerpo de la neurona esta compuesto de tres partes principales, el
-arbol dendrítico, el cuerpo celular o soma y una extension llamada
-axón.  El arbol dendrítico se conecta con los axones de otras neuronas
-y recibe impulsos de estas.  Una neurona puede estar conectada a
-cientos o miles de otras neuronas desde las cuales recibe impulsos,
-los cuales pueden o no activar a la neurona.  Si la neurona se activa,
-entonces retransmite el impulso a través de su axón.
-
-Notar que en realidad las conexiones del arbol dendrítico no son todas
-iguales.  Los axones y las extremidades del arbol dendritico tienen un
-pequeño espacio entre ellos llamado espacio sináptico. Si la exitación
-que proviene de un axón es suficiente, entonces el impulso se
-transmite a la neurona, caso contrario no. Decimos que la primera es
-una transmision exitadora, pues aumenta la posibilidad de transmitir
-el impulso, mientras que el otro caso se denomina transmisión
-inhibidora, dado que reduce esa posibilidad.  De esta manera surge la
-noción de \textit{pesos sinápticos}, que determinan cuando se activan
-las conexiones y cuando no.  Otro aspecto a tener en cuenta es el
-\textit{estímulo acumulativo}, en donde los estimulos de varios
-receptores del arbol dendrítico se combinan de alguna manera para
-activar o no la neurona (no hay punto intermedio). A esa función que
-toma los impulsos de entrada y determina si emitir el impulso de
-salida la llamaremos \textit{función de activación}, y representa la
-frecuencia a la que se activa la neurona.
-
-Ahora podemos dar un modelo más formal de como se comporta una
-neurona.
-
-TODO grafica de neurona con inputs, weights, sumatoria, funcion de activacion, etc.
-
-En la Figura, las entradas \(x_i\) interactúan multiplicativamente con
-los pesos. En nuestra analogía con la neurona biológica, esas son las
-sinapsis. Luego, el el cuerpo de la célula, esos resultados se suma
-junto con un \textit{bias}, y luego se calcula la función de
-activación para decidir si activar o no el axón.
-
-Historicamente se usaba la función sigmoide ( \(\sigma\) ) como
-función de activación, por tener la propiedad de transformar la
-entrada a un rango entre 0 y 1, y tener además una derivada fácil de
-calcular (útil para \textit{backpropagation}), pero fue desplazada por
-una mejor alternativa en los últimos años, las ReLU, o
-\textit{Rectifier Linear Unit} en inglés, que son más fáciles de
-calcular y obtienen mejores resultados.
-
-** TODO --> (TAL VEZ RESUMIR. o describir solamente ReLU en profundidad) Funciones de activación comunes
+** Funciones de activación comunes
 *** Sigmoide
 
 \begin{equation}
