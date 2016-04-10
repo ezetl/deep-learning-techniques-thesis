@@ -326,7 +326,7 @@ Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
 de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
 promedio de las pérdidas de cada imagen.
 
-**** Optimización: Descenso de Gradiente
+**** TODO (MEJORAR ESCRITURA. ECUACIONES) Optimización: Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
@@ -417,8 +417,6 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 \frac{\partial f}{\partial y} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
 \end{equation}
 
-TODO: graficar el grafo de computacion de la funcion de arriba.
-
 Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
 en dos pasos: primero, evaluamos nuestra función \loss{} en los
 parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
@@ -434,8 +432,6 @@ función, o sea, ir a su mínimo). Ese porcentaje es llamado
 \textit{tasa de aprendizaje} (\textit{learning rate}) y suele ser uno
 de los parámetros más difíciles de elegir, ya que la calidad y rapidez
 de aprendizaje dependen de él.
-
-TODO: pseudocódigo de optimizacion
 
 Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
 actualizaríamos los parámetros, y repetiríamos el ciclo hasta
@@ -455,6 +451,9 @@ no es estrictamente un hiperparámetro que uno pueda
 \textit{cross-}validar, sino que más bien depende del hardware sobre
 el que se esté entrenando la red (en general se eligen potencias de
 dos por cuestiones de eficiencia).
+
+***** TODO graficar el grafo de computacion de la funcion de arriba.
+***** TODO pseudocódigo de optimizacion
 
 ** Redes Neuronales
 
@@ -501,10 +500,7 @@ Consecuentemente, nos concentraremos en un tipo especifico de función
 de activación, los Rectificadores Lineales o ReLU por sus siglas en
 inglés. Los rectificadores lineales son muy populares en las redes
 convolucionales debido a sus buenas propiedades.
-
 **** TODO CITAR BIBLIOGRAFIA CON PROBLEMA DE SATURACION DE GRADIENTE.
-
-
 *** \textit{ReLU}
 Una unidad ReLU establece un umbral en \(0\) a la salida de la
 neurona. Es decir, la activación de una neurona va a ser \(0\) si su
@@ -529,7 +525,6 @@ improbable que vuelva a activarse, dado que su gradiente en \(0\) es
 también \(0\), por lo que un entrenamiendo mediante descenso de
 gradiente y \textit{backpropagation} no va a modificar los pesos
 locales, dejando a esa neurona "muerta".
-
 **** TODO bibliografia de relu
 
 *** \textit{Leaky ReLU}
@@ -544,8 +539,11 @@ Es decir, la función queda:
 f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
 \end{equation}
 
-De esta manera nos aseguramos que al menos un pequeño gradiente fluya y se normalicen los pesos a mediano/largo plazo. Sin embargo no está demostrado del todo que las \textit{Leaky ReLU} presenten una mejora sustancial en el entrenamiento de las redes, por lo que las \{ReLU} convencionales siguen siendo ampliamente usadas.
-
+De esta manera nos aseguramos que al menos un pequeño gradiente fluya
+y se normalicen los pesos a mediano/largo plazo. Sin embargo no está
+demostrado del todo que las \textit{Leaky ReLU} presenten una mejora
+sustancial en el entrenamiento de las redes, por lo que las \{ReLU}
+convencionales siguen siendo ampliamente usadas.
 **** TODO agregar bibliografia de leaky realu
 
 *** \texit{Maxout}
@@ -796,7 +794,7 @@ junto con el calculo del \textit{bias}, como ya se vio para las redes
 neuronales convencionales.
 
 ***** TODO explicacion. ecuacion.
-**** TODO Arquitecturas (agregar bibliografia e imagen)
+**** TODO (AGREGAR BIBLIOGRAFIA) Arquitecturas 
 
 Normalmente una red convolucional esta compuesta de varias capas
 convolucionales (CONV), capas de \textit{pooling} (POOL), capas
