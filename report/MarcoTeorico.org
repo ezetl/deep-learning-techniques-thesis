@@ -497,84 +497,48 @@ el parecido con los clasificadores lineales), siempre que se eliga la
 función de pérdida adecuada.
  
 ** Funciones de activación comunes
-*** Sigmoide
 
-\begin{equation}
-\sigma(x) = \frac{1}{1+\exp{-x}}
-\end{equation}
+Se han propuesto varias funciones de activación a lo largo de los
+años. Inicialmente se intentó simular el comportamiento de las
+conexiones sinápticas entre las neuronas mediante funciones como la
+Sigmoide (\(\sigma\)) y la Tangente Hiperbólica (\(\tanh\), aunque
+ambas ya estan en desuso por no poseer buenas propiedades (saturación
+de gradiente).
 
-TODO grafico de la funcion
+Consecuentemente, nos concentraremos en un tipo especifico de función
+de activación, los Rectificadores Lineales o ReLU por sus siglas en
+inglés. Los rectificadores lineales son muy populares en las redes
+convolucionales debido a sus buenas propiedades.
 
-Como se puede ver en la Figura XX, la fución sigmoide toma valores
-reales y los "comprime" en el rango \((0,1)\). En particular, los
-números muy pequeños se transforman en 0 y los muy grandes
-en 1. Durante mucho tiempo esta función fue utilizada como activadora
-dado que simula el comportamiento de una neurona bastante bien (desde
-no activarse hasta saturarse) y porque además cuenta con una derivada
-fácil de calcular:
+**** TODO CITAR BIBLIOGRAFIA CON PROBLEMA DE SATURACION DE GRADIENTE.
 
-\begin{equation}
-    \tilde{\sigma(x)} = \sigma(x) (1 - \sigma(x))
-\end{equation}
-
-Sin embargo, al analizar la derivada descubrimos un problema: el
-sigmoide satura los gradientes. Supongamos que durante la etapa
-\texit{feed-forward} que la salida de \(\sigma\) fue muy cercano a
-\(0\) ó \(1\). Entonces el gradiente local durante
-\textit{backpropagation} va a ser muy cercano a \(0\), por lo que al
-multiplicarlo por el gradiente de la salida de \(\sigma\) lo va a
-anular y casi nada de la señal original va a ser retrasmitida a los
-pesos a la hora de actualizarlos. Adicionalmente si los pesos
-iniciales de la red fueran muy grandes, \(\sigma\) también se va a
-saturar y vamos a tener el mismo problema.
-
-Otro potencial inconveniente de usar \(\sigma\) es que los resultados
-no están centrados en \(0\) (de hecho, siempre son
-positivos). Supongamos que la entrada \(\boldsymbol{x}\) a una neurona
-es positiva en todos sus elementos, entonces el gradiente en
-\weights{} de \(f=Wx+b\) va a ser todo positivo o negativo durante
-\textit{backpropagation}, dependiendo del gradiente de la expresion
-\(f\). Esto podría introducir un \textit{zig-zag} en la actualización
-de los pesos, aunque una vez que se suman todos los gradientes a lo
-largo de un \textit{batch} de datos los pesos pueden tener signos
-variables, por lo que este problema no tiene consecuencias tan
-severas.
-
-*** Tangente Hiperbólica
-\begin{equation}
-f(x) = \tanh(x)
-\end{equation}
-
-Analogamente al sigmoide, la tangente hiperbólica transforma números
-reales al rango \([-1,1]\). Notemos que también sufre del problema de
-la saturación, pero su salida está centrada en cero, por lo que se la
-prefiere sobre la sigmoide.
-
-TODO Grafico de tanh
 
 *** \textit{ReLU}
+Una unidad ReLU establece un umbral en \(0\) a la salida de la
+neurona. Es decir, la activación de una neurona va a ser \(0\) si su
+salida fue negativa o un numero positivo en caso contrario:
 
 \begin{equation}
 f(x) = \max{(0,x)}
 \end{equation}
 
-Básicamente es poner un umbral en \(0\) a la salida de la
-neurona. Comparada con \(\sigma\) y \(\tanh\), requiere menos
-operaciones y además no es saturante.
+Comparada con \(\sigma\) y \(\tanh\), requiere menos
+operaciones y además no es saturante. 
 
-Las \textit{ReLU} pueden provocar la "muerte" de neuronas durante el
-entrenamiento. Si un gran gradiente fluye a través de una \texit{ReLU}
-durante \textit{backpropagation} entonces va a actualizar los pesos de
-tal manera que no se vuelva a activar la neurona. Pensemos que el
-proceso de actualización de \weights{} implica restar un porcentaje
-del gradiente en \weights{}. Esto se puede agravar si nuestra tasa de
-aprendizaje es muy grande.
+Una desventaja de las \textit{ReLU} es que pueden provocar la "muerte"
+de neuronas durante el entrenamiento. Si un gran gradiente fluye a
+través de una \texit{ReLU} durante el proceso de
+\textit{backpropagation} entonces va a actualizar los pesos de tal
+manera que no se vuelva a activar la neurona. Pensemos que el proceso
+de actualización de \weights{} implica restar un porcentaje del
+gradiente en \weights{}, lo cual puede agravarse si nuestra tasa de
+aprendizaje es muy grande. Una vez que la ReLU alcanza este estado, es
+improbable que vuelva a activarse, dado que su gradiente en \(0\) es
+también \(0\), por lo que un entrenamiendo mediante descenso de
+gradiente y \textit{backpropagation} no va a modificar los pesos
+locales, dejando a esa neurona "muerta".
 
-Luego de esa actualización, la neurona va a permanecer apagada
-siempre, pues su entrada va a ser siempre negativa.
-
-TODO explicar mejor,
-https://www.quora.com/What-is-the-dying-ReLU-problem-in-neural-networks
+**** TODO bibliografia de relu
 
 *** \textit{Leaky ReLU}
 
@@ -588,8 +552,9 @@ Es decir, la función queda:
 f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
 \end{equation}
 
-De esa manera podemos evitar la muerte de una neurona para el caso
-antes mencionado.
+De esta manera nos aseguramos que al menos un pequeño gradiente fluya y se normalicen los pesos a mediano/largo plazo. Sin embargo no está demostrado del todo que las \textit{Leaky ReLU} presenten una mejora sustancial en el entrenamiento de las redes, por lo que las \{ReLU} convencionales siguen siendo ampliamente usadas.
+
+**** TODO agregar bibliografia de leaky realu
 
 *** \texit{Maxout}
 
@@ -598,11 +563,12 @@ f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
 \end{equation}
 
 Es una generalización de las funciones \textit{ReLU}, y obtiene lo
-mejor de los dos mundos: la forma lineal y no saturante de las
-\textit{ReLUs} y evita el problema de las neuronas que se mueren. A
-pesar de eso tiene el problema de duplicar los parámetros para cada
-neurona, lo cual no siempre es deseable (más tiempo de entrenamiento,
-más consumo de memoria y de recursos, sobre todo en redes profundas).
+mejor de los dos mundos: por un lado la forma lineal y no saturante de
+las \textit{ReLUs} y por el otro evita el problema de las neuronas que
+se mueren. A pesar de ello tiene la desventaja de duplicar los
+parámetros para cada neurona, lo cual no siempre es deseable, pues
+conlleva en más tiempo de entrenamiento y más consumo de memoria y de
+recursos, sobre todo en redes profundas.
 
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
