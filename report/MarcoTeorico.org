@@ -326,7 +326,7 @@ Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
 de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
 promedio de las pérdidas de cada imagen.
 
-**** TODO (MEJORAR ESCRITURA. ECUACIONES) Optimización: Descenso de Gradiente
+**** Descenso de Gradiente
 
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
@@ -336,29 +336,31 @@ control sobre nuestro conjunto de datos de entrenamiento, pero sí
 podemos modificar los parámetros de \weights{} para producir la menor
 pérdida posible.
 
-Vamos ahora a analizar uno de los métodos más usados en redes
-neuronales para optimizar la pérdida: descenso de gradiente.
+El descenso de gradiente se utiliza para optimizar los pesos partiendo
+de la premisa que el modelo es diferenciable con respecto a
+\weights{}. Dado que queremos minimizar la funcion de costo \loss{},
+lo que vamos a hacer es calcular su gradiente \(\nabla L\) respecto a
+cada parametro y luego modificar cada uno ligeramente con el objetivo
+de alcanzar un minimo en la funcion:
 
-Tomemos un escenario hipotético: imaginemos por un momento que una
-persona con los ojos vendados está atrapada entre montañas y busca
-llegar al valle. Una manera de llegar al valle es probar dando un
-pequeño paso a su alrededor, y "sentir" hacia donde desciende más
-rápido la montaña, sólo valiéndose de la información local para
-moverse. Cuando finalmente esté seguro hacia donde descender, dará
-varios pasos en esa dirección, se detendrá y volverá a
-observar. Sabemos que eventualmente llegará al fondo del valle, pues
-lo único que tiene que hacer es seguir bajando por la pendiente de la
-montaña.
+\begin{equation}
+    W_{n+1} = W_n - \epsilon frac{1}{m} \sum^{m}_{i} \nabla_{\theta} L(f(x_i; \theta), y_i)
+\end{equation}
 
-Formalmente, la pendiente de la montaña es la pendiente de la función
-de pérdida \loss{} que estemos utilizando, la elección de hacia donde
-bajar se corresponde con el cálculo de la derivada de la función de
-pérdida, mientras que la cantidad de pasos que realice se corresponde
-con la \textit{tasa de aprendizaje}. En otras palabras, lo que estamos
-haciendo es buscar el mínimo de \loss{}, y en consecuencia, el conjunto
-de parámetros de \weights{} que minimicen el error.
+Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
+\(m\) es la cantidad de elementos en el conjunto de datos. En la
+ecuacion se puede observar que se modifican los parametros con
+respecto a la direccion opuesta al gradiente, dado que el mismo indica
+la direccion de crecimiento de una funcion pero nosotros queremos
+encontrar un minimo.
 
-***** TODO AGREGAR FORMULA MATEMATICA DE COMO UPDATEAR LOS PESOS Wn  = Wanterior - gradiente
+Existen variantes mas sofisticadas del descenso de gradiente
+(Momentum, Nesterov Momentum, Adagrad, Rmsprop entre otros). Lo mas
+comun es utilizar una tecnica llamada \textit{descenso de gradiente
+estocastico}, que se basa en calcular el gradiente de un subconjunto
+del total de datos (\textit{batch}) y actualizar \weights{} al final
+de cada \textit{batch}.
+
 **** \textit{Backpropagation}
 
 Notemos que \loss{} es una función que depende de las imágenes de
@@ -451,9 +453,6 @@ no es estrictamente un hiperparámetro que uno pueda
 \textit{cross-}validar, sino que más bien depende del hardware sobre
 el que se esté entrenando la red (en general se eligen potencias de
 dos por cuestiones de eficiencia).
-
-***** TODO graficar el grafo de computacion de la funcion de arriba.
-***** TODO pseudocódigo de optimizacion
 
 ** Redes Neuronales
 
@@ -560,7 +559,7 @@ recursos, sobre todo en redes profundas.
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
-** Entrenamiento de redes neuronales
+** TODO Entrenamiento de redes neuronales
 
 Antes de comenzar a entrenar una red neuronal es necesario tener en
 cuenta aspectos referidos al preprocesamiento de los datos, como
