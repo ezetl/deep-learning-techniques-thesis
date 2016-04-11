@@ -500,7 +500,6 @@ Consecuentemente, nos concentraremos en un tipo especifico de función
 de activación, los Rectificadores Lineales o ReLU por sus siglas en
 inglés. Los rectificadores lineales son muy populares en las redes
 convolucionales debido a sus buenas propiedades.
-**** TODO CITAR BIBLIOGRAFIA CON PROBLEMA DE SATURACION DE GRADIENTE.
 *** \textit{ReLU}
 Una unidad ReLU establece un umbral en \(0\) a la salida de la
 neurona. Es decir, la activación de una neurona va a ser \(0\) si su
@@ -510,8 +509,9 @@ salida fue negativa o un numero positivo en caso contrario:
 f(x) = \max{(0,x)}
 \end{equation}
 
-Comparada con \(\sigma\) y \(\tanh\), requiere menos
-operaciones y además no es saturante. 
+Comparada con \(\sigma\) y \(\tanh\), requiere menos operaciones, no
+es saturante y converge hasta 6 veces mas rapido que las funciones
+sigmoide y tanh \cite{NIPS2012_4824}.
 
 Una desventaja de las \textit{ReLU} es que pueden provocar la "muerte"
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
@@ -525,15 +525,13 @@ improbable que vuelva a activarse, dado que su gradiente en \(0\) es
 también \(0\), por lo que un entrenamiendo mediante descenso de
 gradiente y \textit{backpropagation} no va a modificar los pesos
 locales, dejando a esa neurona "muerta".
-**** TODO bibliografia de relu
 
 *** \textit{Leaky ReLU}
 
 Se puede solucionar el problema de la "muerte" de neuronas agregando
 una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
-negativos.
-
-Es decir, la función queda:
+negativos. Esta funcion de activacion es la que se conoce como
+\textit{Leaky ReLU} \cite{zhang2014improving}:
 
 \begin{equation}
 f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
@@ -544,7 +542,6 @@ y se normalicen los pesos a mediano/largo plazo. Sin embargo no está
 demostrado del todo que las \textit{Leaky ReLU} presenten una mejora
 sustancial en el entrenamiento de las redes, por lo que las \{ReLU}
 convencionales siguen siendo ampliamente usadas.
-**** TODO agregar bibliografia de leaky realu
 
 *** \texit{Maxout}
 
@@ -552,7 +549,7 @@ convencionales siguen siendo ampliamente usadas.
 f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
 \end{equation}
 
-Es una generalización de las funciones \textit{ReLU}, y obtiene lo
+Maxout \cite{Maxout} es una generalización de las funciones \textit{ReLU}, y obtiene lo
 mejor de los dos mundos: por un lado la forma lineal y no saturante de
 las \textit{ReLUs} y por el otro evita el problema de las neuronas que
 se mueren. A pesar de ello tiene la desventaja de duplicar los
@@ -610,7 +607,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** TODO --> (BORRAR Y EXPLICAR BREVEMENTE EN OTRA SECCION) Inicialización de pesos
+*** TODO --> (regularizacion varianza/ por que queremos valores cercanos a cero) Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
 simetría. Imaginemos que inicializamos todos los pesos en \(0\), algo
@@ -625,9 +622,7 @@ En cambio podemos inicializar los pesos con pequeños números
 aleatorios cercanos a cero. Una opción común es utilizar una
 distribución gaussiana con media cero y desviación estándar 0.01.
 
-**** TODO regularizacion de la varianza
-**** TODO expicar por que queremos valores cercanos a cero
-*** Regularización
+*** TODO (DROPOUT) Regularización
 
 Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
 problema del \textit{sobre-ajuste}. Esto significa que nuestro modelo
@@ -676,13 +671,12 @@ regularización L1 y las redes tienden a usar un subconjunto de los
 datos de entrada, convirtiendose en invariantes al ruido. En general
 se prefiere la regularización L2 por obtenerse mejores resultados.
 
-**** \texit{Dropout}
+**** TODO (EXPLICAR MAS) \texit{Dropout}
 
 En pocas palabras, la técnica de \textout{dropout} \cite{dropout}
 consiste en mantener activa una neurona con una probabilidad
 \(\boldsymbol{p}\), o establecer su salida a cero en caso contrario.
 
-***** TODO explayar mas dropout
 *** Organización y entrenamiento de redes neuronales
 
 Las redes neuronales estan organizadas como un grafo acíclico de
@@ -794,7 +788,7 @@ junto con el calculo del \textit{bias}, como ya se vio para las redes
 neuronales convencionales.
 
 ***** TODO explicacion. ecuacion.
-**** TODO (AGREGAR BIBLIOGRAFIA) Arquitecturas 
+**** TODO (AGREGAR IMAGEN) Arquitecturas 
 
 Normalmente una red convolucional esta compuesta de varias capas
 convolucionales (CONV), capas de \textit{pooling} (POOL), capas
@@ -808,36 +802,40 @@ entrada de la red. Luego es comun utilizar capas FC hasta reducir las
 dimensiones a las dimensiones de salida, que en el caso de
 clasificacion son las probabilidades de cada clase.
 
-TODO: imagen ejemplo de red neuronal con [CONV-RELU-POOL]* FC FC etc.
-
 A lo largo de los años ha habido varias arquitecturas de redes
-convolucionales que cuentan con nombre propio, como por ejemplo LeNet,
-creada en los 90 por Yann LeCun y utilizada para el reconocimiento de
-digitos manuscriptos. Esta red fue utilizada con exito para leer
-codigos postales y cheques bancarios.
+convolucionales que cuentan con nombre propio, como por ejemplo LeNet
+\cite{Lecun98gradient-basedlearning}, creada en los 90 por Yann LeCun
+y utilizada para el reconocimiento de digitos manuscriptos. Esta red
+fue utilizada con exito para leer codigos postales y cheques
+bancarios.
 
 En 2012, el ganador del desafio ImageNet ILSVRC, Alex Krizhevsky,
-obtuvo un 16% de error utilizando una arquitectura llamada AlexNet. Su
-arquitectura es muy similar a la de LeNet, aunque mas profunda y fue
-una de las primeras en concatenar varias capas CONV antes de una capa
-de \textit{pooling}.
+obtuvo un 16% de error utilizando una arquitectura llamada AlexNet
+\cite{NIPS2012_4824}. Su arquitectura es muy similar a la de LeNet,
+aunque mas profunda y fue una de las primeras en concatenar varias
+capas CONV antes de una capa de \textit{pooling}.
 
-Los ganadores del ISLVRC 2013 utilizaron una red llamada ZFNet, que
-era basicamente una modificacion de AlexNet, con cambios en los
-hiperparametros y las capas convolucionales.
+Los ganadores del ISLVRC 2013 utilizaron una red llamada ZFNet
+\cite{DBLP:journals/corr/ZeilerF13}, que era basicamente una
+modificacion de AlexNet, con cambios en los hiperparametros y las
+capas convolucionales.
 
 En la misma competencia ILSVRC del 2014 se dieron a conocer dos redes,
-GoogLeNet y VGGNet. Ambas demostraron que la profundidad de la red es
-una caracteristica critica a la hora de obtener buenos resultados.
+GoogLeNet \cite{43022} y VGGNet \cite{Simonyan14c}. Ambas demostraron
+que la profundidad de la red es una caracteristica critica a la hora
+de obtener buenos resultados.
 
 Si bien GoogLeNet fue la ganadora ese año, luego se demostro que
 VGGNet es superior en muchas tareas de transferencia de aprendizaje,
 por lo que es mas popular que GoogLeNet y se pueden encontrar muchos
 modelos ya preentrenados.
 
-Finalmente, ResNet (Residual Network), la red ganadora del ILSRVC
-2015, cuenta con nada menos que 152 capas (VGGNet cuenta con 19) y
-obteniendo un error de 3.57% en el top-5.
+Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
+ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
+cuenta con 19) y obteniendo un error de 3.57% en el top-5.
+
+***** TODO imagen ejemplo de red neuronal con [CONV-RELU-POOL]* FC FC etc.
+
 
 * Redes neuronales siamesas
 ** Conceptos generales sobre los cuales parte el trabajo
