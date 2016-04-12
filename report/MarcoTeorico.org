@@ -606,7 +606,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** TODO --> (regularizacion varianza/ por que queremos valores cercanos a cero) Inicialización de pesos
+*** Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
 simetría. Imaginemos que inicializamos todos los pesos en \(0\), algo
@@ -621,7 +621,7 @@ En cambio podemos inicializar los pesos con pequeños números
 aleatorios cercanos a cero. Una opción común es utilizar una
 distribución gaussiana con media cero y desviación estándar 0.01.
 
-*** TODO (DROPOUT) Regularización
+*** Regularización
 
 Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
 problema del \textit{sobre-ajuste}. Esto significa que nuestro modelo
@@ -670,11 +670,14 @@ regularización L1 y las redes tienden a usar un subconjunto de los
 datos de entrada, convirtiendose en invariantes al ruido. En general
 se prefiere la regularización L2 por obtenerse mejores resultados.
 
-**** TODO (EXPLICAR MAS) \texit{Dropout}
+**** \texit{Dropout}
 
-En pocas palabras, la técnica de \textout{dropout} \cite{dropout}
-consiste en mantener activa una neurona con una probabilidad
-\(\boldsymbol{p}\), o establecer su salida a cero en caso contrario.
+La técnica de \textout{dropout} \cite{dropout} consiste en mantener
+activa una neurona con una probabilidad \(\boldsymbol{p}\), o
+establecer su salida a cero en caso contrario.
+TODO la red va a prender mejor blab blba
+TODO formula
+TODO grafico
 
 *** Organización y entrenamiento de redes neuronales
 
@@ -834,7 +837,6 @@ ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 
 ***** TODO imagen ejemplo de red neuronal con [CONV-RELU-POOL]* FC FC etc.
-
 
 * Redes neuronales siamesas
 ** Conceptos generales sobre los cuales parte el trabajo
