@@ -559,7 +559,7 @@ recursos, sobre todo en redes profundas.
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
-** TODO Entrenamiento de redes neuronales
+** Entrenamiento de redes neuronales
 
 Antes de comenzar a entrenar una red neuronal es necesario tener en
 cuenta aspectos referidos al preprocesamiento de los datos, como
@@ -675,9 +675,50 @@ se prefiere la regularización L2 por obtenerse mejores resultados.
 La técnica de \textout{dropout} \cite{dropout} consiste en mantener
 activa una neurona con una probabilidad \(\boldsymbol{p}\), o
 establecer su salida a cero en caso contrario.
-TODO la red va a prender mejor blab blba
-TODO formula
-TODO grafico
+
+Si consideramos una red neuronal con \(L\) capas, sea \(l \in
+\{1,\dots,L\}\) el índice de cada capa oculta de la red. Sea
+\(\boldsymbol{z}^{(l)}\) el vector de entrada a la capa \(l\),
+\(\boldsymbol{y}^{(l)}\) el vector de salidas de la capa \(l\)
+(\(\boldsymbol{y}^{(0)} = \boldsymbol{x}\) son los datos de entrada a
+la red). \(W^{(l)}\) y \(\boldsymbol{b}^{(l)}\) son los parametros de
+la capa \(l\). Dada una neurona \(i\) de la capa \(l\), la operacion
+de \textit{feed-forward} de la red puede ser descripta como:
+
+\begin{equation}
+z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \boldsymbol{y}^{l} + b^{(l+1)}_{i},
+\end{equation}
+
+\begin{equation}
+y^{(l+1)}_{i} = f(z^{(l+1)}_{i})
+\end{equation}
+
+Donde \(f\) es una función de activación. Si ahora agregamos \textit{dropout}:
+
+\begin{equation}
+r^{(l)}_{j} \sim Bernoulli(p),
+\end{equation}
+
+\begin{equation}
+\tilde{\boldsymbol{y}}^{(l)} = \boldsymbol{r}^{(l)} * \boldsymbol{y}^{(l)},
+\end{equation}
+
+\begin{equation}
+z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \tilde{\boldsymbol{y}}^{l} + b^{(l+1)}_{i},
+\end{equation}
+
+\begin{equation}
+y^{(l+1)}_{i} = f(z^{(l+1)}_{i})
+\end{equation}
+
+Aquí \(*\) denota el producto elemento a elemento y
+\(\boldsymbol{r}^{(l)}\) es un vector de variables aleatorias de
+Bernoulli con probabilidad \(p\) de ser \(1\). Para cada capa se
+calcula este vector \(\boldsymbol{r}^{(l)}\) y luego se lo multiplica
+elemento a elemento por \(\boldsymbol{y}^{(l)}\) para reducir la
+cantidad de neuronas activas, obteniendo como resultado
+\(\tilde{\boldsymbol{y}}^{(l)}\) que a su vez va a ser la entrada de
+la capa siguiente.
 
 *** Organización y entrenamiento de redes neuronales
 
@@ -789,7 +830,6 @@ sus activaciones se pueden calcular con una multiplicacion de matrices
 junto con el calculo del \textit{bias}, como ya se vio para las redes
 neuronales convencionales.
 
-***** TODO explicacion. ecuacion.
 **** TODO (AGREGAR IMAGEN) Arquitecturas 
 
 Normalmente una red convolucional esta compuesta de varias capas
@@ -835,8 +875,6 @@ modelos ya preentrenados.
 Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5.
-
-***** TODO imagen ejemplo de red neuronal con [CONV-RELU-POOL]* FC FC etc.
 
 * Redes neuronales siamesas
 ** Conceptos generales sobre los cuales parte el trabajo
