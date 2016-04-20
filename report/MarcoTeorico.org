@@ -879,12 +879,24 @@ cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 *** SFA
 
 * Plan de Trabajo                                :noexport:
-** Conseguir datasets
-MINST: http://yann.lecun.com/exdb/mnist/
-KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
-SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
+** Datasets
+1. MINST: http://yann.lecun.com/exdb/mnist/
+
+2. KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
+
+3. SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
+
+4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
 
 ** Prueba de Concepto con MNIST
+DEADLINE: <2016-04-29 vie> 
+
+Analizar como hacer redes siamesas en distintos frameworks. Hacer
+pruebas de concepto con MNIST. Elegir un framework.
+
+EL objetivo es entender como hacer redes siamesas en los distintos
+frameworks (entrada de la red, como es la ultima capa, como
+preprocesar los datos)
 *** Preprocesamiento
 El dataset tiene unas 60K imágenes. A cada dígito se le aplican dos
 conjuntos de transformaciones aleatorias diferentes para generar los
@@ -935,7 +947,14 @@ conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training
 set de MNIST (sin transformaciones).  El test set que viene con MNIST
 se utiliza para testing.
 ** Experimentos con KITTI y SF
-*** Preprocesamiento KITTI
+*** Preprocesamiento
+DEADLINE: <2016-05-13 vie>
+
+Analizar como se eligen las clases (es un problema de
+clasificacion). Hacer todos los scripts de preprocesamiento.
+Crear las lmdb.
+
+**** KITTI
 Tiene 20501 imágenes. Se calculan las transformaciones entre las
 imágenes cercanas utilizando los datos odométricos del dataset.
 Similar a MNIST: se crean 20 clases para las transformaciones en X,Y,Z
@@ -949,7 +968,7 @@ Para SFA, el threshold para imágenes temporalmente cercanas (T) es
 también de +-7
 El numero total de imagenes usadas para entrenamiento es 20501
 
-*** Preprocesamiento SF
+**** SF
 Análogo a KITTI, solo que además de las transformaciones en X,Y,Z
 agregan los 3 "euler angles" (no entendi eso).
 
@@ -959,6 +978,7 @@ primeras capas de AlexNet, extraer tamaño de filtros de esa red)
 TCNN: C256-C128-F500-D-Op. Los kernels convolucionales con 3x3.
 
 *** Entrenamiento
+DEADLINE: <2016-05-31 mar>
 Se entrena por 60K iteraciones con batch size de 128, learning rate
 inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
@@ -979,15 +999,11 @@ Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
 clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
 (AlexNet con pesos inicializados de manera aleatoria). Nuevamente el
 paper no explica las iteraciones ni el learning rate utilizados.
+** Mejoras al sistema
+DEADLINE: <2016-06-17 vie>
+Probar con otras redes.
+Otros datasets (elegir datasets pequeños y ver que pasa).
 
-* Datasets                                       :noexport:
-1. MINST: http://yann.lecun.com/exdb/mnist/
-
-2. KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
-
-3. SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
-
-4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
 * Bibliografía
 #+LaTeX: \bibliographystyle{abbrv}
 #+LaTex: \bibliography{MarcoTeorico}
