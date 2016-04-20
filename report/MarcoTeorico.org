@@ -20,6 +20,7 @@
 #+LATEX_HEADER: \usepackage{url}\urlstyle{sf}
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
+#+LATEX_HEADER: \usepackage{amsmath}
 
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
@@ -45,7 +46,6 @@
 #+LATEX_HEADER: \newcommand{\CNN}{\textit{Convolutional Neural Networks}}
 
 * Introducción
-** Qué es la visión por computadoras
 
 Para los seres humanos, percibir el mundo que nos rodea es una tarea
 fácil. Millones de años de evolución nos han dotado con un sistema
@@ -68,8 +68,8 @@ categorías, determinar a cual de las categorías pertenece esa
 imagen. Tener un buen entendimiento de los algoritmos de clasificación
 es crucial para desarrollar otras tareas dentro de la visión por
 computadoras, dado que muchos problemas pueden ser reducidos a
-clasificación: detección de objetos, \textit{captioning} de imágenes,
-segmentación, etc.
+clasificación: detección de objetos, descripcion de imágenes y
+segmentación entre otros.
 
 Sin embargo, es un problema más difícil de lo que aparenta. Una
 fotografía es solamente un conjunto de números (píxeles), entonces
@@ -97,7 +97,7 @@ Convolucionales. Desde el año 2010, todos los equipos ganadores del
 desafío Imagenet usaron Redes Neuronales Convolucionales, cada vez con
 resultados más precisos \cite{imagenet}.
 
-A pesar de haber tenido su golpe de popularidad en los últimos 6 años,
+A pesar de haber tenido su golpe de popularidad en los últimos años,
 los primeros esbozos de modelar redes neuronales artificiales datan de
 1958, cuando Frank Rosenblatt ideó el \textit{perceptron}, un
 algoritmo para reconocimiento de patrones basado en una red de dos
@@ -108,56 +108,41 @@ implicando que el área se estancara durante años \cite{minsky}. Tan
 así es, que recién en 2006, con el abaratamiento de costos en hardware
 de alto desempeño se pudieron implementar arquitecturas más complejas
 (no necesariamente nuevas) y redes neuronales más profundas, algo que
-se conoce como \DL, y que explicaremos más adelante.
-
-
-
-** Gran cantidad de datos
+se conoce como Aprendizaje Profundo (\textit{Deep Learning}).
 
 Para poder entrenar Redes Neuronales Profundas, es necesario contar
 con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
-de los miles hasta los cientos de millones de imágenes. En la mayoría de los
-casos, se requiere un gran esfuerzo humano para etiquetar tantas
-imágenes.
+de los cientos de miles hasta millones de imágenes. Generalmente se
+requiere un gran esfuerzo humano para etiquetar tantas imágenes.
 
-La buena noticia es que actualmente contamos con una increíble
-cantidad de imágenes para etiquetar. Para 2016, Cisco estima que el
-51\% del trafico de Internet va a provenir de dispositivos WiFi, tales
-como celulares, \textit{tablets}, \textit{smart TV's}, etc.  Más aún,
-se estima que para el 2019 el 80\% del tráfico IP va a ser en forma de
-píxeles (multimedia), superando al 67\% que existente en 2014
+Actualmente contamos con una increíble cantidad de imágenes para
+etiquetar. Para 2016, Cisco estima que el 51\% del trafico de Internet
+va a provenir de dispositivos WiFi, tales como celulares,
+\textit{tablets}, \textit{smart TV's}, etc.  Más aún, se estima que
+para el 2019 el 80\% del tráfico IP va a ser en forma de píxeles
+(multimedia), superando al 67\% que existente en 2014
 \cite{ciscostats}. Como tendencia podemos nombrar a Youtube, donde la
 mitad de los videos son subidos desde dispositivos móviles
-\cite{youtustats}.
- 
-Por otro lado, las redes sociales más populares como Facebook, Flickr
-o Instagram almacenan una gigantesca cantidad de imágenes, contando la
-última con más de 80 millones de imágenes subidas por día
-\cite{instastats}. 
+\cite{youtustats}. Por otro lado, las redes sociales más populares
+como Facebook, Flickr o Instagram almacenan una gigantesca cantidad de
+imágenes, contando la última con más de 80 millones de imágenes
+subidas por día \cite{instastats}. Sin embargo, es practicamente
+imposible contar con los recursos suficientes para anotar tantos
+videos, imágenes y demás contenido multimedia.
 
-Es practicamente imposible contar con los recursos suficientes para
-anotar tantos videos, imágenes y demás contenido multimedia. Para ello
-debemos contar con herramientas de visión por computadoras para
-filtrar, procesar y dar un sentido semántico a las imágenes.
-
-Pero no podemos clasificar las imágenes si no contamos con una
-herramienta poderosa que nos ayude, de la misma manera que no podemos
-entrenar una herramienta poderosa si no tenemos la suficiente cantidad
-de datos anotados.
-
-Una posible solución a esto es la propuesta por \cite{LSM2015}, en
-donde en vez de utilizar un gran dataset anotado a mano, proponen
-utilizar información odométrica disponible en cámaras (giróscopos,
-acelerómetros, etc) para pre-entrenar redes neuronales profundas, y
-luego entrenarlas utilizando el dataset que se desee, obteniendo la
-ventaja de no necesitar un dataset tan grande para lograr buena
+Una posible solución al entrenamiento de redes profundas cuando no se
+puede anotar una gran cantidad de datos es la propuesta por
+\cite{LSM2015}. En la misma proponen utilizar información odométrica
+disponible en cámaras (giróscopos, acelerómetros, etc) para
+pre-entrenar redes neuronales profundas, y luego entrenarlas
+utilizando el conjunto de datos anotados que se desee, obteniendo la
+ventaja de no necesitar un conjunto tan grande para lograr buena
 precisión.
 
 En este trabajo final nos proponemos reproducir este paper, analizando
 cada paso para luego proponer mejoras y aplicaciones al mundo real.
 
 El trabajo está organizado como sigue:
-*** TODO organizacion del trabajo
 
 * Marco Teórico
 ** Aprendizaje Automatico
@@ -344,7 +329,7 @@ cada parametro y luego modificar cada uno ligeramente con el objetivo
 de alcanzar un minimo en la funcion:
 
 \begin{equation}
-    W_{n+1} = W_n - \epsilon frac{1}{m} \sum^{m}_{i} \nabla_{\theta} L(f(x_i; \theta), y_i)
+    W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta} L(f(x_i; \theta), y_i)
 \end{equation}
 
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
@@ -413,9 +398,17 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 
 \begin{equation}
 \frac{\partial f}{\partial z} = q
-\frac{\partial f}{\partial q} = z
+\end{equation}
 
+\begin{equation}
+\frac{\partial f}{\partial q} = z
+\end{equation}
+
+\begin{equation}
 \frac{\partial f}{\partial x} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial x} = \frac{z}{y^2}
+\end{equation}
+
+\begin{equation}
 \frac{\partial f}{\partial y} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
 \end{equation}
 
@@ -462,6 +455,9 @@ clasificador \(s_2=W_2y+b_2\), entonces obtendríamos un tercero:
 
 \begin{equation}
 s_3 = W_2 (W_1x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1) + b_2
+\end{equation}
+
+\begin{equation}
 s_3 = W_3 x + b_3
 \end{equation}
 
@@ -475,7 +471,7 @@ romper la linealidad de estas "capas" de clasificadores es, por
 ejemplo, agregar lo que se llama \textit{función de activación}:
  
 \begin{equation}
-    s = W_2 \max{0, W_1 x + b_1} + b_2
+    s = W_2 \max{(0, W_1 x + b_1)} + b_2
 \end{equation}
  
  
@@ -876,13 +872,13 @@ Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 
-* Redes neuronales siamesas
+* Redes neuronales siamesas                      :noexport:
 ** Conceptos generales sobre los cuales parte el trabajo
 *** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
 *** Egomotion
 *** SFA
 
-* Plan de Trabajo
+* Plan de Trabajo                                :noexport:
 ** Conseguir datasets
 MINST: http://yann.lecun.com/exdb/mnist/
 KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
@@ -984,7 +980,7 @@ clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
 (AlexNet con pesos inicializados de manera aleatoria). Nuevamente el
 paper no explica las iteraciones ni el learning rate utilizados.
 
-* Datasets
+* Datasets                                       :noexport:
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
 2. KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
@@ -992,9 +988,6 @@ paper no explica las iteraciones ni el learning rate utilizados.
 3. SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
 
 4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
-* Herramientas   
-Obtener acceso a algun server con Caffe+Ubuntu.
-
 * Bibliografía
 #+LaTeX: \bibliographystyle{abbrv}
 #+LaTex: \bibliography{MarcoTeorico}
