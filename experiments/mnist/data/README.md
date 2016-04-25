@@ -1,1 +1,1 @@
-Uncompress here the MNIST files downloaded from http://yann.lecun.com/exdb/mnist/
+The MNIST dataset goes here. You can download it by running the script download_mnist.sh in the previous folder.
