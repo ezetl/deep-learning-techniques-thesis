@@ -12,7 +12,7 @@
  * flag off and it will run in high endian mode
  *
  * How to compile:
- *     g++ -o preprocess_mnist preprocess_mnist.cpp -std=gnu++11 -lopencv_core 
+ *     g++ -o preprocess_mnist preprocess_mnist.cpp -std=gnu++11 -lopencv_core -lopencv_highgui 
  *
  * Author: Ezequiel Torti Lopez
  */
@@ -70,7 +70,6 @@ void load_images(string path)
 
 void parse_images(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist)
 {
-    namedWindow("MNIST", CV_WINDOW_AUTOSIZE);
     unsigned int size_img = meta.cols * meta.rows;
     // 4 integers in the header of the images file
     streampos offset = sizeof(int32_t) * 4;
@@ -79,10 +78,10 @@ void parse_images(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist)
         vector<Byte> raw_data = read_block(f, size_img, offset);
         Mat mchar(raw_data, false);
         mchar = mchar.reshape(1, meta.rows);
+        //string name = to_string(i);
+        //name += ".png";
+        //imwrite(name, mchar);
         offset += size_img;
-        string name = to_string(i);
-        name += ".jpg";
-        imwrite(name, mchar);
     }
 }
 
@@ -97,9 +96,11 @@ vector<Byte> read_block(ifstream &f, unsigned int size, streampos offset)
     vector<Byte> raw_data(size);
     for (unsigned int i=0; i<size; i++)
     {
-        raw_data[i] = 255 - bytes[i];
+        raw_data[i] = bytes[i];
     }
+
     free(bytes);
+
     return raw_data;
 }
 
@@ -137,6 +138,7 @@ MNIST_metadata parse_images_header(ifstream &f)
  */
 int32_t get_int32_t(ifstream &f, streampos offset)
 {
+    // TODO add support to big-endian machines
     int32_t* i_int;
     Byte* b_int; 
 
