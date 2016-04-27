@@ -1,11 +1,20 @@
 #include <iostream>
 #include <fstream>
+#include <string> 
 #include <vector>
 #include <cinttypes>
+#include <sys/stat.h>
+#include <iomanip>
+
+#include <leveldb/db.h>
+#include <leveldb/write_batch.h>
+#include <lmdb.h>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-#include <string> 
+#include "caffe/proto/caffe.pb.h"
+
 /*
  * Author: Ezequiel Torti Lopez
  *
@@ -18,16 +27,21 @@
  *
  */
 
+using namespace caffe;
 using namespace std;
 using namespace cv;
 
 #define LOW_ENDIAN true
+#define TB 1099511627776
 
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
+
+#define LMDB_TRAIN (DATA_ROOT"mnist_train_lmdb/")
+#define LMDB_VAL   (DATA_ROOT"mnist_val_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -39,6 +53,7 @@ typedef struct
     uint32_t rows;
 } MNIST_metadata;
 
+void create_lmdbs(const char* images, const char* labels, const char* db_path);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
@@ -50,19 +65,80 @@ vector<uByte> load_labels(string path);
 void process_images();
 void process_labels();
 
-int main()
+int main(int argc, char** argv)
 {
-    cout << "Loading training split: \n"; 
-    vector<Mat> train_imgs = load_images(TRAIN_IMAGES);
-    cout << "Loading testing split: \n"; 
-    vector<Mat> test_imgs = load_images(TEST_IMAGES);
-    cout << "Loading training labels: \n"; 
-    vector<uByte> train_labels = load_labels(TRAIN_LABELS);
-    cout << "Loading testing labels: \n"; 
-    vector<uByte> test_labels = load_labels(TEST_LABELS);
-    // TODO: add random rotation/translations.
-    // TODO: save Mat to lmdb.
+    cout << "Creating train LMDB\n";
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
+    cout << "Creating test LMDB\n";
+    create_lmdbs(TEST_IMAGES, TEST_LABELS, LMDB_VAL);
     return 0;
+}
+
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
+{
+    /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
+    // lmdb
+    MDB_env *mdb_env;
+    MDB_dbi mdb_dbi;
+    MDB_val mdb_key, mdb_data;
+    MDB_txn *mdb_txn;
+
+    // Set database environment
+    mkdir(lmdb_path, 0744);
+
+    mdb_env_create(&mdb_env);
+    mdb_env_set_mapsize(mdb_env, TB);
+    mdb_env_open(mdb_env, lmdb_path, 0, 0664);
+    mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+    mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
+
+    // Load images/labels
+    vector<Mat> list_imgs = load_images(images);
+    vector<uByte> list_labels = load_labels(labels);
+    // TODO: add random rotation/translations.
+    // TODO: modify dimensions of Datum according to the new format of images (I'll do a Split to separate images later on training)
+
+    // Storing to db
+    unsigned int rows = list_imgs[0].rows;
+    unsigned int cols = list_imgs[0].cols;
+    int count = 0;
+    string value;
+    
+    Datum datum;
+    datum.set_channels(1);
+    datum.set_height(rows);
+    datum.set_width(cols);
+
+    std::ostringstream s;
+    for (unsigned int item_id = 0; item_id < list_imgs.size(); ++item_id) {
+        datum.set_data((char*)list_imgs[item_id].data, rows*cols);
+        datum.set_label((char)list_labels[item_id]);
+
+        s << std::setw(8) << std::setfill('0') << item_id;
+        string key_str = s.str();
+        s.str(std::string());
+
+        datum.SerializeToString(&value);
+
+        mdb_data.mv_size = value.size();
+        mdb_data.mv_data = reinterpret_cast<void*>(&value[0]);
+        mdb_key.mv_size = key_str.size();
+        mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
+        mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
+        if (++count % 1000 == 0) {
+            // Commit txn
+            mdb_txn_commit(mdb_txn);
+            mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+        }
+    }
+    // Last batch
+    if (count % 1000 != 0) {
+        mdb_txn_commit(mdb_txn);
+        mdb_close(mdb_env, mdb_dbi);
+        mdb_env_close(mdb_env);
+    }
+
+    return;
 }
 
 vector<Mat> load_images(string path)
