@@ -23,7 +23,7 @@ using namespace cv;
 
 #define LOW_ENDIAN true
 
-#define DATA_ROOT    "data/"
+#define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
@@ -33,13 +33,13 @@ typedef char Byte;
 typedef unsigned char uByte;
 typedef struct
 {
-    int32_t magic;
-    int32_t num_elems;
-    int32_t cols;
-    int32_t rows;
+    uint32_t magic;
+    uint32_t num_elems;
+    uint32_t cols;
+    uint32_t rows;
 } MNIST_metadata;
 
-int32_t get_int32_t(ifstream &f, streampos offset);
+uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
 MNIST_metadata parse_labels_header(ifstream &f);
@@ -52,9 +52,13 @@ void process_labels();
 
 int main()
 {
+    cout << "Loading training split: \n"; 
     vector<Mat> train_imgs = load_images(TRAIN_IMAGES);
+    cout << "Loading testing split: \n"; 
     vector<Mat> test_imgs = load_images(TEST_IMAGES);
+    cout << "Loading training labels: \n"; 
     vector<uByte> train_labels = load_labels(TRAIN_LABELS);
+    cout << "Loading testing labels: \n"; 
     vector<uByte> test_labels = load_labels(TEST_LABELS);
     // TODO: add random rotation/translations.
     // TODO: save Mat to lmdb.
@@ -94,30 +98,27 @@ MNIST_metadata parse_images_header(ifstream &f)
 {
     MNIST_metadata meta;
     streampos offset = 0;
-    meta.magic = get_int32_t(f, offset);
-    offset += sizeof(int32_t);
-    meta.num_elems = get_int32_t(f, offset);
-    offset += sizeof(int32_t);
-    meta.rows = get_int32_t(f, offset);
-    offset += sizeof(int32_t);
-    meta.cols = get_int32_t(f, offset);
+    meta.magic = get_uint32_t(f, offset);
+    offset += sizeof(uint32_t);
+    meta.num_elems = get_uint32_t(f, offset);
+    offset += sizeof(uint32_t);
+    meta.rows = get_uint32_t(f, offset);
+    offset += sizeof(uint32_t);
+    meta.cols = get_uint32_t(f, offset);
     return meta;
 }
 
 void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> &mnist)
 {
-    //namedWindow("MNIST");
     unsigned int size_img = meta.cols * meta.rows;
     // 4 integers in the header of the images file
-    streampos offset = sizeof(int32_t) * 4;
+    streampos offset = sizeof(uint32_t) * 4;
     for (unsigned int i=0; i<meta.num_elems; i++)
     {
         vector<uByte> raw_data = read_block(f, size_img, offset);
         Mat mchar(raw_data, false);
         mchar = mchar.reshape(1, meta.rows);
         mnist[i] = mchar;
-        //imshow("MNIST", mchar);
-        //waitKey(100);
         offset += size_img;
     }
 }
@@ -126,16 +127,16 @@ MNIST_metadata parse_labels_header(ifstream &f)
 {
     MNIST_metadata meta;
     streampos offset = 0;
-    meta.magic = get_int32_t(f, offset);
-    offset += sizeof(int32_t);
-    meta.num_elems = get_int32_t(f, offset);
+    meta.magic = get_uint32_t(f, offset);
+    offset += sizeof(uint32_t);
+    meta.num_elems = get_uint32_t(f, offset);
     return meta;
 }
 
 void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> &labels)
 {
     // 4 integers in the header of the images file
-    streampos offset = sizeof(int32_t) * 2;
+    streampos offset = sizeof(uint32_t) * 2;
     for (unsigned int i=0; i<meta.num_elems; i++)
     {
         f.seekg(offset);
@@ -173,22 +174,22 @@ vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset)
  * 
  * Precondition: f has to be opened with ios::in | ios::binary flags
  */
-int32_t get_int32_t(ifstream &f, streampos offset)
+uint32_t get_uint32_t(ifstream &f, streampos offset)
 {
     // TODO add support to big-endian machines
-    int32_t* i_int;
+    uint32_t* i_int;
     Byte* b_int; 
 
-    b_int = (Byte*) malloc(sizeof(int32_t));
+    b_int = (Byte*) malloc(sizeof(uint32_t));
 
-    for (unsigned int i=0; i<sizeof(int32_t); i++)
+    for (unsigned int i=0; i<sizeof(uint32_t); i++)
     {
         f.seekg(offset + (streampos) i);
-        f.read(b_int+(sizeof(int32_t)-i-1), sizeof(Byte));
+        f.read(b_int+(sizeof(uint32_t)-i-1), sizeof(Byte));
     }
-    i_int = reinterpret_cast<int32_t*>(b_int); 
+    i_int = reinterpret_cast<uint32_t*>(b_int); 
 
-    int32_t res = *i_int;
+    uint32_t res = *i_int;
     free(b_int);
 
     return res;
