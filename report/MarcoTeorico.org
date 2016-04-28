@@ -891,23 +891,43 @@ cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 ** Prueba de Concepto con MNIST
 DEADLINE: <2016-04-29 vie> 
 
-Analizar como hacer redes siamesas en distintos frameworks. Hacer
-pruebas de concepto con MNIST. Elegir un framework.
+EL objetivo es entender como hacer redes siamesas con Caffe
 
-EL objetivo es entender como hacer redes siamesas en los distintos
-frameworks (entrada de la red, como es la ultima capa, como
-preprocesar los datos)
-
-*** [33%] Preprocesamiento
+*** [71%] Preprocesamiento
 Train set: 60K imagenes. Test set 10K imagenes.
-Para pretraining de la red, hay que hacer un preprocesamiento del dataset:
+
+Para pretraining de la red, hay que hacer un preprocesamiento del
+dataset:
   1. Traslación relativa en un rango de [-3,3]
   2. Rotación relativa en un rango de [-30°,30°]
+Tanto las traslaciones como las rotaciones fueron hechas con numeros
+enteros (es decir, los angulos son -30º,-29º,-28º,..,29,30; igual para
+las traslaciones).
+
+Para cada par nuevo creado se eligieron las traslaciones y rotaciones
+de manera aleatoria, de manera que cada par esta compuesto por la
+imagen original y la imagen transformada aleatoriamente.
+
+En total entrenaron con 5 millones de pares de imagenes. Eso significa
+que hay que hacer 85 pares para 10000 imagenes y 83 pares para las
+otras 50000 imagenes.
+
+DUDA: no queda claro en el paper si el par esta compuesto por la
+imagen original mas la imagen transformada o si esta compuesto por una
+imagen previamente transformada a la cual se le hace una
+transformacion relativa. Por lo pronto voy a efectuar el experimento
+con la original+transformada.
 **** DONE Crear codigo (c++) para levantar MNIST y devolver una lista de Mat's
-**** TODO Modificar codigo para crear las transformaciones aleatorias de rotacion y traslacion (OpenCV)
-**** TODO Modificar codigo para guardar lmdb
+**** DONE Modificar codigo para crear las transformaciones de rotacion y traslacion (OpenCV)
+**** DONE Hacer que las rotaciones y traslaciones sean aleatorias
+**** DONE Modificar codigo para guardar lmdb
+**** DONE Modificar algunos aspectos de la parte de lmdb para guardar las nuevas imagenes (dos imagenes mergeadas en una, dimensiones: 28x28x2)
+**** TODO Investigar como guardar multiples etiquetas por imagen (traslacion y rotacion)
+https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
+https://github.com/BVLC/caffe/issues/2407
 *** [0%] Entrenamiento
-**** TODO Preparar Arquitectura
+**** TODO Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
+
 BCCN: C96-P-C256-P
 TCCN: F1000-D-Op
 
