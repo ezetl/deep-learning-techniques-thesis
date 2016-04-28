@@ -33,6 +33,7 @@ using namespace cv;
 #define TB 1099511627776
 #define NUM_TRASLATIONS 7
 #define NUM_ROTATIONS 61
+#define NUM_BIN_ROTATIONS 20
 #define LOWER_ANGLE -30
 #define LOWER_TRASLATION -3
 
@@ -47,6 +48,7 @@ using namespace cv;
 
 typedef char Byte;
 typedef unsigned char uByte;
+typedef uByte Label;
 typedef struct
 {
     uint32_t magic;
@@ -55,17 +57,25 @@ typedef struct
     uint32_t rows;
 } MNIST_metadata;
 
+typedef struct
+{
+    Mat img;
+    Label x;
+    Label y;
+    Label z;
+} DataBlob;
+
 void create_lmdbs(const char* images, const char* labels, const char* db_path);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
 MNIST_metadata parse_labels_header(ifstream &f);
 void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist);
-void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> *labels);
+void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<Label> *labels);
 Mat transform_image(Mat &img, float tx, float ty, float rot);
 vector<Mat> load_images(string path);
-vector<uByte> load_labels(string path);
-void process_images(vector<Mat> &list_imgs);
+vector<Label> load_labels(string path);
+vector<DataBlob> process_images(vector<Mat> &list_imgs);
 void process_labels();
 unsigned int generate_rand(int range_limit);
 
@@ -73,8 +83,6 @@ int main(int argc, char** argv)
 {
     cout << "Creating train LMDB\n";
     create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
-    cout << "Creating test LMDB\n";
-    create_lmdbs(TEST_IMAGES, TEST_LABELS, LMDB_VAL);
     return 0;
 }
 
@@ -98,8 +106,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 
     // Load images/labels
     vector<Mat> list_imgs = load_images(images);
-    vector<uByte> list_labels = load_labels(labels);
-    process_images(list_imgs);
+    vector<Label> list_labels = load_labels(labels);
+    vector<DataBlob> final_data = process_images(list_imgs);
     // TODO: add random rotation/translations.
     // TODO: modify dimensions of Datum according to the new format of images (I'll do a Split to separate images later on training)
 
@@ -161,7 +169,7 @@ vector<Mat> load_images(string path)
     return mnist;
 }
 
-vector<uByte> load_labels(string path)
+vector<Label> load_labels(string path)
 {
     ifstream f;
     f.open(path, ios::in | ios::binary);
@@ -169,7 +177,7 @@ vector<uByte> load_labels(string path)
     MNIST_metadata meta = parse_labels_header(f);
     cout << "\nMagic number: " << meta.magic << endl; 
     cout << "Number of Labels: " << meta.num_elems << endl; 
-    vector<uByte> labels_mnist(meta.num_elems);
+    vector<Label> labels_mnist(meta.num_elems);
     parse_labels_data(f, meta, &labels_mnist);
     return labels_mnist;
 
@@ -217,17 +225,17 @@ MNIST_metadata parse_labels_header(ifstream &f)
     return meta;
 }
 
-void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> *labels)
+void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<Label> *labels)
 {
     // 4 integers in the header of the images file
     streampos offset = sizeof(uint32_t) * 2;
     for (unsigned int i=0; i<meta.num_elems; i++)
     {
         f.seekg(offset);
-        uByte label;
-        f.read((Byte*) &label, sizeof(uByte));
+        Label label;
+        f.read((Byte*) &label, sizeof(Label));
         (*labels)[i] = label;
-        offset += sizeof(uByte);
+        offset += sizeof(Label);
     }
 }
 
@@ -290,12 +298,20 @@ Mat transform_image(Mat &img, float tx, float ty, float rot)
     Mat rotMat = getRotationMatrix2D(mid,  rot,  1.0);
     Mat transMat = (Mat_<double>(2,3) << 0,0,tx,0,0,ty);
     rotMat = rotMat + transMat;
-    warpAffine(img, res, rotMat, Size(img.cols, img.rows));
+    // Set constant value for border to be white
+    warpAffine(img,
+               res,
+               rotMat,
+               Size(img.cols, img.rows),
+               INTER_LINEAR,
+               BORDER_CONSTANT,
+               Scalar(255, 255, 255));
     return res;
 }
 
-void process_images(vector<Mat> &list_imgs)
+vector<DataBlob> process_images(vector<Mat> &list_imgs)
 {
+    vector<DataBlob> final_data;
     srand(0);
     unsigned int rand_index = 0;
     vector<float> translations(NUM_TRASLATIONS);
@@ -312,24 +328,62 @@ void process_images(vector<Mat> &list_imgs)
         rotations[i] = value++;
     }
 
-    namedWindow("Normal");
-    namedWindow("Transformed");
+    // Debugging
+    //namedWindow("Normal");
+    //namedWindow("Transformed");
+    int count = 0;
     for (unsigned int i=0; i<list_imgs.size(); i++)
     {
-        rand_index = generate_rand(NUM_TRASLATIONS);
-        float tx = translations[rand_index];
-        rand_index = generate_rand(NUM_TRASLATIONS);
-        float ty = translations[rand_index];
-        rand_index = generate_rand(NUM_ROTATIONS);
-        float rot = rotations[rand_index];
-        Mat new_img = transform_image(list_imgs[i], tx, ty, rot);
+        unsigned int amount_pairs = 83;
+        if (i<10000)
+        {
+            amount_pairs = 85;
+        }
+
+        // Use white background
         bitwise_not(list_imgs[i], list_imgs[i]);
-        bitwise_not(new_img, new_img);
-        imshow("Normal", list_imgs[i]);
-        imshow("Transformed", new_img);
-        waitKey(100);
+
+        for (unsigned int j=0; j<amount_pairs; j++)
+        {
+            DataBlob d;
+            // Generate random X translation
+            rand_index = generate_rand(NUM_TRASLATIONS);
+            d.x = rand_index; 
+            float tx = translations[rand_index];
+            // Generate random Y translation
+            rand_index = generate_rand(NUM_TRASLATIONS);
+            d.y = rand_index; 
+            float ty = translations[rand_index];
+            // Calculate random bin of rotation (0 to 19)
+            rand_index = generate_rand(NUM_BIN_ROTATIONS);
+            d.z = rand_index;
+            // Calculate the real index of the array of rotations (0 to 61)
+            rand_index *= 3;
+            rand_index += generate_rand(3);
+            float rot = rotations[rand_index];
+
+            // Finally, apply the selected transformations to the image
+            Mat new_img = transform_image(list_imgs[i], tx, ty, rot);
+
+            // Merge the original img and the transformed one into a unique Mat
+            // Then we split the channels in Caffe using the SLICE layer
+            auto channels = vector<Mat>{list_imgs[i], new_img};
+            Mat merged_mats;
+            merge(channels, merged_mats);
+            d.img = merged_mats;
+
+            final_data.push_back(d);
+
+            // Debugging
+            //imshow("Normal", list_imgs[i]);
+            //imshow("Transformed", new_img);
+            //waitKey(100);
+
+            count++;
+        }
     }
-    return;
+    cout << "Amount of images processed: " << count << "\n";
+    return final_data;
 }
 
 /* Generate a random number between 0 and range_limit-1
