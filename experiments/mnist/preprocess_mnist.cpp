@@ -4,6 +4,7 @@
 #include <vector>
 #include <cinttypes>
 #include <sys/stat.h>
+#include <stdlib.h> 
 #include <iomanip>
 
 #include <leveldb/db.h>
@@ -30,6 +31,10 @@ using namespace cv;
 
 #define LOW_ENDIAN true
 #define TB 1099511627776
+#define NUM_TRASLATIONS 7
+#define NUM_ROTATIONS 61
+#define LOWER_ANGLE -30
+#define LOWER_TRASLATION -3
 
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
@@ -57,11 +62,12 @@ MNIST_metadata parse_images_header(ifstream &f);
 MNIST_metadata parse_labels_header(ifstream &f);
 void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist);
 void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> *labels);
-Mat transform_image(Mat &img);
+Mat transform_image(Mat &img, float tx, float ty, float rot);
 vector<Mat> load_images(string path);
 vector<uByte> load_labels(string path);
 void process_images(vector<Mat> &list_imgs);
 void process_labels();
+unsigned int generate_rand(int range_limit);
 
 int main(int argc, char** argv)
 {
@@ -273,14 +279,15 @@ uint32_t get_uint32_t(ifstream &f, streampos offset)
     return res;
 }
 
-Mat transform_image(Mat &img)
+/*
+ * rot (Rotation) is in degrees
+ * tx, ty (Translations) are pixels
+ */
+Mat transform_image(Mat &img, float tx, float ty, float rot)
 {
     Mat res;
-    float rot_angle = 30.0; // in degrees
     Point2f mid(img.cols / 2, img.rows / 2);
-    Mat rotMat = getRotationMatrix2D(mid,  rot_angle,  1.0);
-    float tx = -3; // translation in pixels
-    float ty = 0;
+    Mat rotMat = getRotationMatrix2D(mid,  rot,  1.0);
     Mat transMat = (Mat_<double>(2,3) << 0,0,tx,0,0,ty);
     rotMat = rotMat + transMat;
     warpAffine(img, res, rotMat, Size(img.cols, img.rows));
@@ -289,11 +296,33 @@ Mat transform_image(Mat &img)
 
 void process_images(vector<Mat> &list_imgs)
 {
+    srand(0);
+    unsigned int rand_index = 0;
+    vector<float> translations(NUM_TRASLATIONS);
+    float value = LOWER_TRASLATION;
+    for (unsigned int i=0; i<translations.size(); i++)
+    {
+        translations[i] = value++;
+    }
+
+    value = LOWER_ANGLE;
+    vector<float> rotations(NUM_ROTATIONS);
+    for (unsigned int i=0; i<rotations.size(); i++)
+    {
+        rotations[i] = value++;
+    }
+
     namedWindow("Normal");
     namedWindow("Transformed");
     for (unsigned int i=0; i<list_imgs.size(); i++)
     {
-        Mat new_img = transform_image(list_imgs[i]);
+        rand_index = generate_rand(NUM_TRASLATIONS);
+        float tx = translations[rand_index];
+        rand_index = generate_rand(NUM_TRASLATIONS);
+        float ty = translations[rand_index];
+        rand_index = generate_rand(NUM_ROTATIONS);
+        float rot = rotations[rand_index];
+        Mat new_img = transform_image(list_imgs[i], tx, ty, rot);
         bitwise_not(list_imgs[i], list_imgs[i]);
         bitwise_not(new_img, new_img);
         imshow("Normal", list_imgs[i]);
@@ -301,6 +330,14 @@ void process_images(vector<Mat> &list_imgs)
         waitKey(100);
     }
     return;
+}
+
+/* Generate a random number between 0 and range_limit-1
+ * Useful to get a random element in an array of size range_limit
+ */
+unsigned int generate_rand(int range_limit)
+{
+    return rand() % range_limit;
 }
 
 void process_labels()
