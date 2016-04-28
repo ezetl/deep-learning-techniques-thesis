@@ -12,6 +12,7 @@
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #include "caffe/proto/caffe.pb.h"
 
@@ -21,10 +22,6 @@
  * This code parses the MNIST dataset files (images and labels).
  * It was done for my low-endian machine, but you can set the LOW_ENDIAN
  * flag off and it will run in high endian mode
- *
- * How to compile:
- *     g++ -o preprocess_mnist preprocess_mnist.cpp -std=gnu++11 -lopencv_core -lopencv_highgui 
- *
  */
 
 using namespace caffe;
@@ -58,11 +55,12 @@ uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
 MNIST_metadata parse_labels_header(ifstream &f);
-void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> &mnist);
-void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> &labels);
+void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist);
+void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> *labels);
+Mat transform_image(Mat &img);
 vector<Mat> load_images(string path);
 vector<uByte> load_labels(string path);
-void process_images();
+void process_images(vector<Mat> &list_imgs);
 void process_labels();
 
 int main(int argc, char** argv)
@@ -95,6 +93,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     // Load images/labels
     vector<Mat> list_imgs = load_images(images);
     vector<uByte> list_labels = load_labels(labels);
+    process_images(list_imgs);
     // TODO: add random rotation/translations.
     // TODO: modify dimensions of Datum according to the new format of images (I'll do a Split to separate images later on training)
 
@@ -152,7 +151,7 @@ vector<Mat> load_images(string path)
     cout << "Rows: " << meta.rows << endl;
     cout << "Columns: " << meta.cols << endl; 
     vector<Mat> mnist(meta.num_elems);
-    parse_images_data(f, meta, mnist);
+    parse_images_data(f, meta, &mnist);
     return mnist;
 }
 
@@ -165,7 +164,7 @@ vector<uByte> load_labels(string path)
     cout << "\nMagic number: " << meta.magic << endl; 
     cout << "Number of Labels: " << meta.num_elems << endl; 
     vector<uByte> labels_mnist(meta.num_elems);
-    parse_labels_data(f, meta, labels_mnist);
+    parse_labels_data(f, meta, &labels_mnist);
     return labels_mnist;
 
 }
@@ -184,8 +183,9 @@ MNIST_metadata parse_images_header(ifstream &f)
     return meta;
 }
 
-void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> &mnist)
+void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist)
 {
+    //namedWindow("MNIST");
     unsigned int size_img = meta.cols * meta.rows;
     // 4 integers in the header of the images file
     streampos offset = sizeof(uint32_t) * 4;
@@ -194,8 +194,10 @@ void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> &mnist)
         vector<uByte> raw_data = read_block(f, size_img, offset);
         Mat mchar(raw_data, false);
         mchar = mchar.reshape(1, meta.rows);
-        mnist[i] = mchar;
+        (*mnist)[i] = mchar.clone();
         offset += size_img;
+        //imshow("MNIST", mchar);
+        //waitKey(100);
     }
 }
 
@@ -209,7 +211,7 @@ MNIST_metadata parse_labels_header(ifstream &f)
     return meta;
 }
 
-void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> &labels)
+void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> *labels)
 {
     // 4 integers in the header of the images file
     streampos offset = sizeof(uint32_t) * 2;
@@ -218,7 +220,7 @@ void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<uByte> &labels)
         f.seekg(offset);
         uByte label;
         f.read((Byte*) &label, sizeof(uByte));
-        labels[i] = label;
+        (*labels)[i] = label;
         offset += sizeof(uByte);
     }
 }
@@ -271,9 +273,34 @@ uint32_t get_uint32_t(ifstream &f, streampos offset)
     return res;
 }
 
-void process_images()
+Mat transform_image(Mat &img)
 {
+    Mat res;
+    float rot_angle = 30.0; // in degrees
+    Point2f mid(img.cols / 2, img.rows / 2);
+    Mat rotMat = getRotationMatrix2D(mid,  rot_angle,  1.0);
+    float tx = -3; // translation in pixels
+    float ty = 0;
+    Mat transMat = (Mat_<double>(2,3) << 0,0,tx,0,0,ty);
+    rotMat = rotMat + transMat;
+    warpAffine(img, res, rotMat, Size(img.cols, img.rows));
+    return res;
+}
 
+void process_images(vector<Mat> &list_imgs)
+{
+    namedWindow("Normal");
+    namedWindow("Transformed");
+    for (unsigned int i=0; i<list_imgs.size(); i++)
+    {
+        Mat new_img = transform_image(list_imgs[i]);
+        bitwise_not(list_imgs[i], list_imgs[i]);
+        bitwise_not(new_img, new_img);
+        imshow("Normal", list_imgs[i]);
+        imshow("Transformed", new_img);
+        waitKey(100);
+    }
+    return;
 }
 
 void process_labels()
