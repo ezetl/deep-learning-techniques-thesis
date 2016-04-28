@@ -22,7 +22,18 @@
  *
  * This code parses the MNIST dataset files (images and labels).
  * It was done for my low-endian machine, but you can set the LOW_ENDIAN
- * flag off and it will run in high endian mode
+ * flag off and it will run in high endian mode (TODO)
+ *
+ * The main idea is to create a database with 5 million images to 
+ * reproduce the results obtained in "Learning to See by Moving" by 
+ * Agrawal el al.
+ *
+ * For that, I parse the MNIST files, apply the transformations mentioned
+ * in the section 3.4.1 of the paper and save the images to a LMDB.
+ *
+ * This code is part of my undergrad thesis: "Reconocimiento visual
+ * empleando técnicas de deep learning" ("Visual Recognition using Deep
+ * Learning techniques")
  */
 
 using namespace caffe;
@@ -124,7 +135,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     std::ostringstream s;
 
     // Processing and generating 5 million images at once will consume too much RAM (>7GB)
-    // and it will throw std::bad_alloc.
+    // and it will (probably) throw a std::bad_alloc exception.
     // Lets split the processing in several batches instead. 
     // list_imgs.size() has to be multiple of BATCHES (to simplify things)
     int len_batch = list_imgs.size() / BATCHES;
