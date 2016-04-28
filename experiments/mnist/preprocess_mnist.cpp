@@ -36,6 +36,7 @@ using namespace cv;
 #define NUM_BIN_ROTATIONS 20
 #define LOWER_ANGLE -30
 #define LOWER_TRASLATION -3
+#define BATCHES 20 
 
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
@@ -89,6 +90,7 @@ int main(int argc, char** argv)
 void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 {
     /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
+
     // lmdb
     MDB_env *mdb_env;
     MDB_dbi mdb_dbi;
@@ -107,9 +109,6 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     // Load images/labels
     vector<Mat> list_imgs = load_images(images);
     vector<Label> list_labels = load_labels(labels);
-    vector<DataBlob> final_data = process_images(list_imgs);
-    // TODO: add random rotation/translations.
-    // TODO: modify dimensions of Datum according to the new format of images (I'll do a Split to separate images later on training)
 
     // Storing to db
     unsigned int rows = list_imgs[0].rows;
@@ -118,30 +117,49 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     string value;
     
     Datum datum;
-    datum.set_channels(1);
+    datum.set_channels(2);
     datum.set_height(rows);
     datum.set_width(cols);
 
     std::ostringstream s;
-    for (unsigned int item_id = 0; item_id < list_imgs.size(); ++item_id) {
-        datum.set_data((char*)list_imgs[item_id].data, rows*cols);
-        datum.set_label((char)list_labels[item_id]);
 
-        s << std::setw(8) << std::setfill('0') << item_id;
-        string key_str = s.str();
-        s.str(std::string());
+    // Processing and generating 5 million images at once will consume too much RAM (>7GB)
+    // and it will throw std::bad_alloc.
+    // Lets split the processing in several batches instead. 
+    // list_imgs.size() has to be multiple of BATCHES (to simplify things)
+    int len_batch = list_imgs.size() / BATCHES;
+    for (unsigned int i = 0; i<BATCHES; i++)
+    {
+        unsigned int begin = i * len_batch; 
+        unsigned int end = begin + len_batch;
+        vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
+        vector<DataBlob> batch_data = process_images(batch_imgs);
+        for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
+            datum.set_data((char*)batch_data[item_id].img.data, rows*cols);
+            // TODO: research about how to make multilabel learning in Caffe
+            // https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
+            // https://github.com/BVLC/caffe/issues/2407
+            //datum.set_label((char)batch_data[item_id]);
 
-        datum.SerializeToString(&value);
+            // Dont use item_id as key here since we have 83/85 images per original image,
+            // meaning that we will overwrite the same image 83/85 times instead of creating 
+            // a new entry
+            s << std::setw(8) << std::setfill('0') << count; 
+            string key_str = s.str();
+            s.str(std::string());
 
-        mdb_data.mv_size = value.size();
-        mdb_data.mv_data = reinterpret_cast<void*>(&value[0]);
-        mdb_key.mv_size = key_str.size();
-        mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
-        mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
-        if (++count % 1000 == 0) {
-            // Commit txn
-            mdb_txn_commit(mdb_txn);
-            mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+            datum.SerializeToString(&value);
+
+            mdb_data.mv_size = value.size();
+            mdb_data.mv_data = reinterpret_cast<void*>(&value[0]);
+            mdb_key.mv_size = key_str.size();
+            mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
+            mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
+            if (++count % 1000 == 0) {
+                // Commit txn
+                mdb_txn_commit(mdb_txn);
+                mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+            }
         }
     }
     // Last batch
@@ -331,7 +349,6 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
     // Debugging
     //namedWindow("Normal");
     //namedWindow("Transformed");
-    int count = 0;
     for (unsigned int i=0; i<list_imgs.size(); i++)
     {
         unsigned int amount_pairs = 83;
@@ -378,11 +395,8 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
             //imshow("Normal", list_imgs[i]);
             //imshow("Transformed", new_img);
             //waitKey(100);
-
-            count++;
         }
     }
-    cout << "Amount of images processed: " << count << "\n";
     return final_data;
 }
 
