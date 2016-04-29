@@ -48,6 +48,7 @@ using namespace cv;
 #define LOWER_ANGLE -30
 #define LOWER_TRASLATION -3
 #define BATCHES 20 
+#define NUM_CLASSES 3
 
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
@@ -55,8 +56,9 @@ using namespace cv;
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_TRAIN (DATA_ROOT"mnist_train_lmdb/")
-#define LMDB_VAL   (DATA_ROOT"mnist_val_lmdb/")
+#define LMDB_TRAIN        (DATA_ROOT"mnist_train_lmdb/")
+#define LMDB_TRAIN_LABELS (DATA_ROOT"mnist_train_labels_lmdb/")
+#define LMDB_VAL          (DATA_ROOT"mnist_val_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -77,7 +79,7 @@ typedef struct
     Label z;
 } DataBlob;
 
-void create_lmdbs(const char* images, const char* labels, const char* db_path);
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, const char* lmdb_labels_path);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
@@ -88,34 +90,46 @@ Mat transform_image(Mat &img, float tx, float ty, float rot);
 vector<Mat> load_images(string path);
 vector<Label> load_labels(string path);
 vector<DataBlob> process_images(vector<Mat> &list_imgs);
-void process_labels();
 unsigned int generate_rand(int range_limit);
 
 int main(int argc, char** argv)
 {
     cout << "Creating train LMDB\n";
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN, LMDB_TRAIN_LABELS);
     return 0;
 }
 
-void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, const char* lmdb_labels_path)
 {
     /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
 
-    // lmdb
+    // lmdb data 
     MDB_env *mdb_env;
     MDB_dbi mdb_dbi;
     MDB_val mdb_key, mdb_data;
     MDB_txn *mdb_txn;
 
+    // lmdb labels 
+    MDB_env *mdb_label_env;
+    MDB_dbi mdb_label_dbi;
+    MDB_val mdb_label_key, mdb_labels;
+    MDB_txn *mdb_label_txn;
+
     // Set database environment
     mkdir(lmdb_path, 0744);
+    mkdir(lmdb_labels_path, 0744);
 
     mdb_env_create(&mdb_env);
     mdb_env_set_mapsize(mdb_env, TB);
     mdb_env_open(mdb_env, lmdb_path, 0, 0664);
     mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
     mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
+
+    mdb_env_create(&mdb_label_env);
+    mdb_env_set_mapsize(mdb_label_env, TB);
+    mdb_env_open(mdb_label_env, lmdb_labels_path, 0, 0664);
+    mdb_txn_begin(mdb_label_env, NULL, 0, &mdb_label_txn);
+    mdb_open(mdb_label_txn, NULL, 0, &mdb_label_dbi);
 
     // Load images/labels
     vector<Mat> list_imgs = load_images(images);
@@ -125,12 +139,19 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     unsigned int rows = list_imgs[0].rows;
     unsigned int cols = list_imgs[0].cols;
     int count = 0;
-    string value;
+    string data_value, label_value;
     
+    // Data datum
     Datum datum;
     datum.set_channels(2);
     datum.set_height(rows);
     datum.set_width(cols);
+
+    // Labels datum
+    Datum ldatum;
+    datum.set_channels(1);
+    datum.set_height(1);
+    datum.set_width(NUM_CLASSES);
 
     std::ostringstream s;
 
@@ -146,11 +167,13 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
         vector<DataBlob> batch_data = process_images(batch_imgs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
+            // Set Data
             datum.set_data((char*)batch_data[item_id].img.data, rows*cols);
-            // TODO: research about how to make multilabel learning in Caffe
-            // https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
-            // https://github.com/BVLC/caffe/issues/2407
-            //datum.set_label((char)batch_data[item_id]);
+            // Set Labels
+            char labels[3] = {(char)batch_data[item_id].x,
+                            (char)batch_data[item_id].y,
+                            (char)batch_data[item_id].z};
+            ldatum.set_data(labels, NUM_CLASSES);
 
             // Dont use item_id as key here since we have 83/85 images per original image,
             // meaning that we will overwrite the same image 83/85 times instead of creating 
@@ -159,24 +182,40 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
             string key_str = s.str();
             s.str(std::string());
 
-            datum.SerializeToString(&value);
+            datum.SerializeToString(&data_value);
+            ldatum.SerializeToString(&label_value);
 
-            mdb_data.mv_size = value.size();
-            mdb_data.mv_data = reinterpret_cast<void*>(&value[0]);
+            // Sabe Data
+            mdb_data.mv_size = data_value.size();
+            mdb_data.mv_data = reinterpret_cast<void*>(&data_value[0]);
             mdb_key.mv_size = key_str.size();
             mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
             mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
+            // Sabe Label 
+            mdb_labels.mv_size = label_value.size();
+            mdb_labels.mv_data = reinterpret_cast<void*>(&label_value[0]);
+            mdb_label_key.mv_size = key_str.size();
+            mdb_label_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
+            mdb_put(mdb_label_txn, mdb_label_dbi, &mdb_label_key, &mdb_labels, 0);
             if (++count % 1000 == 0) {
-                // Commit txn
+                // Commit txn Data
                 mdb_txn_commit(mdb_txn);
                 mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+                // Commit txn Labels 
+                mdb_txn_commit(mdb_label_txn);
+                mdb_txn_begin(mdb_label_env, NULL, 0, &mdb_label_txn);
             }
         }
     }
     // Last batch
     if (count % 1000 != 0) {
         mdb_txn_commit(mdb_txn);
+        mdb_txn_commit(mdb_label_txn);
+
         mdb_close(mdb_env, mdb_dbi);
+        mdb_close(mdb_label_env, mdb_label_dbi);
+
+        mdb_env_close(mdb_label_env);
         mdb_env_close(mdb_env);
     }
 
@@ -417,9 +456,4 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
 unsigned int generate_rand(int range_limit)
 {
     return rand() % range_limit;
-}
-
-void process_labels()
-{
-
 }
