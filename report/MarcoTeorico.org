@@ -893,7 +893,7 @@ DEADLINE: <2016-04-29 vie>
 
 EL objetivo es entender como hacer redes siamesas con Caffe
 
-*** [71%] Preprocesamiento
+*** [100%] Preprocesamiento
 Train set: 60K imagenes. Test set 10K imagenes.
 
 Para pretraining de la red, hay que hacer un preprocesamiento del
@@ -922,11 +922,13 @@ con la original+transformada.
 **** DONE Hacer que las rotaciones y traslaciones sean aleatorias
 **** DONE Modificar codigo para guardar lmdb
 **** DONE Modificar algunos aspectos de la parte de lmdb para guardar las nuevas imagenes (dos imagenes mergeadas en una, dimensiones: 28x28x2)
-**** TODO Investigar como guardar multiples etiquetas por imagen (traslacion y rotacion)
+**** DONE Investigar como guardar multiples etiquetas por imagen (traslacion y rotacion)
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
 https://github.com/BVLC/caffe/issues/2407
 *** [0%] Entrenamiento
 **** TODO Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
+Slice de los labels:
+https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
 
 BCCN: C96-P-C256-P
 TCCN: F1000-D-Op

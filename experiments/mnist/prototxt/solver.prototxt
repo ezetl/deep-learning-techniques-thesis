@@ -1,0 +1,22 @@
+net: "siamese_mnist.prototxt"
+
+base_lr: 0.01
+momentum: 0.9
+weight_decay: 0.0005
+
+# The learning rate policy
+lr_policy: "step"
+stepsize: 10000 
+gamma: 0.5
+
+# Display every 100 iterations
+display: 100
+max_iter: 40000
+
+
+snapshot: 1000
+snapshot_prefix: "../snapshots/snapshot_mnist"
+
+
+# solver mode: CPU or GPU
+solver_mode: GPU

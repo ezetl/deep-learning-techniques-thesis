@@ -15,3 +15,4 @@ train-labels-idx1-ubyte
 build/
 experiments/mnist/data/mnist_train_lmdb/
 experiments/mnist/data/mnist_val_lmdb/
+experiments/mnist/data/mnist_train_labels_lmdb/
