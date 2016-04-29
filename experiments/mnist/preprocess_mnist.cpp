@@ -21,6 +21,7 @@
  * Author: Ezequiel Torti Lopez
  *
  * This code parses the MNIST dataset files (images and labels).
+ *
  * It was done for my low-endian machine, but you can set the LOW_ENDIAN
  * flag off and it will run in high endian mode (TODO)
  *
@@ -28,8 +29,17 @@
  * reproduce the results obtained in "Learning to See by Moving" by 
  * Agrawal el al.
  *
- * For that, I parse the MNIST files, apply the transformations mentioned
+ * For that, I parse the MNIST data, apply the transformations mentioned
  * in the section 3.4.1 of the paper and save the images to a LMDB.
+ *
+ * Since Agrawal et al. pose the problem as a classification problem
+ * (discrete clases for transformations in the axis X, Y and Z) we 
+ * need three classifiers, one for each dimension; hence we need three 
+ * labels. It is not straightforward to create a multiclass database in LMDB,
+ * so I will create a separate database with an array of labels for each element.
+ * Then, during training phase, I just Slice the label to retrieve the 
+ * labels again. Check this post to get a more complete idea:
+ * https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ 
  *
  * This code is part of my undergrad thesis: "Reconocimiento visual
  * empleando técnicas de deep learning" ("Visual Recognition using Deep
@@ -267,7 +277,6 @@ MNIST_metadata parse_images_header(ifstream &f)
 
 void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist)
 {
-    //namedWindow("MNIST");
     unsigned int size_img = meta.cols * meta.rows;
     // 4 integers in the header of the images file
     streampos offset = sizeof(uint32_t) * 4;
@@ -278,8 +287,6 @@ void parse_images_data(ifstream &f, MNIST_metadata meta, vector<Mat> *mnist)
         mchar = mchar.reshape(1, meta.rows);
         (*mnist)[i] = mchar.clone();
         offset += size_img;
-        //imshow("MNIST", mchar);
-        //waitKey(100);
     }
 }
 
