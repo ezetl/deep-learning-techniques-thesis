@@ -1,25 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <string> 
-#include <vector>
-#include <cinttypes>
-#include <sys/stat.h>
-#include <stdlib.h> 
-#include <iomanip>
-
-#include <leveldb/db.h>
-#include <leveldb/write_batch.h>
-#include <lmdb.h>
-
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-
-#include "caffe/proto/caffe.pb.h"
-
 /*
- * Author: Ezequiel Torti Lopez
- *
  * This code parses the MNIST dataset files (images and labels).
  *
  * It was done for my low-endian machine, but you can set the LOW_ENDIAN
@@ -44,7 +23,29 @@
  * This code is part of my undergrad thesis: "Reconocimiento visual
  * empleando técnicas de deep learning" ("Visual Recognition using Deep
  * Learning techniques")
+ *
+ * Author: Ezequiel Torti Lopez
  */
+
+#include <iostream>
+#include <fstream>
+#include <string> 
+#include <vector>
+#include <cinttypes>
+#include <sys/stat.h>
+#include <stdlib.h> 
+#include <iomanip>
+
+#include <leveldb/db.h>
+#include <leveldb/write_batch.h>
+#include <lmdb.h>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include "caffe/proto/caffe.pb.h"
+
 
 using namespace caffe;
 using namespace std;
