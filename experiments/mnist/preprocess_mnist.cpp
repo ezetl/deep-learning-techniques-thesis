@@ -381,7 +381,7 @@ Mat transform_image(Mat &img, float tx, float ty, float rot)
                Size(img.cols, img.rows),
                INTER_LINEAR,
                BORDER_CONSTANT,
-               Scalar(255, 255, 255));
+               Scalar(0, 0, 0));
     return res;
 }
 
@@ -405,8 +405,8 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
     }
 
     // Debugging
-    //namedWindow("Normal");
-    //namedWindow("Transformed");
+    namedWindow("Normal");
+    namedWindow("Transformed");
     for (unsigned int i=0; i<list_imgs.size(); i++)
     {
         unsigned int amount_pairs = 83;
@@ -416,7 +416,7 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
         }
 
         // Use white background
-        bitwise_not(list_imgs[i], list_imgs[i]);
+        //bitwise_not(list_imgs[i], list_imgs[i]);
 
         for (unsigned int j=0; j<amount_pairs; j++)
         {
@@ -450,9 +450,9 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs)
             final_data.push_back(d);
 
             // Debugging
-            //imshow("Normal", list_imgs[i]);
-            //imshow("Transformed", new_img);
-            //waitKey(100);
+            imshow("Normal", list_imgs[i]);
+            imshow("Transformed", new_img);
+            waitKey(100);
         }
     }
     return final_data;
