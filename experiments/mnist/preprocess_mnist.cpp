@@ -160,9 +160,9 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
 
     // Labels datum
     Datum ldatum;
-    datum.set_channels(1);
+    datum.set_channels(3);
     datum.set_height(1);
-    datum.set_width(NUM_CLASSES);
+    datum.set_width(1);
 
     std::ostringstream s;
 
@@ -216,6 +216,9 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
                 mdb_txn_commit(mdb_label_txn);
                 mdb_txn_begin(mdb_label_env, NULL, 0, &mdb_label_txn);
             }
+            if (++count % 50000 == 0) {
+                cout << "Processed " << count << "\r" << flush;
+            }
         }
     }
     // Last batch
@@ -230,6 +233,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
         mdb_env_close(mdb_env);
     }
 
+    cout << "\nFinished creation of LMDB's\n";
     return;
 }
 
