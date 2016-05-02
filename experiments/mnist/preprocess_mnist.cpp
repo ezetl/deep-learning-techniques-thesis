@@ -67,9 +67,10 @@ using namespace cv;
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_TRAIN        (DATA_ROOT"mnist_train_lmdb/")
-#define LMDB_TRAIN_LABELS (DATA_ROOT"mnist_train_labels_lmdb/")
-#define LMDB_VAL          (DATA_ROOT"mnist_val_lmdb/")
+#define LMDB_ROOT         "/media/ezetl/0C74D0DD74D0CB1A/mnist/"
+#define LMDB_TRAIN        (LMDB_ROOT"mnist_train_lmdb/")
+#define LMDB_TRAIN_LABELS (LMDB_ROOT"mnist_train_labels_lmdb/")
+#define LMDB_VAL          (LMDB_ROOT"mnist_val_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -179,12 +180,12 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
         vector<DataBlob> batch_data = process_images(batch_imgs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
             // Set Data
-            datum.set_data((char*)batch_data[item_id].img.data, rows*cols);
+            datum.set_data((char*)batch_data[item_id].img.data, 2*rows*cols);
             // Set Labels
-            char labels[3] = {(char)batch_data[item_id].x,
+            char dlabels[3] = {(char)batch_data[item_id].x,
                             (char)batch_data[item_id].y,
                             (char)batch_data[item_id].z};
-            ldatum.set_data(labels, NUM_CLASSES);
+            ldatum.set_data(dlabels, NUM_CLASSES);
 
             // Dont use item_id as key here since we have 83/85 images per original image,
             // meaning that we will overwrite the same image 83/85 times instead of creating 
@@ -216,7 +217,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
                 mdb_txn_commit(mdb_label_txn);
                 mdb_txn_begin(mdb_label_env, NULL, 0, &mdb_label_txn);
             }
-            if (++count % 50000 == 0) {
+            if (count % 50000 == 0) {
                 cout << "Processed " << count << "\r" << flush;
             }
         }

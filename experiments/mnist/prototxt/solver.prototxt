@@ -19,4 +19,4 @@ snapshot_prefix: "../snapshots/snapshot_mnist"
 
 
 # solver mode: CPU or GPU
-solver_mode: GPU
+solver_mode: CPU
