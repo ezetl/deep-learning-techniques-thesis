@@ -19,6 +19,7 @@ layer {
 layer {
   name: "labelx"
   type: "Data" 
+  top: "lxdata"
   top: "labelx"
   include {
     phase: TRAIN
@@ -33,6 +34,7 @@ layer {
 layer {
   name: "labely"
   type: "Data" 
+  top: "lydata"
   top: "labely"
   include {
     phase: TRAIN
@@ -46,6 +48,7 @@ layer {
 layer {
   name: "labelz"
   type: "Data" 
+  top: "lzdata"
   top: "labelz"
   include {
     phase: TRAIN

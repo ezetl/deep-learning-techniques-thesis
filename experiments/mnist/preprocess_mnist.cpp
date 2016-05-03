@@ -205,9 +205,9 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
         unsigned int begin = i * len_batch; 
         unsigned int end = begin + len_batch - 1;
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 83;
+        unsigned int amount_pairs = 1;//83;
         if (i==0 || i==1){
-            amount_pairs = 85;
+            amount_pairs = 1;//85;
         } 
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
@@ -230,7 +230,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
 
             // Set Label X
             char dlabel = (char)batch_data[item_id].x;
-            ldatum.set_data(&dlabel, sizeof(Label));
+            //ldatum.set_data(&dlabel, sizeof(Label));
+            ldatum.set_label(dlabel);
             ldatum.SerializeToString(&label_value);
             // Save Label X 
             mdb_labelsx.mv_size = label_value.size();
@@ -241,7 +242,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
 
             // Set Label Y
             dlabel = (char)batch_data[item_id].y;
-            ldatum.set_data(&dlabel, sizeof(Label));
+            //ldatum.set_data(&dlabel, sizeof(Label));
+            ldatum.set_label(dlabel);
             ldatum.SerializeToString(&label_value);
             // Save Label Y 
             mdb_labelsy.mv_size = label_value.size();
@@ -252,7 +254,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
 
             // Set Label Z
             dlabel = (char)batch_data[item_id].z;
-            ldatum.set_data(&dlabel, sizeof(Label));
+            //ldatum.set_data(&dlabel, sizeof(Label));
+            ldatum.set_label(dlabel);
             ldatum.SerializeToString(&label_value);
             // Save Label Z 
             mdb_labelsz.mv_size = label_value.size();
