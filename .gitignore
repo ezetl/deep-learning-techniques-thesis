@@ -13,6 +13,4 @@ t10k-labels-idx1-ubyte
 train-images-idx3-ubyte
 train-labels-idx1-ubyte
 build/
-experiments/mnist/data/mnist_train_lmdb/
-experiments/mnist/data/mnist_val_lmdb/
-experiments/mnist/data/mnist_train_labels_lmdb/
+experiments/mnist/{data,snapshots,logs}
