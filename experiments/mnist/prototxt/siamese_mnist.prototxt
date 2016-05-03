@@ -17,33 +17,59 @@ layer {
 }
 
 layer {
-  name: "labels"
+  name: "labelx"
   type: "Data" 
-  top: "labels"
+  top: "labelx"
   include {
     phase: TRAIN
   }
   data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_lmdb"
+    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_x_lmdb"
     batch_size: 50 
     backend: LMDB
   }
 }
 
 layer {
-    name: "slice_labels"
-    type: "Slice"
-    bottom: "labels"
-    top: "labelx"
-    top: "labely"
-    top: "labelz"
-    slice_param {
-      axis: 1
-      #slice_dim: 1
-      slice_point: 1 
-      slice_point: 2 
-    }
+  name: "labely"
+  type: "Data" 
+  top: "labely"
+  include {
+    phase: TRAIN
+  }
+  data_param {
+    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_y_lmdb"
+    batch_size: 50 
+    backend: LMDB
+  }
 }
+layer {
+  name: "labelz"
+  type: "Data" 
+  top: "labelz"
+  include {
+    phase: TRAIN
+  }
+  data_param {
+    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_z_lmdb"
+    batch_size: 50 
+    backend: LMDB
+  }
+}
+#layer {
+#    name: "slice_labels"
+#    type: "Slice"
+#    bottom: "labels"
+#    top: "labelx"
+#    top: "labely"
+#    top: "labelz"
+#    slice_param {
+#      #axis: 1
+#      slice_dim: 1
+#      slice_point: 1 
+#      slice_point: 2 
+#    }
+#}
 
 
 layer {
