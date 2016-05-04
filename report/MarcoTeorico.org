@@ -925,6 +925,27 @@ con la original+transformada.
 **** DONE Investigar como guardar multiples etiquetas por imagen (traslacion y rotacion)
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
 https://github.com/BVLC/caffe/issues/2407
+
+Se probaron varias cosas:
+***** Armar una DB para cada label (X,Y y Z) pero no anduvo
+***** Armar una sola DB para todas las labels y despues slicearla pero no anduvo
+para cada clase crear array de bytes asi: 0 0 0 1 donde si hay un cero
+significa que esa label esta inactiva y si hay 1 significa que esta
+activa
+
+Va a haber un solo 1 por clase claramente
+
+Entonces agarro y creo la base de datos de labels nomas, con la
+dimension a lo ancho que sea la dimension de la clase de mayor tama;o
+(en este caso las rotaciones, que son 61) y la profundidad que sea la
+cantidad de clases a clasificar (en este caso 3: X, Y y Z).
+
+Luego Sliceo la base de datos y con la capa ArgMax obtengo el indice
+del mayor elemento de ese arreglo, que termina siendo la clase a la
+que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
+accuracy/softmax por ejemplo
+
+***** Armar una sola DB para datos y labels y despues slicear los labels
 *** [0%] Entrenamiento
 **** TODO Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:

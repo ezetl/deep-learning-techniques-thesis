@@ -3,6 +3,7 @@ layer {
   name: "data"
   type: "Data" 
   top: "data"
+  #top: "dummy_label"
   include {
     phase: TRAIN
   }
@@ -16,49 +17,21 @@ layer {
   }
 }
 
-layer {
-  name: "labelx"
-  type: "Data" 
-  top: "lxdata"
-  top: "labelx"
-  include {
-    phase: TRAIN
-  }
-  data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_x_lmdb"
-    batch_size: 50 
-    backend: LMDB
-  }
-}
-
-layer {
-  name: "labely"
-  type: "Data" 
-  top: "lydata"
-  top: "labely"
-  include {
-    phase: TRAIN
-  }
-  data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_y_lmdb"
-    batch_size: 50 
-    backend: LMDB
-  }
-}
-layer {
-  name: "labelz"
-  type: "Data" 
-  top: "lzdata"
-  top: "labelz"
-  include {
-    phase: TRAIN
-  }
-  data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_z_lmdb"
-    batch_size: 50 
-    backend: LMDB
-  }
-}
+#layer {
+#  name: "labels"
+#  type: "Data" 
+#  top: "labels"
+#  top: "dummy_label2"
+#  include {
+#    phase: TRAIN
+#  }
+#  data_param {
+#    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_lmdb"
+#    batch_size: 50 
+#    backend: LMDB
+#  }
+#}
+#
 #layer {
 #    name: "slice_labels"
 #    type: "Slice"
@@ -67,8 +40,7 @@ layer {
 #    top: "labely"
 #    top: "labelz"
 #    slice_param {
-#      #axis: 1
-#      slice_dim: 1
+#      axis: 1
 #      slice_point: 1 
 #      slice_point: 2 
 #    }
@@ -81,12 +53,38 @@ layer {
     bottom: "data"
     top: "data0"
     top: "data1"
+    top: "labelx"
+    top: "labely"
+    top: "labelz"
     slice_param {
-      slice_dim: 1
+      axis: 1
       slice_point: 1 
+      slice_point: 2
+      slice_point: 3
+      slice_point: 4
     }
 }
 
+layer {
+  name: "argmaxX"
+  type: "ArgMax"
+  bottom: "labelx"
+  top: "argmxX"
+}
+
+layer {
+  name: "argmaxY"
+  type: "ArgMax"
+  bottom: "labely"
+  top: "argmxY"
+}
+
+layer {
+  name: "argmaxZ"
+  type: "ArgMax"
+  bottom: "labelz"
+  top: "argmxZ"
+}
 
 
 # First component of siamese network
@@ -293,8 +291,8 @@ layer {
 
 layer {
   bottom: "concat"
-  top: "fcn"
-  name: "fcn"
+  top: "fcnx"
+  name: "fcnx"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -305,7 +303,7 @@ layer {
   }
   type: "InnerProduct"
   inner_product_param {
-    num_output: 1000
+    num_output: 7 
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -318,11 +316,63 @@ layer {
 }
 
 layer {
-  name: "loss"
+  bottom: "concat"
+  top: "fcny"
+  name: "fcny"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 7 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  bottom: "concat"
+  top: "fcnz"
+  name: "fcnz"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 20
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "lossx"
   type: "SoftmaxWithLoss"
-  bottom: "fcn"
-  bottom: "labelx"
-  top: "loss"
+  bottom: "fcnx"
+  bottom: "argmxX"
+  top: "lossx"
   loss_weight:1
   include {
       phase: TRAIN
@@ -330,11 +380,11 @@ layer {
 }
 
 layer {
-  name: "loss"
+  name: "lossy"
   type: "SoftmaxWithLoss"
-  bottom: "fcn"
-  bottom: "labely"
-  top: "loss"
+  bottom: "fcny"
+  bottom: "argmxY"
+  top: "lossy"
   loss_weight:1
   include {
       phase: TRAIN
@@ -342,11 +392,11 @@ layer {
 }
 
 layer {
-  name: "loss"
+  name: "lossz"
   type: "SoftmaxWithLoss"
-  bottom: "fcn"
-  bottom: "labelz"
-  top: "loss"
+  bottom: "fcnz"
+  bottom: "argmxZ"
+  top: "lossz"
   loss_weight:1
   include {
       phase: TRAIN
