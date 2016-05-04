@@ -7,7 +7,7 @@ ROOT=/home/$USER
 CAFFE=/home/$USER/Software/caffe/
 TOOLS=${CAFFE}build/tools
 DATA=./data
-LMDB=/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb
+LMDB=/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_standar_lmdb
 
 $TOOLS/compute_image_mean $LMDB \
   $DATA/mean_mnist.binaryproto
