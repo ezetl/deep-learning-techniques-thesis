@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <stdlib.h> 
 #include <iomanip>
+#include <algorithm>
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
@@ -134,6 +135,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path,
 
     // Load images/labels
     vector<Mat> list_imgs = load_images(images);
+    random_shuffle(std::begin(list_imgs), std::end(list_imgs));
+
 
     // Dimensions of Data LMDB 
     unsigned int rows = list_imgs[0].rows;

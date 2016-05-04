@@ -3,13 +3,12 @@ layer {
   name: "data"
   type: "Data" 
   top: "data"
-  #top: "dummy_label"
   include {
     phase: TRAIN
   }
-  transform_param {
-    #mean_file: "../data/mean_mnist.binaryproto"
-  }
+  #transform_param {
+  #  mean_file: "../data/mean_mnist.binaryproto"
+  #}
   data_param {
     source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb"
     batch_size: 50 
@@ -18,32 +17,18 @@ layer {
 }
 
 #layer {
-#  name: "labels"
+#  name: "data"
 #  type: "Data" 
-#  top: "labels"
-#  top: "dummy_label2"
+#  top: "data"
 #  include {
-#    phase: TRAIN
+#    phase: TEST
+#    stage: "test-on-train"
 #  }
 #  data_param {
-#    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_labels_lmdb"
-#    batch_size: 50 
+#    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb"
+#    batch_size: 20 
 #    backend: LMDB
 #  }
-#}
-#
-#layer {
-#    name: "slice_labels"
-#    type: "Slice"
-#    bottom: "labels"
-#    top: "labelx"
-#    top: "labely"
-#    top: "labelz"
-#    slice_param {
-#      axis: 1
-#      slice_point: 1 
-#      slice_point: 2 
-#    }
 #}
 
 
@@ -286,11 +271,54 @@ layer {
 }
 
 
+layer {
+  bottom: "concat"
+  top: "fcn"
+  name: "fcn"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 1000 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "fcn"
+  top: "fcn"
+}
+
+layer {
+  name: "drop"
+  type: "Dropout"
+  bottom: "fcn"
+  top: "fcn"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
 
 
 
 layer {
-  bottom: "concat"
+  bottom: "fcn"
   top: "fcnx"
   name: "fcnx"
   param {
@@ -316,7 +344,7 @@ layer {
 }
 
 layer {
-  bottom: "concat"
+  bottom: "fcn"
   top: "fcny"
   name: "fcny"
   param {
@@ -342,7 +370,7 @@ layer {
 }
 
 layer {
-  bottom: "concat"
+  bottom: "fcn"
   top: "fcnz"
   name: "fcnz"
   param {
@@ -368,11 +396,11 @@ layer {
 }
 
 layer {
-  name: "lossx"
+  name: "loss_x"
   type: "SoftmaxWithLoss"
   bottom: "fcnx"
   bottom: "argmxX"
-  top: "lossx"
+  top: "loss_x"
   loss_weight:1
   include {
       phase: TRAIN
@@ -380,11 +408,11 @@ layer {
 }
 
 layer {
-  name: "lossy"
+  name: "loss_y"
   type: "SoftmaxWithLoss"
   bottom: "fcny"
   bottom: "argmxY"
-  top: "lossy"
+  top: "loss_y"
   loss_weight:1
   include {
       phase: TRAIN
@@ -392,46 +420,90 @@ layer {
 }
 
 layer {
-  name: "lossz"
+  name: "loss_z"
   type: "SoftmaxWithLoss"
   bottom: "fcnz"
   bottom: "argmxZ"
-  top: "lossz"
+  top: "loss_z"
   loss_weight:1
   include {
       phase: TRAIN
     }
 }
 
-layer {
-  name: "accuracy_X"
-  type: "Accuracy"
-  bottom: "fcnx"
-  bottom: "argmxX"
-  top: "accuracy_X"
-  #include {
-  #  phase: TEST
-  #}
-}
 
-layer {
-  name: "accuracy_Y"
-  type: "Accuracy"
-  bottom: "fcny"
-  bottom: "argmxY"
-  top: "accuracy_Y"
-  #include {
-  #  phase: TEST
-  #}
-}
-
-layer {
-  name: "accuracy_Z"
-  type: "Accuracy"
-  bottom: "fcnz"
-  bottom: "argmxZ"
-  top: "accuracy_Z"
-  #include {
-  #  phase: TEST
-  #}
-}
+### TEST NETWORK ON TRAIN SET
+#layer {
+#  name: "test_loss_x"
+#  type: "SoftmaxWithLoss"
+#  bottom: "fcnx"
+#  bottom: "argmxX"
+#  top: "test_loss_x"
+#  loss_weight:1
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}
+#
+#layer {
+#  name: "test_loss_y"
+#  type: "SoftmaxWithLoss"
+#  bottom: "fcny"
+#  bottom: "argmxY"
+#  top: "test_loss_y"
+#  loss_weight:1
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}
+#
+#layer {
+#  name: "test_loss_z"
+#  type: "SoftmaxWithLoss"
+#  bottom: "fcnz"
+#  bottom: "argmxZ"
+#  top: "test_loss_z"
+#  loss_weight:1
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}
+#
+#layer {
+#  name: "accuracy_X"
+#  type: "Accuracy"
+#  bottom: "fcnx"
+#  bottom: "argmxX"
+#  top: "accuracy_X"
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}
+#
+#layer {
+#  name: "accuracy_Y"
+#  type: "Accuracy"
+#  bottom: "fcny"
+#  bottom: "argmxY"
+#  top: "accuracy_Y"
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}
+#
+#layer {
+#  name: "accuracy_Z"
+#  type: "Accuracy"
+#  bottom: "fcnz"
+#  bottom: "argmxZ"
+#  top: "accuracy_Z"
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#}

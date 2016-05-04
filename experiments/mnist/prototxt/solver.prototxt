@@ -1,5 +1,7 @@
 net: "siamese_mnist.prototxt"
 type: "SGD"
+
+#test_state: { stage: 'test-on-train' }
 #test_iter: 500
 #test_interval: 1000
 

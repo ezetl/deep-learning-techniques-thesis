@@ -27,4 +27,5 @@ MACRO(add_code name)
                          ${OpenCV_LIBS})
 ENDMACRO()
 
-add_code(preprocess_mnist)
+add_code(preprocess_mnist_egomotion)
+add_code(preprocess_mnist_standar)
