@@ -402,3 +402,36 @@ layer {
       phase: TRAIN
     }
 }
+
+layer {
+  name: "accuracy_X"
+  type: "Accuracy"
+  bottom: "fcnx"
+  bottom: "argmxX"
+  top: "accuracy_X"
+  #include {
+  #  phase: TEST
+  #}
+}
+
+layer {
+  name: "accuracy_Y"
+  type: "Accuracy"
+  bottom: "fcny"
+  bottom: "argmxY"
+  top: "accuracy_Y"
+  #include {
+  #  phase: TEST
+  #}
+}
+
+layer {
+  name: "accuracy_Z"
+  type: "Accuracy"
+  bottom: "fcnz"
+  bottom: "argmxZ"
+  top: "accuracy_Z"
+  #include {
+  #  phase: TEST
+  #}
+}

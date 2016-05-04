@@ -1,4 +1,7 @@
 net: "siamese_mnist.prototxt"
+type: "SGD"
+#test_iter: 500
+#test_interval: 1000
 
 base_lr: 0.01
 momentum: 0.9
