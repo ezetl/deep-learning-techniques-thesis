@@ -51,8 +51,8 @@ Para los seres humanos, percibir el mundo que nos rodea es una tarea
 fácil. Millones de años de evolución nos han dotado con un sistema
 visual altamente sofisticado que nos permite reconocer patrones muy
 complejos del mundo tridimensional en el que vivimos. Distinguir
-sombras, color, formas, o incluso cosas más generales, como
-movimiento, potenciales amenazas o rostros de conocidos, son algunas
+formas, sombras y color, o incluso cosas más generales, como
+movimiento, potenciales amenazas y rostros de conocidos, son algunas
 de las actividades que nuestros cerebros realizan casi de manera
 inconsciente. Y si bien estas tareas pueden ser fáciles para nosotros,
 no es tal el caso para las computadoras.
@@ -78,18 +78,19 @@ pensar en elaborar alguna métrica de distancia con los píxeles otra
 imagen la cual sepamos está en la misma categoría, y si la distancia
 es menor a un cierto umbral sabríamos que ambas pertenecen a la misma
 clase. Sin embargo este enfoque carece de robustez, ya que el menor
-cambio de \textit{iluminación} en las fotos podría alterar las
-métricas y confundir a nuestro modelo. No solamente eso, los objetos
-en las imágenes podrían estar ocultos por el ambiente
+cambio de \textit{iluminación} (o sea, variaciones en los píxeles)
+podría alterar las métricas y confundir a nuestro modelo. No solamente
+eso, los objetos en las imágenes podrían estar ocultos por el ambiente
 (\textit{oclusión}), o en una posición diferente
 (\textit{deformación}), o ser exactamente iguales, pero variar en
 colores y pequeños detalles (\textit{variación intraclase}).
 
 Diferentes métodos se han utilizado a lo largo de la historia para
-taclear este problema: \svms, árboles de decisión, \bow, etc. En la
-mayoría de los casos las \features y descriptores que se extraían de
-las imágenes debían ser implementadas manualmente (por ejemplo: histogramas de
-colores o descriptores \sift \cite{Lowe-SIFT}).
+taclear este problema: \textit{máquinas de vectores de soporte},
+árboles de decisión, \textit{bolsas de palabras}, etc. En la mayoría
+de los casos las \features y descriptores que se extraían de las
+imágenes debían ser implementadas manualmente (por ejemplo:
+histogramas de colores o descriptores \sift \cite{Lowe-SIFT}).
 
 En los últimos años toda la parafernalia relativa a la clasificación
 de imágenes fue ampliamente superada por las Redes Neuronales
@@ -112,7 +113,7 @@ se conoce como Aprendizaje Profundo (\textit{Deep Learning}).
 
 Para poder entrenar Redes Neuronales Profundas, es necesario contar
 con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
-de los cientos de miles hasta millones de imágenes. Generalmente se
+de las decenas de miles hasta millones de imágenes. Generalmente se
 requiere un gran esfuerzo humano para etiquetar tantas imágenes.
 
 Actualmente contamos con una increíble cantidad de imágenes para
@@ -131,82 +132,91 @@ imposible contar con los recursos suficientes para anotar tantos
 videos, imágenes y demás contenido multimedia.
 
 Una posible solución al entrenamiento de redes profundas cuando no se
-puede anotar una gran cantidad de datos es la propuesta por
-\cite{LSM2015}. En la misma proponen utilizar información odométrica
-disponible en cámaras (giróscopos, acelerómetros, etc) para
-pre-entrenar redes neuronales profundas, y luego entrenarlas
-utilizando el conjunto de datos anotados que se desee, obteniendo la
-ventaja de no necesitar un conjunto tan grande para lograr buena
-precisión.
+puede anotar una gran cantidad de datos es la propuesta por Agrawal et
+al. \cite{LSM2015}. En la misma proponen utilizar información
+odométrica disponible en cámaras (giróscopos, acelerómetros, etc) para
+pre-entrenar redes neuronales profundas, y luego realizar una
+transferencia de aprendizaje sobre un conjunto de datos anotados que
+se desee, obteniendo la ventaja de no necesitar un conjunto tan grande
+para lograr buena precisión.
 
 En este trabajo final nos proponemos reproducir este paper, analizando
 cada paso para luego proponer mejoras y aplicaciones al mundo real.
 
-El trabajo está organizado como sigue:
+El trabajo está organizado como sigue: en la Sección \ref{sec:marco}
+se introducirán conceptos del aprendizaje automático y las redes
+neuronales artificiales para concluir con redes convolucionales, en la
+Sección \ref{sec:siamesa} se presentará un método para entrenar
+modelos de aprendizaje profundo mediante redes siamesas, que luego se
+utilizará para reproducir los resultados de \cite{LSM2015} en la
+Sección \ref{sec:odometry}. Finalmente, la Sección \ref{sec:concl}
+presenta pensamientos finales y trabajo a futuro.
 
 * Marco Teórico
-** Aprendizaje Automatico
+#+LaTeX: \label{sec:marco}
+** Aprendizaje Automático
 *** Introducción
 
-Las tecnicas de aprendizaje automatico tienen como objetivo
+Las técnicas de aprendizaje automético tienen como objetivo
 identificar patrones en conjuntos de datos utilizando herramientas de
-la estadistica, teoria de la informacion, calculo y optimizacion entre
+la estadística, teoría de la información, cálculo y optimización entre
 otras. De esta manera se pueden automatizar tareas, como por ejemplo
-del filtro de correo basura (\textit{spam}), la verificacion de
-rostros o incluso prediccion de precios en el mercado.
+del filtro de correo basura (\textit{spam}), la verificación de
+rostros o incluso predicción de precios en el mercado.
 
-El aprendizaje automatico adquiere relevancia cuando las tareas que se
+El aprendizaje automático adquiere relevancia cuando las tareas que se
 desean automatizar son demasiado complejas para programarse
-directamente. Por ejemplo la verificacion de rostros debe tener en
-cuenta detalles como variaciones en sombra, color, orientacion, por no
-mencionar las diferentes caracteristicas que hay que extraer de una
+directamente. Por ejemplo la verificación de rostros debe tener en
+cuenta detalles como variaciones en sombra, color, orientación, por no
+mencionar las diferentes características que hay que extraer de una
 cara para diferenciarla de otra (arrugas, prominencias y otros
-rasgos).  Otro caso es el analisis de grandes volumenes de datos, como
-estadisticas del clima para crear nuevos modelos.
+rasgos).  Otro caso es el análisis de grandes volúmenes de datos, como
+estadísticas del clima para crear nuevos modelos.
 
 Hay varios paradigmas o ejes dentro del aprendizaje automatico que
-definen las caracteristicas de los algoritmos, las tecnicas de
+definen los tipos de algoritmos, las técnicas de
 entrenamiento y las potenciales aplicaciones de esos modelos:
 
 **** Aprendizaje supervisado vs. no supervisado
 
 Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
 datos a aprender, hablamos de aprendizaje supervisado. Retomando el
-caso del verificador de rostros, las etiquetas serian el nombre o
-algun identificador de cada persona y nuestro clasificador aprenderia
+caso del verificador de rostros, las etiquetas serían el nombre o
+algun identificador de cada persona y nuestro clasificador aprendería
 a diferenciar las caras tomando como referencia las anotaciones.
 
 Por otro lado, cuando los datos no estan categorizados de antemano
 hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
-una lista de casas con sus respectivos precios, su area en metros
-cubicos y cantidad de habitaciones y quisieramos encontrar alguna
-relacion entre ellas. Los algoritmos no supervisados trabajan
-netamente sobre los datos \textit{tal como estan}.
+una lista de casas con sus respectivos precios, su área en metros
+cúbicos y cantidad de habitaciones y quisieramos encontrar alguna
+relación entre ellas. Los algoritmos no supervisados trabajan
+netamente sobre los datos \textit{tal como están}.
 
 **** Aprendizaje pasivo vs. activo
 
 El aprendizaje pasivo implica utilizar solamente los datos ya
 existentes. El aprendizaje activo se refiere a interactuar con el
-ambiente para obtener informacion, como por ejemplo preguntar a un
-usuario si un rostro es de cierta persona.
+ambiente para obtener información, como por ejemplo preguntar a un
+usuario si un rostro es de cierta persona y utilizar los datos
+proporcionados durante su etrenamiento.
 
 **** Aprendizaje \textit{online} vs. estadistico (\textit{batch learning})
 
 En el aprendizaje \textit{online} los datos estan disponibles de
 manera secuencial, actualizando el modelo en cada paso para lograr
-mejores predicciones/clasificaciones. En el aprendizaje estadistico
+mejores predicciones/clasificaciones. En el aprendizaje estadístico
 primero se analiza una gran cantidad de datos (tal vez la totalidad
-del conjunto) y recien ahi se pueden obtener conclusiones o un modelo
-final.
+del conjunto) y solamente luego de haberlos analizado se pueden
+obtener conclusiones o un modelo final.
 
 *** Clasificadores lineales
 
 Un clasificador lineal combina linealmente las caracteristicas (o
 \textit{features}) de los datos de entrada para determinar a que clase
-pertenecen los mismos, usualmente entrenado mediante tecnicas de
+pertenecen los mismos, usualmente entrenado mediante técnicas de
 aprendizaje supervisado.
 
-Supongamos que queremos clasificar imagenes, es decir, asignar una
+Imaginemos que queremos clasificar imágenes, es decir, asignar una
 etiqueta a un conjunto de píxeles. Para ello vamos a definir una
 función \func{} que mapee píxeles \(\boldsymbol{x}\) a probablidades
 de cada etiqueta (\textit{scores}). Supongamos que contamos con un
@@ -223,7 +233,7 @@ R^{K}}\) como un mapeo lineal entre píxeles y \scores:
      \boldsymbol{f(x_i, W, b)= W x_i + b}
 \end{equation}
 
-Estamos asumiendo que la imagen \img{} es un vector de una sola columna
+Asumimos que la imagen \img{} es un vector de una sola columna
 \([D \times 1]\), \weights{} es una matriz \([K \times D]\) y \bias{} es
 otro vector \([K \times 1]\). A menudo la matriz \weights{} es llamada
 los \textit{pesos} de \func{}, y a \bias{} el \textit{vector de sesgo}
@@ -234,15 +244,46 @@ Para entender mejor a los clasificadores lineales, podemos verlos de
 la siguiente manera: si la imagen tiene \(32\times32\) píxeles y la
 representamos con un vector columna de dimensión \(D\), entonces en
 ese espacio \textit{D-dimensional} la imagen es solamente un
-punto. Nuestro clasificador lineal entonces define una "línea" que
-separa cada clase dentro de ese espacio multidimensional. Notar que en
-realidad, la multiplicación \(W x_i\) está evaluado \(K\)
-clasificadores en paralelo, donde cada uno es una fila de \weights{}.
+punto. Nuestro clasificador lineal entonces define una "línea" (o un
+hiperplano mejor dicho) que separa cada clase dentro de ese espacio
+multidimensional. Notar que en realidad, la multiplicación
+\(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\) clasificadores
+en paralelo, donde cada uno es una fila de \weights{}.
 
 Mas adelante veremos como definir \weights{} y \bias{} para obtener un
 buen clasificador.
 
 *** Entrenamiento
+En el caso de los clasificadores lineales, entrenar un modelo se
+traduce en encontrar buenos valores de \weights{} y \bias{} que
+minimicen el error.
+
+Es muy común, cuando se cuenta con un conjunto de datos lo
+suficientemente grande, dividirlo en al menos 3 subconjuntos
+disjuntos: uno para entrenar el modelo, un segundo para validar el
+modelo durante el entrenamiento y un tercero para probar el modelo una
+vez entrenado. De esta manera se puede medir que tan bien el modelo
+aprendió características relevantes a la clasificación y las pudo
+aplicar a un conjunto de datos completamente nuevo (conjunto de
+pruebas). Si la precisión que obtuvo nuestro modelo sobre este
+conjunto de pruebas es muy baja, es un síntoma de que algo no anda
+bien en el entrenamiento (ver problema de \textit{sobre-ajuste} en la
+Sección \ref{sec:regular}).
+
+A grandes rasgos, el proceso de entrenamiento de un clasificador
+consta de dos etapas: la primera es medir el error actual del modelo
+con algún conjunto de datos de validación, la segunda es actualizar
+los parámetros del clasificador (\weights{} y \bias{}) para minimizar
+ese error. Por lo tanto hay dos aspectos a tener en cuenta antes de
+entrenar un modelo: cómo medir efectivamente la tasa de error y cómo
+actualizar sus parámetros para minimizarla. Para el primer caso se
+define lo que se llama una \textit{función de pérdida}, mientras que
+para el segundo analizaremos una técnica muy utilizada en aprendizaje
+automático denominada \textit{descenso de gradiente}. Esto no
+significa que sea la única alternativa para entrenar modelos, pero al
+ser ampliamente utilizada en redes neuronales artifiales será la única
+que analizaremos.
+
 **** Función de costo
 
 Una función de costo nos ayuda a saber que tan bien o mal está
@@ -259,23 +300,75 @@ donde \(L\) es la función de pérdidad individual de cada muestra en el
 conjunto de datos, \(f(x_i;\theta)\) es la predicción del modelo sobre
 una muestra \(x_i\) con parámetros \(\theta\), \(y_i\) es el objetivo
 (por ejemplo, la etiqueta de cada muestra del conjunto de datos en una
-tarea de clasificación).
+tarea de clasificación). Notar que para el caso de un clasificador
+lineal los parámetros \(\theta\) son \weights{} y \bias{}. De ahora en
+adelante utilizaremos \(\theta\) o \weights{} indiferentemente para
+hablar de los parámetros de nuestro modelo.
 
-Un ejemplo de función de perdidad popular es la función de pérdida de
-\textit{máquinas de vectores de soporte multiclase}:
+Un ejemplo de función de perdida popular es la función de pérdida de
+\textit{máquinas de vectores de soporte multiclase}. Sea \(f(x_i;
+\theta)_j\) el puntaje asignado por el clasificador \(f\) a la clase
+\(j\) con \(x_i\) como dato de entrada y parámetros \(\theta\) y sea
+\(f(x_i, \theta)_{y_i}\) el puntaje asignado por \(f\) a la clase
+verdadera de \(x_i\), o sea \(y_i\), entonces la pérdida para \(x_i\)
+se calcula de la siguiente manera:
 
 \begin{equation}
-     L_i = \sum_{j \neq i} \max{(0, f(x_i; \theta) - y_{i} + \Delta) }
+     L_i = \sum_{j \neq y_i} \max{(0, f(x_i; \theta)_j - f(x_i; \theta)_{y_{i}} + \Delta) }
 \end{equation}
 
 Se puede observar que esta función de pérdida busca que la clase
 correcta tenga un puntaje más alto que las otras por un margen
-\(\Delta\)
+\(\Delta\).
 
 Cuando tenemos una función con la forma \( \max{(0,\_)} \) a menudo se
 la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 
+**** Descenso de Gradiente
+
+Ya contamos con una función para medir que tan bien o que tan mal está
+comportándose nuestro modelo, la \textit{función de pérdida}. Como se
+puede observar, esta función depende de nuestro \weights{} y las
+imágenes (o \features{} que estemos usando). Nosotros no tenemos
+control sobre nuestro conjunto de datos de entrenamiento, pero sí
+podemos modificar los parámetros de \weights{} para producir la menor
+pérdida posible.
+
+El descenso de gradiente se utiliza para optimizar los pesos partiendo
+de la premisa que el modelo es diferenciable con respecto a
+\weights{}. Dado que queremos minimizar la funcion de costo \loss{},
+lo que vamos a hacer es calcular su gradiente \(\boldsymbol{\nabla
+L}\) respecto a cada parámetro y luego modificar cada uno ligeramente
+con el objetivo de alcanzar un mínimo en la función. Entonces, si
+\(\theta_{n}\) son nuestros parámetros en el paso \(n\) del
+entrenamiento, calculamos \(\theta_{n+1}\) de la siguiente manera:
+
+\begin{equation}
+    \theta_{n+1} = \theta_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta_{n}} L(f(x_i; \theta_n), y_i)
+\end{equation}
+
+Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
+\(m\) es la cantidad de elementos en el conjunto de datos. En la
+ecuacion se puede observar que se modifican los parámetros con
+respecto a la dirección opuesta al gradiente, dado que el mismo indica
+la dirección de crecimiento de una función pero nosotros queremos
+encontrar un mínimo.
+
+Existen variantes mas sofisticadas del descenso de gradiente
+(\textit{Momentum}, \textit{Nesterov Momentum}, \textit{Adagrad},
+\textit{Rmsprop} entre otros). Lo más comun es utilizar alguna de
+ellas con una técnica llamada \textit{descenso de gradiente
+estocástico}, que se basa en calcular el gradiente de un subconjunto
+del total de datos (\textit{batch}) y actualizar \weights{} al final
+de cada \textit{batch}. Esto es muy útil dado que es
+computacionalmente costoso calcular el gradiente de todo un conjunto
+de datos con miles de imágenes a la vez y calcular el gradiente de un
+\textit{batch} aproxima bastante bien el gradiente del total.
+
 **** Clasificador \textit{Softmax}
+Antes de saltar de lleno a las redes neuronales artificiales vamos a
+describir brevemente un tipo de clasificador muy utilizado en las
+mismas, el clasificador \textit{Softmax}.
 
 La función \textit{Softmax} tiene la siguiente forma:
 
@@ -292,59 +385,24 @@ diferente. En vez de tratar a los resultados como puntajes para cada
 clase (lo cual puede ser confuso y dificíl de comparar), Softmax
 devuelve probabilidades normalizadas para cada clase.
 
-Un clasificador Softmax no modifica la funcion \func{} que ya
+Un clasificador Softmax no modifica la funcion \(f\) que ya
 conocemos, pero sí interpreta los puntajes como probabilidades
 logarítmicas sin normalizar, reemplazando la pérdida bisagra por una
 \textit{entropía cruzada}:
 
 \begin{equation}
-     L_i = - \log \bigg( \frac{\exp{f_{y_{i}}}} {\sum_j \exp{f_j}}\bigg)
+     L_i = - \log \bigg( \frac{e^{f(x_i, \theta)_{y_{i}}}} {\sum_j e^{f(x_i, \theta)_j}}\bigg)
 \end{equation}
 
 Que es equivalente a:
 
 \begin{equation}
-     L_i = - f_{y_{i}} + \log {\Big( \sum_j \exp{f_j}\Big)}
+     L_i = - f(x_i, \theta)_{y_{i}} + \log {\Big( \sum_j e^{f(x_i, \theta)_j}\Big)}
 \end{equation}
 
 Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
 de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
 promedio de las pérdidas de cada imagen.
-
-**** Descenso de Gradiente
-
-Ya contamos con una función para medir que tan bien o que tan mal está
-comportándose nuestro modelo, la \textit{función de pérdida}. Como se
-puede observar, esta función depende de nuestro \weights{} y las
-imágenes (o \features{} que estemos usando). Nosotros no tenemos
-control sobre nuestro conjunto de datos de entrenamiento, pero sí
-podemos modificar los parámetros de \weights{} para producir la menor
-pérdida posible.
-
-El descenso de gradiente se utiliza para optimizar los pesos partiendo
-de la premisa que el modelo es diferenciable con respecto a
-\weights{}. Dado que queremos minimizar la funcion de costo \loss{},
-lo que vamos a hacer es calcular su gradiente \(\nabla L\) respecto a
-cada parametro y luego modificar cada uno ligeramente con el objetivo
-de alcanzar un minimo en la funcion:
-
-\begin{equation}
-    W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta} L(f(x_i; \theta), y_i)
-\end{equation}
-
-Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
-\(m\) es la cantidad de elementos en el conjunto de datos. En la
-ecuacion se puede observar que se modifican los parametros con
-respecto a la direccion opuesta al gradiente, dado que el mismo indica
-la direccion de crecimiento de una funcion pero nosotros queremos
-encontrar un minimo.
-
-Existen variantes mas sofisticadas del descenso de gradiente
-(Momentum, Nesterov Momentum, Adagrad, Rmsprop entre otros). Lo mas
-comun es utilizar una tecnica llamada \textit{descenso de gradiente
-estocastico}, que se basa en calcular el gradiente de un subconjunto
-del total de datos (\textit{batch}) y actualizar \weights{} al final
-de cada \textit{batch}.
 
 **** \textit{Backpropagation}
 
@@ -618,6 +676,7 @@ aleatorios cercanos a cero. Una opción común es utilizar una
 distribución gaussiana con media cero y desviación estándar 0.01.
 
 *** Regularización
+#+LaTeX: \label{sec:regular}
 
 Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
 problema del \textit{sobre-ajuste}. Esto significa que nuestro modelo
@@ -872,12 +931,16 @@ Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 
-* Redes neuronales siamesas                      :noexport:
-** Conceptos generales sobre los cuales parte el trabajo
-*** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
-*** Egomotion
-*** SFA
+* Redes neuronales siamesas
+#+LaTeX: \label{sec:siamesa}
+* Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
+#+LaTeX: \label{sec:odometry}
+** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
+** Egomotion
+** SFA
 
+* Conclusiones 
+#+LaTeX: \label{sec:concl}
 * Plan de Trabajo                                :noexport:
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
