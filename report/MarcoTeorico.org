@@ -325,6 +325,7 @@ Cuando tenemos una función con la forma \( \max{(0,\_)} \) a menudo se
 la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 
 **** Descenso de Gradiente
+#+LaTeX: \label{sec:sgd}
 
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
@@ -404,112 +405,12 @@ Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
 de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
 promedio de las pérdidas de cada imagen.
 
-**** \textit{Backpropagation}
+** Redes Neuronales Artificiales
 
-Notemos que \loss{} es una función que depende de las imágenes de
-entrada \img{}, \weights{} y \bias{}. Sin embargo el conjunto de datos
-de entrenamiento es algo fijo en nuestro modelo, por lo que sólo nos
-interesa calcular el gradiente sobre \weights{} y \bias{} para poder
-actualizar sus parámetros.
-
-En una función de una dimensión, la derivada se expresa como:
-\begin{equation}
-     \boldsymbol{\frac{df(x)}{dx} = \lim_{h\to 0} \frac{f(x + h) - f(x)}{h} }
-\end{equation}
-
-Cuando la función toma un vector de números en vez de uno solo, a las
-derivadas las llamamos derivadas parciales y el \textit{gradiente} es
-simplemente un vector de esas derivadas. Por ejemplo, sea \(f\) una
-función que toma dos parámetros \(x\) e \(y\), entonces el gradiente
-de \(f\) es \(\nabla f = [\frac{\partial f}{\partial x},
-\frac{\partial f}{\partial y}]\)
-
-Usualmente podemos diferenciar con métodos numéricos, asignando a
-\(h\) números muy pequeños por ejemplo, pero esto requiere de muchos
-cálculos, es lento y tan sólo una aproximación. Veremos más
-adelante que la función \loss{} de las redes neuronales suele tener
-decenas de millones de parámetros, y realizar tantas
-operaciones para una sola actualización de los parámetros no es
-conveniente. En la práctica usaremos el cálculo analítico del
-gradiente, en el cual derivamos una fórmula directa que es muy rápida
-de computar valiéndonos de la \textit{regla de la cadena}.
-
-La \textit{regla de la cadena} nos ayuda a descomponer el cálculo del
-gradiente de expresiones complejas en pequeños pasos. Por ejemplo,
-tomemos la función:
-
-\begin{equation}
-    f(x,y,z) = \frac{x}{y^2} + z
-\end{equation}
-
-Si quisieramos obtener su gradiente en \(x\) de la manera tradicional,
-calculando el cociente de \(f(x+h) - f(x)\) con \(h\) cuando \({h \to
-0}\) deberíamos realizar muchos cálculos computacionalmente
-costosos. En cambio, podemos ver a \(f\) como una composición de
-funciones:
-
-\begin{equation}
-    f(x,y,z) = \frac{x}{y^2} + z = q + z
-\end{equation}
-
-Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
-
-\begin{equation}
-\frac{\partial f}{\partial z} = q
-\end{equation}
-
-\begin{equation}
-\frac{\partial f}{\partial q} = z
-\end{equation}
-
-\begin{equation}
-\frac{\partial f}{\partial x} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial x} = \frac{z}{y^2}
-\end{equation}
-
-\begin{equation}
-\frac{\partial f}{\partial y} = \frac{\partial f}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
-\end{equation}
-
-Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
-en dos pasos: primero, evaluamos nuestra función \loss{} en los
-parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
-resultado calculamos el gradiente en cada variable utilizando la
-\textit{regla de la cadena}. De esta manera "propagamos" el error de la
-predicción hacia atrás (\textit{backpropagation}) y corregimos
-ligeramente los pesos para mejorar las futuras predicciones.
-
-Una vez que contamos con el gradiente, actualizamos los parámetros de
-\loss{} restándole un porcentaje del gradiente negativo calculado
-(negativo porque queremos ir en dirección opuesta a donde crece la
-función, o sea, ir a su mínimo). Ese porcentaje es llamado
-\textit{tasa de aprendizaje} (\textit{learning rate}) y suele ser uno
-de los parámetros más difíciles de elegir, ya que la calidad y rapidez
-de aprendizaje dependen de él.
-
-Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
-actualizaríamos los parámetros, y repetiríamos el ciclo hasta
-conseguir un buen resultado. Sin embargo los conjuntos de datos para
-entrenar las redes neuronales suelen tener cientos de miles o incluso
-millones de imágenes, por lo cual se utiliza una técnica llamada
-\textit{Descenso de Gradiente Estocástico} o \textit{SGD} por sus
-siglas en inglés, en el cual se calcula el gradiente para una cantidad
-predeterminada de imágenes (\textit{batches}), se actualizan los
-parámetros y se vuelve a repetir el ciclo con otro subconjunto
-distinto. Esto parte de la suposición de que todas las imágenes del
-conjunto de datos estan correlacionadas entre sí. En teoría
-\textit{SGD} utiliza una sola imagen por batch, pero dada la alta
-paralelización que provee el hardware actual, conviene hacer lotes de
-imágenes de 62, 128, 512 imágenes. El tamaño de los \textit{batches}
-no es estrictamente un hiperparámetro que uno pueda
-\textit{cross-}validar, sino que más bien depende del hardware sobre
-el que se esté entrenando la red (en general se eligen potencias de
-dos por cuestiones de eficiencia).
-
-** Redes Neuronales
-
-Hasta ahora vimos clasificadores lineales. Si conectaramos la salida
-de un clasificador lineal \(s_1=W_1x+b_1\) con la entrada de otro
-clasificador \(s_2=W_2y+b_2\), entonces obtendríamos un tercero:
+Hasta ahora analizamos clasificadores lineales y un tipo particular
+llamado softmax. Si conectáramos la salida de un clasificador lineal
+\(s_1=W_1x+b_1\) con la entrada de otro clasificador \(s_2=W_2y+b_2\),
+entonces obtendríamos un tercero:
 
 \begin{equation}
 s_3 = W_2 (W_1x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1) + b_2
@@ -540,20 +441,28 @@ Una sola neurona puede funcionar como un clasificador también (notar
 el parecido con los clasificadores lineales), siempre que se eliga la
 función de pérdida adecuada.
  
-** Funciones de activación comunes
+*** Funciones de activación comunes
 
 Se han propuesto varias funciones de activación a lo largo de los
-años. Inicialmente se intentó simular el comportamiento de las
-conexiones sinápticas entre las neuronas mediante funciones como la
-Sigmoide (\(\sigma\)) y la Tangente Hiperbólica (\(\tanh\), aunque
-ambas ya estan en desuso por no poseer buenas propiedades (saturación
-de gradiente).
+años. 
 
-Consecuentemente, nos concentraremos en un tipo especifico de función
-de activación, los Rectificadores Lineales o ReLU por sus siglas en
-inglés. Los rectificadores lineales son muy populares en las redes
-convolucionales debido a sus buenas propiedades.
-*** \textit{ReLU}
+Inicialmente se intentó simular el comportamiento de las conexiones
+sinápticas mediante la función de activación Sigmoide (\(\sigma\)),
+por tener la propiedad de transformar la entrada a un rango entre 0 y
+1, y tener además una derivada fácil de calcular (útil para
+\textit{backpropagation}).  Luego se propuso la Tangente Hiperbólica
+(\(\tanh\)), pero ambas fueron desplazadas en favor de las unidades
+\textit{ReLU}, o \textit{Rectifier Linear Unit} en inglés, que son más
+fáciles de calcular y no sufren del problema de saturación de
+gradiente que poseen \(\sigma\) y \(\tanh\).
+
+Nos concentraremos entonces en las unidades \textit{ReLU}, actualmente
+muy populares en las redes convolucionales debido a sus buenas
+propiedades.
+
+Hay tres tipos de rectificadores lineales:
+
+**** \textit{ReLU}
 Una unidad ReLU establece un umbral en \(0\) a la salida de la
 neurona. Es decir, la activación de una neurona va a ser \(0\) si su
 salida fue negativa o un numero positivo en caso contrario:
@@ -563,66 +472,135 @@ f(x) = \max{(0,x)}
 \end{equation}
 
 Comparada con \(\sigma\) y \(\tanh\), requiere menos operaciones, no
-es saturante y converge hasta 6 veces mas rapido que las funciones
+es saturante y converge hasta 6 veces más rápido que las funciones
 sigmoide y tanh \cite{NIPS2012_4824}.
 
 Una desventaja de las \textit{ReLU} es que pueden provocar la "muerte"
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
 través de una \textit{ReLU} durante el proceso de
-\textit{backpropagation} entonces va a actualizar los pesos de tal
-manera que no se vuelva a activar la neurona. Pensemos que el proceso
-de actualización de \weights{} implica restar un porcentaje del
-gradiente en \weights{}, lo cual puede agravarse si nuestra tasa de
-aprendizaje es muy grande. Una vez que la ReLU alcanza este estado, es
-improbable que vuelva a activarse, dado que su gradiente en \(0\) es
-también \(0\), por lo que un entrenamiendo mediante descenso de
-gradiente y \textit{backpropagation} no va a modificar los pesos
-locales, dejando a esa neurona "muerta".
+\textit{backpropagation} entonces va a actualizar los pesos de esa
+neurona de tal manera que no se vuelva a activar. Pensemos que el
+proceso de actualización de \weights{} implica restar un porcentaje
+del gradiente en \weights{}. Si el gradiente es muy grande entonces
+los pesos sobre los que se realice la actualización terminarán siendo
+muy pequeños. Como consecuencia, la unidad \textit{ReLU} no volverá a
+activarse, pues sus valores de entrada siempre van a ser valores
+negativos. Esta situación puede agravarse si la tasa de
+aprendizaje es muy grande.
 
-*** \textit{Leaky ReLU}
+Una vez que la ReLU alcanza este estado, es improbable que vuelva a
+activarse, dado que su gradiente en \(0\) es también \(0\), por lo que
+un entrenamiendo mediante descenso de gradiente y
+\textit{backpropagation} no va a modificar los pesos locales, dejando
+a esa neurona "muerta".
+
+**** \textit{Leaky ReLU}
 
 Se puede solucionar el problema de la "muerte" de neuronas agregando
 una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
-negativos. Esta funcion de activacion es la que se conoce como
-\textit{Leaky ReLU} \cite{zhang2014improving}:
+negativos de la \textit{ReLU}. Esta función de activación es la que se
+conoce como \textit{Leaky ReLU} \cite{zhang2014improving}:
 
 \begin{equation}
 f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
 \end{equation}
 
 De esta manera nos aseguramos que al menos un pequeño gradiente fluya
-y se normalicen los pesos a mediano/largo plazo. Sin embargo no está
-demostrado del todo que las \textit{Leaky ReLU} presenten una mejora
-sustancial en el entrenamiento de las redes, por lo que las \{ReLU}
-convencionales siguen siendo ampliamente usadas.
+durante \textit{backpropagation} cuando la neurona emite resultados
+negativos, permitiendo que se normalicen los pesos a mediano/largo
+plazo. Sin embargo no está demostrado del todo que las \textit{Leaky
+ReLU} presenten una mejora sustancial en el entrenamiento de las
+redes, por lo que las \{ReLU} convencionales siguen siendo ampliamente
+usadas.
 
-*** \textit{Maxout}
+**** \textit{Maxout}
 
 \begin{equation}
 f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
 \end{equation}
 
-Maxout \cite{Maxout} es una generalización de las funciones \textit{ReLU}, y obtiene lo
-mejor de los dos mundos: por un lado la forma lineal y no saturante de
-las \textit{ReLUs} y por el otro evita el problema de las neuronas que
-se mueren. A pesar de ello tiene la desventaja de duplicar los
-parámetros para cada neurona, lo cual no siempre es deseable, pues
-conlleva en más tiempo de entrenamiento y más consumo de memoria y de
-recursos, sobre todo en redes profundas.
+\textit{Maxout} \cite{Maxout} es una generalización de las funciones
+\textit{ReLU}, y obtiene lo mejor de los dos mundos: por un lado la
+forma lineal y no saturante de las \textit{ReLUs} y por el otro evita
+el problema de las neuronas que se mueren. A pesar de ello tiene la
+desventaja de duplicar los parámetros para cada neurona, lo cual no
+siempre es deseable, pues implica más tiempo de entrenamiento y
+más consumo de memoria y recursos, sobre todo en redes profundas.
 
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
-** Entrenamiento de redes neuronales
+*** Inspiración biológica de las redes neuronales artificiales
 
-Antes de comenzar a entrenar una red neuronal es necesario tener en
-cuenta aspectos referidos al preprocesamiento de los datos, como
-inicializar los pesos, que función de pérdida se va a utilizar y que
-métodos de regularización se van a utilizar.
+Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
+sin embargo nos centraremos en el tipo estándar de neurona, un modelo
+\textit{näive}:
+
+TODO: dibujo clasico de neurona
+
+El cuerpo de la neurona esta compuesto de tres partes principales, el
+arbol dendrítico, el cuerpo celular o soma y una extensión llamada
+axón.  El árbol dendrítico se conecta con los axones de otras neuronas
+y recibe impulsos de éstas.  Una neurona puede estar conectada a
+cientos o miles de otras neuronas desde las que recibe impulsos,
+los cuales pueden o no activar a la neurona.  Si la neurona se activa,
+entonces retransmite el impulso a través de su axón.
+
+Notar que en realidad las conexiones del árbol dendrítico no son todas
+iguales.  Los axones y las extremidades del arbol dendrítico tienen un
+pequeño espacio entre ellos llamado espacio sináptico. Si la exitación
+que proviene de un axón es suficiente, entonces el impulso se
+transmite a la neurona, caso contrario no. Decimos que la primera es
+una transmisión exitadora, pues aumenta la posibilidad de transmitir
+el impulso, mientras que el otro caso se denomina transmisión
+inhibidora, dado que reduce esa posibilidad.  De esta manera surge la
+noción de \textit{pesos sinápticos}, que determinan cuando se activan
+las conexiones y cuando no.  Otro aspecto a tener en cuenta es el
+\textit{estímulo acumulativo}, en donde los estímulos de varios
+receptores del arbol dendrítico se combinan de alguna manera para
+activar o no la neurona (no hay punto intermedio). Este sistema de
+tomar los impulsos de entrada y determinar si emitir el impulso de
+salida se corresponde con nuestra \textit{función de activación} que
+ya vimos. La función de activación representa entonces la frecuencia con
+la que se activa la neurona.
+
+Ahora podemos dar un modelo más formal de una neurona:
+
+TODO grafica de neurona con inputs, weights, sumatoria, funcion de activacion, etc.
+
+En la Figura, las entradas \(x_i\) interactúan multiplicativamente con
+los pesos. En nuestra analogía con la neurona biológica, esas son las
+sinapsis. Luego, el el cuerpo de la célula, esos resultados se suma
+junto con un \textit{bias}, y luego se calcula la función de
+activación para decidir si activar o no el axón.
+
+** Entrenamiento de redes neuronales artificiales
+
+Entrenar una red neuronal artificial no es muy distinto a entrenar un
+clasificador lineal. Necesitamos definir una función de pérdida y un
+método para ajustar los parámetros. Veremos además, como en otras
+tareas de aprendizaje automático, que hay que tener en cuenta el
+formato de los datos de entrada al model (tal vez eliminar ruido o
+redundancia, normalizar las dimensiones). Esta tarea se denomina preprocesamiento de datos.
+
+También analizaremos varias técnicas para evitar el sobre-ajuste de
+modelos. El sobre-ajuste surge cuando un modelo aprende "ruido" y
+detalles particulares del conjunto de datos en vez e características
+generales que ayuden a la tarea de clasificación. 
+
+Finalizaremos esta sección con un análisis de la organización interna
+de las redes neuronales artificiales y qué algoritmos se utilizan
+para entrenar.
 
 *** Preprocesamiento de datos
 
-Las dos técnicas más comunes de preprocesamiento de datos para redes
+Antes de comenzar con el entrenamiento de una red neuronal artificial
+es conveniente analizar los datos y si es necesario normalizarlos para
+que todos estén en el mismo rango de valores.
+
+El preprocesamiento de datos, como alinear imágenes o normalizar
+valores ayuda a una mejor convergencia de los modelos. Las dos
+técnicas más comunes de preprocesamiento de datos para redes
 neuronales son la substracción de la media y la normalización.
 
 **** Substracción de la media
@@ -647,12 +625,13 @@ estrictamente necesario normalizar los datos de entrada.
 
 A la hora de entrenar redes convolucionales importan dos cosas: la
 calidad de los datos y la cantidad. Es necesario que además de
-normalizar las imágenes a un bajo nivel, se normalicen aspectos más
-generales. Por ejemplo, si estuvieramos entrenando una red de
-reconocimiento de rostros, es mucho mejor contar con un dataset de
-caras alineadas en vez de un dataset de caras en diferentes posiciones
-y ángulos. De esa manera vamos a lograr que la red aprenda mejor que
-\textit{features} extraer de las imágenes.
+preprocesar los datos con las técnicas usuales (substracción de media
+por ejemplo), se tengan en cuenta aspectos de más alto nivel. Por ejemplo,
+si estuvieramos entrenando una red de reconocimiento de rostros, es
+mucho mejor contar con un dataset de caras alineadas en vez de un
+dataset de caras en diferentes posiciones y ángulos. De esa manera
+vamos a lograr que la red aprenda mejor que \textit{features} extraer
+de las imágenes.
 
 Además no siempre se puede contar con un dataset de millones de
 imágenes para entrenar nuestra red, por lo que hay que aumentar
@@ -660,7 +639,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** Inicialización de pesos
+*** TODO (EXPLAYAR MAS) Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
 simetría. Imaginemos que inicializamos todos los pesos en \(0\), algo
@@ -675,7 +654,7 @@ En cambio podemos inicializar los pesos con pequeños números
 aleatorios cercanos a cero. Una opción común es utilizar una
 distribución gaussiana con media cero y desviación estándar 0.01.
 
-*** Regularización
+*** TODO (breve explicacion de por que funciona el dropout (varias redes neuronales al mismo tiempo, inspiracion biologica)) Evitando el sobre-ajuste: Regularización y Dropout
 #+LaTeX: \label{sec:regular}
 
 Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
@@ -692,7 +671,7 @@ regularización \(R(W)\). Lo que buscamos con esto es poner
 preferencias para algunos conjuntos de \weights{} sobre otros.
 
 De esta manera, nuestra función de pérdida ahora cuenta con dos
-componentes: \textit{pérdida de los datos} y \textit{pérdida de
+componentes: \textit{pérdida de los datos} y \textit{componente de
 regularización}:
 
 \begin{equation}
@@ -703,7 +682,7 @@ Notar que la pérdida total es el promedio de las pérdidas de cada
 imagen, y que la penalización de la regularización sólo se suma una
 vez.
 
-Las tecnicas de regularizacion más usadas son:
+Las técnicas de regularizacion más usadas son:
 
 **** L2
 
@@ -745,10 +724,10 @@ z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \boldsymbol{y}^{l} + b^{(l+1)}_{i},
 \end{equation}
 
 \begin{equation}
-y^{(l+1)}_{i} = f(z^{(l+1)}_{i})
+y^{(l+1)}_{i} = A(z^{(l+1)}_{i})
 \end{equation}
 
-Donde \(f\) es una función de activación. Si ahora agregamos \textit{dropout}:
+Donde \(A\) es una función de activación. Si ahora agregamos \textit{dropout}:
 
 \begin{equation}
 r^{(l)}_{j} \sim Bernoulli(p),
@@ -763,7 +742,7 @@ z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \tilde{\boldsymbol{y}}^{l} + b^{(l+1)
 \end{equation}
 
 \begin{equation}
-y^{(l+1)}_{i} = f(z^{(l+1)}_{i})
+y^{(l+1)}_{i} = A(z^{(l+1)}_{i})
 \end{equation}
 
 Aquí \(*\) denota el producto elemento a elemento y
@@ -794,19 +773,130 @@ capa más, y la capa de salida no tiene funciones de activación, dado
 que generalmente representan las puntuaciones de cada clase (en
 clasificación) o alguna métrica (en regresión).
 
-*** Transferencia de aprendizaje
+Las redes neuronales se entrenan partiendo del principio del descenso
+del gradiente que se explicó en la Sección \ref{sec:sgd}. Notemos que
+\loss{} es una función que depende de las imágenes de entrada \img{},
+\weights{} y \bias{}. Sin embargo, como ya dijimos, el conjunto de
+datos de entrenamiento es algo fijo en nuestro modelo, por lo que sólo
+nos interesa calcular el gradiente sobre \weights{} y \bias{} para
+poder actualizar sus parámetros. Ahora bien, derivar una función con
+millones de parámetros (cantidad que suelen tener las redes neuronales
+artificiales) es computacionalmente costoso, por lo que para
+actualizar \weights{} con los nuevos pesos se utiliza un algoritmo
+llamado \textit{backpropagation}.
 
-Entrenar un modelo con un tipo especifico de problema y luego utilizar
+**** \textit{Backpropagation}
+
+En una función de una dimensión, llamémosle \(g\), la derivada se
+expresa como:
+\begin{equation}
+     \boldsymbol{\frac{dg(x)}{dx} = \lim_{h\to 0} \frac{g(x + h) - g(x)}{h} }
+\end{equation}
+
+Cuando la función toma un vector de números en vez de uno solo, a las
+derivadas las llamamos derivadas parciales y el \textit{gradiente} es
+simplemente un vector de esas derivadas. Por ejemplo, sea \(g\) una
+función que toma dos parámetros \(x\) e \(y\), entonces el gradiente
+de \(g\) es \(\nabla g = [\frac{\partial g}{\partial x},
+\frac{\partial g}{\partial y}]\)
+
+Usualmente podemos diferenciar con métodos numéricos, asignando a
+\(h\) números muy pequeños por ejemplo, pero esto requiere de muchos
+cálculos, es lento y tan sólo una aproximación. Veremos más
+adelante que la función \loss{} de las redes neuronales suele tener
+decenas de millones de parámetros, y realizar tantas
+operaciones para una sola actualización de \weights{} no es
+conveniente. En la práctica usaremos el cálculo analítico del
+gradiente, en el cual derivamos una fórmula directa que es muy rápida
+de computar valiéndonos de la \textit{regla de la cadena}.
+
+La \textit{regla de la cadena} nos ayuda a descomponer el cálculo del
+gradiente de expresiones complejas en pequeños pasos. Por ejemplo,
+tomemos nuevamente una función \(g\):
+
+\begin{equation}
+    g(x,y,z) = \frac{x}{y^2} + z
+\end{equation}
+
+Si quisieramos obtener su gradiente en \(x\) de la manera tradicional,
+calculando el cociente de \(g(x+h) - g(x)\) con \(h\) cuando \({h \to
+0}\) deberíamos realizar muchos cálculos computacionalmente
+costosos. En cambio, podemos ver a \(g\) como una composición de
+funciones:
+
+\begin{equation}
+    g(x,y,z) = \frac{x}{y^2} + z = q + z
+\end{equation}
+
+Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
+
+\begin{equation}
+\frac{\partial g}{\partial z} = q
+\end{equation}
+
+\begin{equation}
+\frac{\partial g}{\partial q} = z
+\end{equation}
+
+\begin{equation}
+\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = \frac{z}{y^2}
+\end{equation}
+
+\begin{equation}
+\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
+\end{equation}
+
+Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
+en dos pasos: primero, evaluamos nuestra función \loss{} en los
+parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
+resultado calculamos el gradiente en cada variable utilizando la
+\textit{regla de la cadena}. De esta manera "propagamos" el error de la
+predicción hacia atrás (\textit{backpropagation}) y corregimos
+ligeramente los pesos para mejorar las futuras predicciones.
+
+Una vez que contamos con el gradiente, actualizamos los parámetros de
+\loss{} restándole un porcentaje del gradiente negativo calculado
+(negativo porque queremos ir en dirección opuesta a donde crece la
+función, o sea, ir a su mínimo). Ese porcentaje es llamado
+\textit{tasa de aprendizaje} (\textit{learning rate}) y suele ser uno
+de los parámetros más difíciles de elegir, ya que la calidad y rapidez
+de aprendizaje dependen de él.
+
+Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
+actualizaríamos los parámetros, y repetiríamos el ciclo hasta
+conseguir un buen resultado. Sin embargo los conjuntos de datos para
+entrenar las redes neuronales suelen tener cientos de miles o incluso
+millones de imágenes, por lo cual se utiliza una técnica llamada
+\textit{Descenso de Gradiente Estocástico} o \textit{SGD} por sus
+siglas en inglés, en el cual se calcula el gradiente para una cantidad
+predeterminada de imágenes (\textit{batches}), se actualizan los
+parámetros y se vuelve a repetir el ciclo con otro subconjunto
+distinto. Esto parte de la suposición de que todas las imágenes del
+conjunto de datos estan correlacionadas entre sí. En teoría
+\textit{SGD} utiliza una sola imagen por batch, pero dada la alta
+paralelización que provee el hardware actual, conviene hacer lotes de
+imágenes de 62, 128, 512 imágenes. El tamaño de los \textit{batches}
+no es estrictamente un hiperparámetro que uno pueda
+\textit{cross-}validar, sino que más bien depende del hardware sobre
+el que se esté entrenando la red (en general se eligen potencias de
+dos por cuestiones de eficiencia).
+**** Transferencia de aprendizaje
+
+Entrenar un modelo con un tipo específico de problema y luego utilizar
 su \textit{conocimiento} para resolver otro problema nuevo, tal vez
-incluso en un area distinta a la que fue pensado originalmente, es lo
-que se llama transferencia de aprendizaje. Esta tecnica ha cobrado
+incluso en un área distinta a la que fue pensado originalmente, es lo
+que se llama transferencia de aprendizaje. Esta técnica ha cobrado
 importancia en \textit{deep learning} dado que a menudo las redes son
 muy profundas y tardan semanas en entrenarse, por lo que contar con
 modelos preentrenados sobre los cuales se puedan ajustar ligeramente
-los parametros para resolver un nuevo problema es una ventaja.
+los parámetros para resolver un nuevo problema es una ventaja. La
+mayoría de los \textit{frameworks} modernos para implementar redes
+neuronales soportan realizar transferencia de aprendizaje utilizando
+modelos pre-entrenados.
 
 ** Redes Convolucionales
-*** Diferencias con redes neuronales convencionales
+*** TODO que es una convolucion
+*** Diferencias con redes neuronales artificales convencionales
 Las redes convolucionales cuentan con los mismos artefactos que las
 redes convencionales que ya discutimos (neuronas con pesos, funciones
 de pérdida, capas completamente conectadas). Incluso los mismos
@@ -821,24 +911,27 @@ nos da una dimensión de entrada de 200x200x3, por lo que una neurona
 completamente conectada en la primer capa oculta tendría 120000
 conexiones y por ende esa misma cantidad de pesos a entrenar. Si
 tenemos en cuenta que seguramente vamos a requerir más de una neurona
-(comunmente cientos de ellas en una misma capa) podemos concluir que
+(comúnmente cientos de ellas en una misma capa) podemos concluir que
 este enfoque no escala bien para el procesamiento de imágenes.
 
 Una red neuronal convolucional se aprovecha de la ventaja de que los
 datos de entrada son imágenes y organiza las neuronas en 3
-dimensiones: ancho, alto y profundidad, como se verá en la siguiente
-sección.
+dimensiones: ancho, alto y profundidad. Tal como hicimos con las redes
+neuronales convencionales, en la siguiente sección analizaremos los
+tipos de capas de una red neuronal convolucional. Al final de la
+Sección se dará una descripción general de la arquitectura de una red
+convolucional y varios ejemplos de redes convolucionales conocidas.
 
 *** Capas de una red convolucional
 **** Capas Convolucionales
 
 Una capa convolucional consta de un conjunto de filtros (o
-\textit{kernels}) cuyos parametros se pueden aprender. En general cada
+\textit{kernels}) cuyos parámetros se pueden aprender. En general cada
 filtro es pequeño a lo ancho y alto, pero se aplica a toda la
 profundidad del volumen de entrada. Notar que el volumen de entrada
 puede bien ser una imagen o las activaciones de otra capa.
 
-Durante el entrenamiento o la clasificacion de imagenes, estos filtros
+Durante el entrenamiento o la clasificación de imagenes, estos filtros
 se convolucionan a traves del ancho y alto de la imagen, produciendo
 un mapa de activaciones en 2-D para cada filtro. Si "apilamos" los
 mapas de activaciones de todos los filtros de una capa convolucional,
@@ -846,37 +939,34 @@ obtenemos un \textit{volumen} de salida.  En otras palabras, se
 computa un producto punto entre el filtro y las distintas regiones de
 la entrada. De esta manera cada elemento en el volumen de salida puede
 ser interpretado como la salida de una neurona conectada a una pequeña
-region de los datos de entrada, la cual comparte parametros (pesos)
+region de los datos de entrada, la cual comparte parámetros (pesos)
 con las otras neuronas que corresponden al mismo filtro.
 
-Esta conexion a una pequeña region en los datos de entrada es un
-hiperparametro de la red llamado campo receptivo. Es importante notar
-que los campos receptivos son locales en una pequeña area en cuanto al
-ancho y alto de la entrada, pero abarcan la totalidad de la
-profundidad del volumen de entrada.
+Esta conexión a una pequeña región en los datos de entrada es un
+hiperparámetro de la red llamado \textit{campo receptivo}. Es
+importante notar que los \textit{campos receptivos} son locales en una
+pequeña área en cuanto al ancho y alto de la entrada, pero abarcan la
+totalidad de la profundidad del volumen de entrada.
 
-Otros hiperparametros relacionados con las capas convolucionales son
-la cantidad de filtros (\textit{K}), el espacio en pixeles entre cada
+Otros hiperparámetros relacionados con las capas convolucionales son
+la cantidad de filtros (\textit{K}), el espacio en píxeles entre cada
 aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
 con ceros o \textit{zero-padding}, donde se le agrega un "marco" de 1
 o mas ceros a la entrada de la capa.
 
-***** TODO imagenes
-
 **** \textit{Pooling}
 
-Las capas de \textit{pooling} reducen la dimension espacial de sus
+Las capas de \textit{pooling} reducen la dimensión espacial de sus
 entradas y por ende reducen la cantidad de parametros en la red,
-ayudando a controlar el \textit{overfitting}. Lo mas comun es
+ayudando a controlar el \textit{overfitting}. Lo más común es
 insertar capas de \textit{pooling} luego de capas convolucionales.
 
-La forma mas comun de \textit{pooling} es \textit{MAX Pooling}, en la
-cual se calcula el maximo de un area local (generalmente 2x2 o 3x3) en
-el ancho y largo del volumen de entrada y a traves de cada una de las
+Un método de \textit{pooling} muy usado es \textit{MAX Pooling}, en el
+cual se calcula el máximo de un área local (generalmente 2x2 o 3x3) en
+el ancho y largo del volumen de entrada y a través de cada una de las
 "rodajas" que conforman la profundidad del volumen. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
 
-***** TODO imagenes
 **** Capas Completamente Conectadas (Fully-Connected)
 
 Como su nombre lo indica, cada neurona de esta capa tiene conexiones a
@@ -885,7 +975,7 @@ sus activaciones se pueden calcular con una multiplicacion de matrices
 junto con el calculo del \textit{bias}, como ya se vio para las redes
 neuronales convencionales.
 
-**** TODO (AGREGAR IMAGEN) Arquitecturas 
+*** Arquitecturas conocidas de redes convolucionales 
 
 Normalmente una red convolucional esta compuesta de varias capas
 convolucionales (CONV), capas de \textit{pooling} (POOL), capas
