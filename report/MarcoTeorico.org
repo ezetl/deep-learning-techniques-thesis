@@ -639,7 +639,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-*** TODO (EXPLAYAR MAS) Inicialización de pesos
+*** Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
 simetría. Imaginemos que inicializamos todos los pesos en \(0\), algo
@@ -652,9 +652,12 @@ red no aprenda.
 
 En cambio podemos inicializar los pesos con pequeños números
 aleatorios cercanos a cero. Una opción común es utilizar una
-distribución gaussiana con media cero y desviación estándar 0.01.
+distribución gaussiana con media cero y desviación estándar 0.01. Este
+método, si bien es bastante \textit{ad-hoc}, es bastante usado. Hay
+muchas otras maneras más sofisticadas de inicializar los pesos de una
+red, pero su análisis escapa al alcance de este trabajo final.
 
-*** TODO (breve explicacion de por que funciona el dropout (varias redes neuronales al mismo tiempo, inspiracion biologica)) Evitando el sobre-ajuste: Regularización y Dropout
+*** Evitando el sobre-ajuste: Regularización y Dropout
 #+LaTeX: \label{sec:regular}
 
 Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
@@ -753,6 +756,25 @@ elemento a elemento por \(\boldsymbol{y}^{(l)}\) para reducir la
 cantidad de neuronas activas, obteniendo como resultado
 \(\tilde{\boldsymbol{y}}^{(l)}\) que a su vez va a ser la entrada de
 la capa siguiente.
+
+En cada iteración del entrenamiento, \textit{dropout} elimina neuronas
+aleatoriamente y utiliza una \textit{subred} con menos neuronas que la
+original, lo cual impide a las neuronas co-adaptarse entre si. La
+co-adaptación ocurre cuando dos o más neuronas consecutivas dependen
+mucho entre ellas para detectar \textit{features}, en vez de que cada
+neurona busque un tipo particular de \textit{feature}.
+
+Otra manera de pensarlo es la siguiente: una red neuronal con \(n\)
+neuronas puede ser vista como una colección de \(2^n\)
+\textit{subredes} que comparten todas los mismos pesos (\weights{}),
+por lo cual la cantidad total de parámetros sigue siendo a lo sumo
+\(O(n^2)\). Para cada elemento en el conjunto de entrenamiento se
+elige una de estas \(2^n\) redes y apenas se la entrena. Esto es
+comparable a entrenar distintos modelos y luego promediar sus
+predicciones, algo que en general es muy útil en aprendizaje
+automático pero rara vez se hace en aprendizaje profundo debido a que
+cada modelo tarda mucho en entrenarse y es muy tedioso elegir buenos
+hiperparámetros.
 
 *** Organización y entrenamiento de redes neuronales
 
@@ -895,7 +917,79 @@ neuronales soportan realizar transferencia de aprendizaje utilizando
 modelos pre-entrenados.
 
 ** Redes Convolucionales
-*** TODO que es una convolucion
+*** Introducción
+
+Antes de introducirnos en el mundo de las redes convolucionales es
+necesario definir qué es una convolución.
+
+Una matriz de convolución, o \textit{kernel}, es una matriz
+generalmente cuadrada y pequeña utilizada extensamente para detectar o
+resaltar bordes y enfocar o desenfocar imágenes dependiendo de sus
+valores y tamaño. Son muy utilizadas en el mundo de la visión por
+computadoras, sobre todo en los pasos de extracción de
+\textit{features} de una imagen a la hora de aplicar algoritmos de
+aprendizaje automático.
+
+Una convolución entre un \textit{kernel} y una imagen se realiza
+sumando las multiplicaciones elemento a elemento entre \textit{kernel}
+y una región de la imagen. Por ejemplo, sea \(C\) un \textit{kernel}
+de \(3x3\) y \(A\) un pedazo de una imagen también de dimension
+\(3x3\), entonces la convolución entre \(C\) y \(A\) (denotada con el símbolo\(*\)) es:
+
+\begin{equation}
+C
+=
+\begin{bmatrix}
+    0  & 1 & 0 \\
+    1  & -4 & 1 \\
+    0  & 1 & 0 \\
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+A
+=
+\begin{bmatrix}
+    a  & b & c \\
+    d  & e & f \\
+    g  & h & i \\
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+A * C = (a*0) + (b*1) + (c*0) + (d*1) + (e*-4) + (f*1) + (g*0) + (h*1) + (i*0)
+\end{equation}
+
+Observemos dos cosas: 
+\begin{enumerate}
+
+\item El resultado de la convolución entre un \textit{kernel} y su
+correspondiente pedazo en la imagen (que hasta ahora es de un canal)
+es un valor escalar, o sea un píxel correspondiente al canal de la
+imagen sobre el cual hayamos convolucionado. Es decir, si
+convolucionamos un \textit{kernel} a través de los 3 canales de una
+imagen (rojo, verde y azul) vamos a obtener como resultado 3 valores
+que se van a combinar para crear un píxel RGB (\textit{Red-Green-Blue}
+por sus siglas en inglés).
+
+\item Uno no realiza una sola convolución con un solo pedazo de la imagen,
+sino que lo hace sobre \textit{toda} la imagen. Esto significa que el
+\textit{kernel} se va "desplazando" a lo largo y ancho de la imagen
+para generar, en cada ocasión, un escalar que va a formar parte de la
+nueva imagen convolucionada.
+
+\end{enumerate}
+
+Las redes convolucionales hacen uso extensivo de estos
+\textit{kernels}. De hecho, \textit{aprenden a generar}
+\textit{kernels} para encontrar diversas características en las
+imágenes, tanto de bajo nivel (bordes o colores) como de alto nivel
+(neuronas que se activan cuando una persona sonríe, por ejemplo). Si
+sumamos esto con la no linealidad propia de las redes neuronales
+artificiales, obtenemos una poderosa herramienta de clasificación de
+imágenes.
+
+
 *** Diferencias con redes neuronales artificales convencionales
 Las redes convolucionales cuentan con los mismos artefactos que las
 redes convencionales que ya discutimos (neuronas con pesos, funciones
