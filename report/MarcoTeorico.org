@@ -32,7 +32,7 @@
 #+LATEX_HEADER: \newcommand{\features}{\textit{features}}
 #+LATEX_HEADER: \newcommand{\scores}{\textit{scores}}
 #+LATEX_HEADER: \newcommand{\sift}{\textit{SIFT}}
-#+LATEX_HEADER: \newcommand{\weigths}{\(\boldsymbol{W}\)}
+#+LATEX_HEADER: \newcommand{\weights}{\(\boldsymbol{W}\)}
 #+LATEX_HEADER: \newcommand{\img}{\(\boldsymbol{x_i}\)}
 #+LATEX_HEADER: \newcommand{\bias}{\(\boldsymbol{b}\)}
 #+LATEX_HEADER: \newcommand{\func}{\(\boldsymbol{f}\)}
@@ -262,7 +262,7 @@ una muestra \(x_i\) con parámetros \(\theta\), \(y_i\) es el objetivo
 tarea de clasificación).
 
 Un ejemplo de función de perdidad popular es la función de pérdida de
-\texit{máquinas de vectores de soporte multiclase}:
+\textit{máquinas de vectores de soporte multiclase}:
 
 \begin{equation}
      L_i = \sum_{j \neq i} \max{(0, f(x_i; \theta) - y_{i} + \Delta) }
@@ -304,7 +304,7 @@ logarítmicas sin normalizar, reemplazando la pérdida bisagra por una
 Que es equivalente a:
 
 \begin{equation}
-     L_i = - f_{y_{i}} + \log {\Big( \sum_j \exp{f_j}}\Big)}
+     L_i = - f_{y_{i}} + \log {\Big( \sum_j \exp{f_j}\Big)}
 \end{equation}
 
 Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
@@ -416,7 +416,7 @@ Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
 en dos pasos: primero, evaluamos nuestra función \loss{} en los
 parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
 resultado calculamos el gradiente en cada variable utilizando la
-\texit{regla de la cadena}. De esta manera "propagamos" el error de la
+\textit{regla de la cadena}. De esta manera "propagamos" el error de la
 predicción hacia atrás (\textit{backpropagation}) y corregimos
 ligeramente los pesos para mejorar las futuras predicciones.
 
@@ -510,7 +510,7 @@ sigmoide y tanh \cite{NIPS2012_4824}.
 
 Una desventaja de las \textit{ReLU} es que pueden provocar la "muerte"
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
-través de una \texit{ReLU} durante el proceso de
+través de una \textit{ReLU} durante el proceso de
 \textit{backpropagation} entonces va a actualizar los pesos de tal
 manera que no se vuelva a activar la neurona. Pensemos que el proceso
 de actualización de \weights{} implica restar un porcentaje del
@@ -538,7 +538,7 @@ demostrado del todo que las \textit{Leaky ReLU} presenten una mejora
 sustancial en el entrenamiento de las redes, por lo que las \{ReLU}
 convencionales siguen siendo ampliamente usadas.
 
-*** \texit{Maxout}
+*** \textit{Maxout}
 
 \begin{equation}
 f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
@@ -666,9 +666,9 @@ regularización L1 y las redes tienden a usar un subconjunto de los
 datos de entrada, convirtiendose en invariantes al ruido. En general
 se prefiere la regularización L2 por obtenerse mejores resultados.
 
-**** \texit{Dropout}
+**** \textit{Dropout}
 
-La técnica de \textout{dropout} \cite{dropout} consiste en mantener
+La técnica de \textit{dropout} \cite{dropout} consiste en mantener
 activa una neurona con una probabilidad \(\boldsymbol{p}\), o
 establecer su salida a cero en caso contrario.
 
@@ -738,7 +738,7 @@ clasificación) o alguna métrica (en regresión).
 *** Transferencia de aprendizaje
 
 Entrenar un modelo con un tipo especifico de problema y luego utilizar
-su \texit{conocimiento} para resolver otro problema nuevo, tal vez
+su \textit{conocimiento} para resolver otro problema nuevo, tal vez
 incluso en un area distinta a la que fue pensado originalmente, es lo
 que se llama transferencia de aprendizaje. Esta tecnica ha cobrado
 importancia en \textit{deep learning} dado que a menudo las redes son
