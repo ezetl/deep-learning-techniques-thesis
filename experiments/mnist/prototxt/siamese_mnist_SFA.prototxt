@@ -6,9 +6,6 @@ layer {
   include {
     phase: TRAIN
   }
-  #transform_param {
-  #  mean_file: "../data/mean_mnist.binaryproto"
-  #}
   data_param {
     source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb"
     batch_size: 50 
@@ -259,251 +256,183 @@ layer {
 
 
 
-layer {
-  name: "concat"
-  bottom: "pool2"
-  bottom: "pool2_p"
-  top: "concat"
-  type: "Concat"
-  concat_param {
-    axis: 1
-  }
-}
-
-
-layer {
-  bottom: "concat"
-  top: "fcn"
-  name: "fcn"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 1000 
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  name: "relu3"
-  type: "ReLU"
-  bottom: "fcn"
-  top: "fcn"
-}
-
-layer {
-  name: "drop"
-  type: "Dropout"
-  bottom: "fcn"
-  top: "fcn"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
-
-
-
-layer {
-  bottom: "fcn"
-  top: "fcnx"
-  name: "fcnx"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 7 
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  bottom: "fcn"
-  top: "fcny"
-  name: "fcny"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 7 
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  bottom: "fcn"
-  top: "fcnz"
-  name: "fcnz"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  type: "InnerProduct"
-  inner_product_param {
-    num_output: 20
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
+#layer {
+#  name: "concat"
+#  bottom: "pool2"
+#  bottom: "pool2_p"
+#  top: "concat"
+#  type: "Concat"
+#  concat_param {
+#    axis: 1
+#  }
+#}
+#
+#
+#layer {
+#  bottom: "concat"
+#  top: "fcn"
+#  name: "fcn"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  type: "InnerProduct"
+#  inner_product_param {
+#    num_output: 1000 
+#    weight_filler {
+#      type: "gaussian"
+#      std: 0.01
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
+#
+#layer {
+#  name: "relu3"
+#  type: "ReLU"
+#  bottom: "fcn"
+#  top: "fcn"
+#}
+#
+#layer {
+#  name: "drop"
+#  type: "Dropout"
+#  bottom: "fcn"
+#  top: "fcn"
+#  dropout_param {
+#    dropout_ratio: 0.5
+#  }
+#}
+#
+#
+#
+#
+#layer {
+#  bottom: "fcn"
+#  top: "fcnx"
+#  name: "fcnx"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  type: "InnerProduct"
+#  inner_product_param {
+#    num_output: 7 
+#    weight_filler {
+#      type: "gaussian"
+#      std: 0.01
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
+#
+#layer {
+#  bottom: "fcn"
+#  top: "fcny"
+#  name: "fcny"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  type: "InnerProduct"
+#  inner_product_param {
+#    num_output: 7 
+#    weight_filler {
+#      type: "gaussian"
+#      std: 0.01
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
+#
+#layer {
+#  bottom: "fcn"
+#  top: "fcnz"
+#  name: "fcnz"
+#  param {
+#    lr_mult: 1
+#    decay_mult: 1
+#  }
+#  param {
+#    lr_mult: 2
+#    decay_mult: 0
+#  }
+#  type: "InnerProduct"
+#  inner_product_param {
+#    num_output: 20
+#    weight_filler {
+#      type: "gaussian"
+#      std: 0.01
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0
+#    }
+#  }
+#}
 
 layer {
   name: "loss_x"
-  type: "SoftmaxWithLoss"
-  bottom: "fcnx"
+  type: "ContrastiveLoss"
+  contrastive_loss_param {
+    margin: 10.0
+  }
+  bottom: "pool2"
+  bottom: "pool2_p"
   bottom: "argmxX"
   top: "loss_x"
-  loss_weight:1
   include {
-      phase: TRAIN
-    }
+    phase: TRAIN
+  }
 }
 
 layer {
   name: "loss_y"
-  type: "SoftmaxWithLoss"
-  bottom: "fcny"
+  type: "ContrastiveLoss"
+  contrastive_loss_param {
+    margin: 10.0
+  }
+  bottom: "pool2"
+  bottom: "pool2_p"
   bottom: "argmxY"
   top: "loss_y"
-  loss_weight:1
   include {
-      phase: TRAIN
-    }
+    phase: TRAIN
+  }
 }
 
 layer {
   name: "loss_z"
-  type: "SoftmaxWithLoss"
-  bottom: "fcnz"
+  type: "ContrastiveLoss"
+  contrastive_loss_param {
+    margin: 10.0
+  }
+  bottom: "pool2"
+  bottom: "pool2_p"
   bottom: "argmxZ"
   top: "loss_z"
-  loss_weight:1
   include {
-      phase: TRAIN
-    }
-}
-
-
-### TEST NETWORK ON TRAIN SET
-layer {
-  name: "test_loss_x"
-  type: "SoftmaxWithLoss"
-  bottom: "fcnx"
-  bottom: "argmxX"
-  top: "test_loss_x"
-  loss_weight:1
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-}
-
-layer {
-  name: "test_loss_y"
-  type: "SoftmaxWithLoss"
-  bottom: "fcny"
-  bottom: "argmxY"
-  top: "test_loss_y"
-  loss_weight:1
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-}
-
-layer {
-  name: "test_loss_z"
-  type: "SoftmaxWithLoss"
-  bottom: "fcnz"
-  bottom: "argmxZ"
-  top: "test_loss_z"
-  loss_weight:1
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-}
-
-layer {
-  name: "accuracy_X"
-  type: "Accuracy"
-  bottom: "fcnx"
-  bottom: "argmxX"
-  top: "accuracy_X"
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-}
-
-layer {
-  name: "accuracy_Y"
-  type: "Accuracy"
-  bottom: "fcny"
-  bottom: "argmxY"
-  top: "accuracy_Y"
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-}
-
-layer {
-  name: "accuracy_Z"
-  type: "Accuracy"
-  bottom: "fcnz"
-  bottom: "argmxZ"
-  top: "accuracy_Z"
-  include {
-    phase: TEST
-    stage: "test-on-train"
+    phase: TRAIN
   }
 }
