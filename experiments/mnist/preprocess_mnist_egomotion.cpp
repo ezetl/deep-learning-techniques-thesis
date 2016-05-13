@@ -93,7 +93,7 @@ typedef struct
     Label z;
 } DataBlob;
 
-void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, const char* lmdb_labels_path);
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
@@ -109,11 +109,11 @@ unsigned int generate_rand(int range_limit);
 int main(int argc, char** argv)
 {
     cout << "Creating train LMDB\n";
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN, LMDB_TRAIN_LABELS);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
     return 0;
 }
 
-void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, const char* lmdb_labels_path)
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 {
     /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
 

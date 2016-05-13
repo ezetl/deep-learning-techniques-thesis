@@ -1224,54 +1224,45 @@ reducido en un factor de 2 cada 10K iteraciones.
 
 Para finetuning: 4K iteraciones con un learning rate constante de
 0.01.
-**** TODO [%] Experimentos a realizar
+**** TODO [0%] Experimentos a realizar
 Todos se basan en el pre-entrenamiento descripto en el item y luego finetuning
-***** Egomotion, lr 0.01. Finetuning con 100 imagenes
-***** Egomotion, lr 0.01. Finetuning con 300 imagenes
-***** Egomotion, lr 0.01. Finetuning con 1000 imagenes
-***** Egomotion, lr 0.01. Finetuning con 10000 imagenes
-
-***** Egomotion, lr 0.001. Finetuning con 100 imagenes
-***** Egomotion, lr 0.001. Finetuning con 300 imagenes
-***** Egomotion, lr 0.001. Finetuning con 1000 imagenes
-***** Egomotion, lr 0.001. Finetuning con 10000 imagenes
-
-***** Egomotion, lr 0.0001. Finetuning con 100 imagenes
-***** Egomotion, lr 0.0001. Finetuning con 300 imagenes
-***** Egomotion, lr 0.0001. Finetuning con 1000 imagenes
-***** Egomotion, lr 0.0001. Finetuning con 10000 imagenes
-
-***** SFA, lr 0.01. Finetuning con 100 imagenes
-***** SFA, lr 0.01. Finetuning con 300 imagenes
-***** SFA, lr 0.01. Finetuning con 1000 imagenes
-***** SFA, lr 0.01. Finetuning con 10000 imagenes
-
-***** SFA, lr 0.001. Finetuning con 100 imagenes
-***** SFA, lr 0.001. Finetuning con 300 imagenes
-***** SFA, lr 0.001. Finetuning con 1000 imagenes
-***** SFA, lr 0.001. Finetuning con 10000 imagenes
-
-***** SFA, lr 0.0001. Finetuning con 100 imagenes
-***** SFA, lr 0.0001. Finetuning con 300 imagenes
-***** SFA, lr 0.0001. Finetuning con 1000 imagenes
-***** SFA, lr 0.0001. Finetuning con 10000 imagenes
-
-***** Entrenamiento standar desde cero, lr 0.01. Finetuning con 100 imagenes
-***** Entrenamiento standar desde cero, lr 0.01. Finetuning con 300 imagenes
-***** Entrenamiento standar desde cero, lr 0.01. Finetuning con 1000 imagenes
-***** Entrenamiento standar desde cero, lr 0.01. Finetuning con 10000 imagenes
-
-***** Entrenamiento standar desde cero, lr 0.001. Finetuning con 100 imagenes
-***** Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
-***** Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
-***** Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
-
-***** Entrenamiento standar desde cero, lr 0.0001. Finetuning con 100 imagenes
-***** Entrenamiento standar desde cero, lr 0.0001. Finetuning con 300 imagenes
-***** Entrenamiento standar desde cero, lr 0.0001. Finetuning con 1000 imagenes
-***** Entrenamiento standar desde cero, lr 0.0001. Finetuning con 10000 imagenes
-
-
+***** TODO Crear lmdb con 100, 300, 1000 y 10000 imagenes para testing
+***** TODO Egomotion, lr 0.01. Finetuning con 100 imagenes
+***** TODO Egomotion, lr 0.01. Finetuning con 300 imagenes
+***** TODO Egomotion, lr 0.01. Finetuning con 1000 imagenes
+***** TODO Egomotion, lr 0.01. Finetuning con 10000 imagenes
+***** TODO Egomotion, lr 0.001. Finetuning con 100 imagenes
+***** TODO Egomotion, lr 0.001. Finetuning con 300 imagenes
+***** TODO Egomotion, lr 0.001. Finetuning con 1000 imagenes
+***** TODO Egomotion, lr 0.001. Finetuning con 10000 imagenes
+***** TODO Egomotion, lr 0.0001. Finetuning con 100 imagenes
+***** TODO Egomotion, lr 0.0001. Finetuning con 300 imagenes
+***** TODO Egomotion, lr 0.0001. Finetuning con 1000 imagenes
+***** TODO Egomotion, lr 0.0001. Finetuning con 10000 imagenes
+***** TODO SFA, lr 0.01. Finetuning con 100 imagenes
+***** TODO SFA, lr 0.01. Finetuning con 300 imagenes
+***** TODO SFA, lr 0.01. Finetuning con 1000 imagenes
+***** TODO SFA, lr 0.01. Finetuning con 10000 imagenes
+***** TODO SFA, lr 0.001. Finetuning con 100 imagenes
+***** TODO SFA, lr 0.001. Finetuning con 300 imagenes
+***** TODO SFA, lr 0.001. Finetuning con 1000 imagenes
+***** TODO SFA, lr 0.001. Finetuning con 10000 imagenes
+***** TODO SFA, lr 0.0001. Finetuning con 100 imagenes
+***** TODO SFA, lr 0.0001. Finetuning con 300 imagenes
+***** TODO SFA, lr 0.0001. Finetuning con 1000 imagenes
+***** TODO SFA, lr 0.0001. Finetuning con 10000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 100 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 300 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 1000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 10000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 100 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.0001. Finetuning con 100 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.0001. Finetuning con 300 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.0001. Finetuning con 1000 imagenes
+***** TODO Entrenamiento standar desde cero, lr 0.0001. Finetuning con 10000 imagenes
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
