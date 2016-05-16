@@ -28,5 +28,6 @@ MACRO(add_code name)
 ENDMACRO()
 
 add_code(preprocess_mnist_egomotion)
+add_code(preprocess_mnist_contrastive)
 add_code(preprocess_mnist_standar)
 add_code(create_mnist_images)
