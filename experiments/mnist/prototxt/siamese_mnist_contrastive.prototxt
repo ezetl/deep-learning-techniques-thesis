@@ -7,8 +7,8 @@ layer {
     phase: TRAIN
   }
   data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb"
-    batch_size: 50 
+    source: "mnist_train_contrastive_lmdb"
+    batch_size: 125 
     backend: LMDB
   }
 }
@@ -22,8 +22,8 @@ layer {
     stage: "test-on-train"
   }
   data_param {
-    source: "/media/ezetl/0C74D0DD74D0CB1A/mnist/mnist_train_lmdb"
-    batch_size: 20 
+    source: "mnist_train_contrastive_lmdb"
+    batch_size: 50 
     backend: LMDB
   }
 }
@@ -51,21 +51,21 @@ layer {
   name: "argmaxX"
   type: "ArgMax"
   bottom: "labelx"
-  top: "argmxX"
+  top: "simX"
 }
 
 layer {
   name: "argmaxY"
   type: "ArgMax"
   bottom: "labely"
-  top: "argmxY"
+  top: "simY"
 }
 
 layer {
   name: "argmaxZ"
   type: "ArgMax"
   bottom: "labelz"
-  top: "argmxZ"
+  top: "simZ"
 }
 
 
@@ -78,10 +78,12 @@ layer {
   param {
     name: "conv1_w"
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     name: "conv1_b"
     lr_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     num_output: 96
@@ -123,10 +125,12 @@ layer {
   param {
     name: "conv2_w"
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     name: "conv2_b"
     lr_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     num_output: 256 
@@ -160,6 +164,12 @@ layer {
     stride: 2
   }
 }
+layer{
+  name : "flat"
+  type: "Flatten"
+  bottom: "pool2"
+  top: "flat"
+}
 
 
 # Second component of siamese network
@@ -171,10 +181,12 @@ layer {
   param {
     name: "conv1_w"
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     name: "conv1_b"
     lr_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     num_output: 96
@@ -216,10 +228,12 @@ layer {
   param {
     name: "conv2_w"
     lr_mult: 1
+    decay_mult: 1
   }
   param {
     name: "conv2_b"
     lr_mult: 2
+    decay_mult: 0
   }
   convolution_param {
     num_output: 256 
@@ -254,143 +268,12 @@ layer {
   }
 }
 
-
-
-#layer {
-#  name: "concat"
-#  bottom: "pool2"
-#  bottom: "pool2_p"
-#  top: "concat"
-#  type: "Concat"
-#  concat_param {
-#    axis: 1
-#  }
-#}
-#
-#
-#layer {
-#  bottom: "concat"
-#  top: "fcn"
-#  name: "fcn"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 1000 
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
-#
-#layer {
-#  name: "relu3"
-#  type: "ReLU"
-#  bottom: "fcn"
-#  top: "fcn"
-#}
-#
-#layer {
-#  name: "drop"
-#  type: "Dropout"
-#  bottom: "fcn"
-#  top: "fcn"
-#  dropout_param {
-#    dropout_ratio: 0.5
-#  }
-#}
-#
-#
-#
-#
-#layer {
-#  bottom: "fcn"
-#  top: "fcnx"
-#  name: "fcnx"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 7 
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
-#
-#layer {
-#  bottom: "fcn"
-#  top: "fcny"
-#  name: "fcny"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 7 
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
-#
-#layer {
-#  bottom: "fcn"
-#  top: "fcnz"
-#  name: "fcnz"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 20
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
+layer{
+  name : "flat_p"
+  type: "Flatten"
+  bottom: "pool2_p"
+  top: "flat_p"
+}
 
 layer {
   name: "loss_x"
@@ -398,9 +281,9 @@ layer {
   contrastive_loss_param {
     margin: 10.0
   }
-  bottom: "pool2"
-  bottom: "pool2_p"
-  bottom: "argmxX"
+  bottom: "flat"
+  bottom: "flat_p"
+  bottom: "simX"
   top: "loss_x"
   include {
     phase: TRAIN
@@ -413,9 +296,9 @@ layer {
   contrastive_loss_param {
     margin: 10.0
   }
-  bottom: "pool2"
-  bottom: "pool2_p"
-  bottom: "argmxY"
+  bottom: "flat"
+  bottom: "flat_p"
+  bottom: "simY"
   top: "loss_y"
   include {
     phase: TRAIN
@@ -428,9 +311,9 @@ layer {
   contrastive_loss_param {
     margin: 10.0
   }
-  bottom: "pool2"
-  bottom: "pool2_p"
-  bottom: "argmxZ"
+  bottom: "flat"
+  bottom: "flat_p"
+  bottom: "simZ"
   top: "loss_z"
   include {
     phase: TRAIN
