@@ -250,6 +250,42 @@ multidimensional. Notar que en realidad, la multiplicación
 \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\) clasificadores
 en paralelo, donde cada uno es una fila de \weights{}.
 
+#+name: linear-classifier
+#+begin_src python :session :exports none :results silent
+import matplotlib
+import os
+import random
+import numpy as np
+
+try:
+    os.mkdir("images")
+except:
+    pass
+
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+N = 50
+x1 = np.random.normal(2, 0.5, size=50)
+y1 = np.random.normal(2, 0.5, size=50)
+
+x2 = np.random.normal(3.5, 0.5, size=50)
+y2 = np.random.normal(3.5, 0.5, size=50)
+
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+
+ax1.scatter(x1, y1, s=20, c='b', marker="s")
+ax1.scatter(x2, y2, s=20, c='r', marker="o")
+
+plt.savefig('images/linear-classifier.pdf')
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:one
+#+caption: Clasificadores lineales.
+[[file:images/linear-classifier.pdf]]
+
 Mas adelante veremos como definir \weights{} y \bias{} para obtener un
 buen clasificador.
 
@@ -283,6 +319,8 @@ automático denominada \textit{descenso de gradiente}. Esto no
 significa que sea la única alternativa para entrenar modelos, pero al
 ser ampliamente utilizada en redes neuronales artifiales será la única
 que analizaremos.
+
+**** TODO esquema del proceso de entrenamiento: medir error-> actualizar->medir error, etc
 
 **** Función de costo
 
@@ -354,6 +392,8 @@ ecuacion se puede observar que se modifican los parámetros con
 respecto a la dirección opuesta al gradiente, dado que el mismo indica
 la dirección de crecimiento de una función pero nosotros queremos
 encontrar un mínimo.
+
+***** TODO figura de descenso de gradiente, con derivadas y direccion de actualizacion
 
 Existen variantes mas sofisticadas del descenso de gradiente
 (\textit{Momentum}, \textit{Nesterov Momentum}, \textit{Adagrad},
@@ -530,13 +570,15 @@ más consumo de memoria y recursos, sobre todo en redes profundas.
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
+**** TODO dibujo de las pendientes de las 3 funciones de activacion
+
 *** Inspiración biológica de las redes neuronales artificiales
 
 Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
 sin embargo nos centraremos en el tipo estándar de neurona, un modelo
 \textit{näive}:
 
-TODO: dibujo clasico de neurona
+**** TODO dibujo clasico de neurona
 
 El cuerpo de la neurona esta compuesto de tres partes principales, el
 arbol dendrítico, el cuerpo celular o soma y una extensión llamada
@@ -566,7 +608,7 @@ la que se activa la neurona.
 
 Ahora podemos dar un modelo más formal de una neurona:
 
-TODO grafica de neurona con inputs, weights, sumatoria, funcion de activacion, etc.
+**** TODO grafica de neurona con inputs, weights, sumatoria, funcion de activacion, etc.
 
 En la Figura, las entradas \(x_i\) interactúan multiplicativamente con
 los pesos. En nuestra analogía con la neurona biológica, esas son las
@@ -610,7 +652,7 @@ conjunto de datos con el objetivo de \textit{centrar} los datos
 alrededor del origen en todas las dimensiones. En las redes
 convolucionales esto equivale a restarle el valor medio de los píxeles
 a cada píxel de la imagen de entrada.
-
+***** TODO dibujo de datos con la media corrida y la media centrada
 **** Normalización
 
 Una manera de normalizar los datos es dividir cada dimensión por su
@@ -620,7 +662,7 @@ escala. Notar que en general los píxeles tienen valores en el rango de
 0 a 255, por lo que sus dimensiones ya se encuentran en escalas
 parecidas y cuando se trabaja con redes convolucionales no es
 estrictamente necesario normalizar los datos de entrada.
-
+***** TODO dibujo con normalizacion de datos
 **** Otras maneras de preprocesar datos
 
 A la hora de entrenar redes convolucionales importan dos cosas: la
@@ -638,7 +680,7 @@ imágenes para entrenar nuestra red, por lo que hay que aumentar
 nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
-
+***** TODO dibujo con data augmentation, face alignment
 *** Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
@@ -667,6 +709,8 @@ entrenamiento, provocando que aprendiera detalles insignificantes del
 mismo, principalmente \textit{ruido}. Como consecuencia, cuando se lo
 prueba en un conjunto de datos nuevos, el modelo presenta un bajo
 rendimiento.
+
+**** TODO  dibujo de overfitting
 
 Queremos elegir los mejores parámetros de \weights{} para evitar este
 problema, y eso lo podemos hacer agregando una penalidad de
@@ -775,7 +819,7 @@ predicciones, algo que en general es muy útil en aprendizaje
 automático pero rara vez se hace en aprendizaje profundo debido a que
 cada modelo tarda mucho en entrenarse y es muy tedioso elegir buenos
 hiperparámetros.
-
+***** TODO dibujo de dropout (sacar del paper de dropout)
 *** Organización y entrenamiento de redes neuronales
 
 Las redes neuronales estan organizadas como un grafo acíclico de
@@ -795,6 +839,7 @@ capa más, y la capa de salida no tiene funciones de activación, dado
 que generalmente representan las puntuaciones de cada clase (en
 clasificación) o alguna métrica (en regresión).
 
+**** TODO dibujo de capas de una red neuronal artificial (FC, input, output)
 Las redes neuronales se entrenan partiendo del principio del descenso
 del gradiente que se explicó en la Sección \ref{sec:sgd}. Notemos que
 \loss{} es una función que depende de las imágenes de entrada \img{},
@@ -875,6 +920,8 @@ resultado calculamos el gradiente en cada variable utilizando la
 \textit{regla de la cadena}. De esta manera "propagamos" el error de la
 predicción hacia atrás (\textit{backpropagation}) y corregimos
 ligeramente los pesos para mejorar las futuras predicciones.
+
+***** TODO dibujo de regla de la cadena para aplicar backpropagation
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
 \loss{} restándole un porcentaje del gradiente negativo calculado
@@ -980,6 +1027,8 @@ nueva imagen convolucionada.
 
 \end{enumerate}
 
+**** TODO ejemplos de convoluciones
+
 Las redes convolucionales hacen uso extensivo de estos
 \textit{kernels}. De hecho, \textit{aprenden a generar}
 \textit{kernels} para encontrar diversas características en las
@@ -988,7 +1037,6 @@ imágenes, tanto de bajo nivel (bordes o colores) como de alto nivel
 sumamos esto con la no linealidad propia de las redes neuronales
 artificiales, obtenemos una poderosa herramienta de clasificación de
 imágenes.
-
 
 *** Diferencias con redes neuronales artificales convencionales
 Las redes convolucionales cuentan con los mismos artefactos que las
@@ -1046,8 +1094,8 @@ Otros hiperparámetros relacionados con las capas convolucionales son
 la cantidad de filtros (\textit{K}), el espacio en píxeles entre cada
 aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
 con ceros o \textit{zero-padding}, donde se le agrega un "marco" de 1
-o mas ceros a la entrada de la capa.
-
+o más ceros a la entrada de la capa.
+***** TODO dibujos de capaz convolucionales
 **** \textit{Pooling}
 
 Las capas de \textit{pooling} reducen la dimensión espacial de sus
@@ -1060,7 +1108,7 @@ cual se calcula el máximo de un área local (generalmente 2x2 o 3x3) en
 el ancho y largo del volumen de entrada y a través de cada una de las
 "rodajas" que conforman la profundidad del volumen. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
-
+***** TODO dibujo de pooling
 **** Capas Completamente Conectadas (Fully-Connected)
 
 Como su nombre lo indica, cada neurona de esta capa tiene conexiones a
