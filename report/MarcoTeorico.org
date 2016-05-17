@@ -226,7 +226,7 @@ conjunto de datos de imágenes \(\boldsymbol{x_i} \in
 = 1\cdots K}\) es la etiqueta asociada. Es decir, tenemos
 \(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
 
-Vamos a definir nuestra función \(\boldsymbol{f\colon R^{D} \mapsto
+Definamos ahora una función \(\boldsymbol{f\colon R^{D} \mapsto
 R^{K}}\) como un mapeo lineal entre píxeles y \scores:
 
 \begin{equation}
@@ -242,20 +242,27 @@ dado que influencia los \scores{} de salida, pero sin interactuar con
 
 Para entender mejor a los clasificadores lineales, podemos verlos de
 la siguiente manera: si la imagen tiene \(32\times32\) píxeles y la
-representamos con un vector columna de dimensión \(D\), entonces en
-ese espacio \textit{D-dimensional} la imagen es solamente un
-punto. Nuestro clasificador lineal entonces define una "línea" (o un
-hiperplano mejor dicho) que separa cada clase dentro de ese espacio
-multidimensional. Notar que en realidad, la multiplicación
-\(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\) clasificadores
-en paralelo, donde cada uno es una fila de \weights{}.
+representamos con un vector columna de dimensión \(D\) (en este caso
+\(D=1024=32*32\)), entonces en ese espacio \textit{D-dimensional} la
+imagen es solamente un punto. Como se observa en la Figura
+\ref{fig-one} de manera simplificada, nuestro clasificador lineal
+define una "línea" (un hiperplano en realidad) que separa cada clase
+dentro de ese espacio multidimensional. Notar que en realidad la
+multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
+clasificadores en paralelo, donde cada uno es una fila de \weights{}.
+
 
 #+name: linear-classifier
 #+begin_src python :session :exports none :results silent
 import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import style
 import os
 import random
 import numpy as np
+from sklearn import svm
+
+style.use("ggplot")
 
 try:
     os.mkdir("images")
@@ -263,7 +270,6 @@ except:
     pass
 
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 N = 50
 x1 = np.random.normal(2, 0.5, size=50)
@@ -273,17 +279,51 @@ x2 = np.random.normal(3.5, 0.5, size=50)
 y2 = np.random.normal(3.5, 0.5, size=50)
 
 fig = plt.figure()
+axes = plt.gca()
+axes.set_xlim([0,5])
+axes.set_ylim([0,5])
 ax1 = fig.add_subplot(111)
+ax1.set_axis_bgcolor('white')  
+ax1.grid(False, which='both')
+#plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+#plt.tick_params(axis='y', which='both', bottom='off', top='off', labelbottom='off')
+ax1.axes.get_xaxis().set_ticks([])
+ax1.axes.get_yaxis().set_ticks([])
+ax1.spines['right'].set_visible(False)
+ax1.spines['top'].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax1.spines[spine].set_color('k')
 
 ax1.scatter(x1, y1, s=20, c='b', marker="s")
 ax1.scatter(x2, y2, s=20, c='r', marker="o")
+
+# Fit a linear classifier
+X = zip(x1,y1) + zip(x2,y2)
+Y = [0]*50 + [1]*50 # 2 classes
+linear_clf = svm.LinearSVC()
+linear_clf.fit(X, Y)
+
+# Get parameters and plot
+coef = linear_clf.coef_[0]
+a = -coef[0] / coef[1]
+xx = np.linspace(-10,10)
+
+yy = a * xx - linear_clf.intercept_[0] / coef[1]
+yy2 = a * xx - linear_clf.intercept_[0] / coef[1] + 1
+yy3 = a * xx - linear_clf.intercept_[0] / coef[1] - 1
+
+ax1.plot(xx, yy, 'k-',  c='orchid', label=r'$Wx + b$')
+ax1.plot(xx, yy2, '--',  c='mediumaquamarine', label=r'$Wx + (b + m)$')
+ax1.plot(xx, yy3, '--',  c='sandybrown', label=r'$Wx + (b - m)$')
+
+plt.legend(frameon=False)
 
 plt.savefig('images/linear-classifier.pdf')
 #+end_src
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:one
-#+caption: Clasificadores lineales.
+#+caption: Clasificador lineal. Cada punto representa una muestra en un espacio de dimension \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorias. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuacion \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo estan graficados dos clasificadores lineales mas con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
 Mas adelante veremos como definir \weights{} y \bias{} para obtener un
