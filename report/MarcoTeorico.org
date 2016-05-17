@@ -245,7 +245,7 @@ la siguiente manera: si la imagen tiene \(32\times32\) píxeles y la
 representamos con un vector columna de dimensión \(D\) (en este caso
 \(D=1024=32*32\)), entonces en ese espacio \textit{D-dimensional} la
 imagen es solamente un punto. Como se observa en la Figura
-\ref{fig-one} de manera simplificada, nuestro clasificador lineal
+\ref{fig-cl} de manera simplificada, nuestro clasificador lineal
 define una "línea" (un hiperplano en realidad) que separa cada clase
 dentro de ese espacio multidimensional. Notar que en realidad la
 multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
@@ -322,7 +322,7 @@ plt.savefig('images/linear-classifier.pdf')
 #+end_src
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:one
+#+label: fig:cl
 #+caption: Clasificador lineal. Cada punto representa una muestra en un espacio de dimension \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorias. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuacion \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo estan graficados dos clasificadores lineales mas con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
@@ -346,11 +346,22 @@ conjunto de pruebas es muy baja, es un síntoma de que algo no anda
 bien en el entrenamiento (ver problema de \textit{sobre-ajuste} en la
 Sección \ref{sec:regular}).
 
-A grandes rasgos, el proceso de entrenamiento de un clasificador
-consta de dos etapas: la primera es medir el error actual del modelo
-con algún conjunto de datos de validación, la segunda es actualizar
-los parámetros del clasificador (\weights{} y \bias{}) para minimizar
-ese error. Por lo tanto hay dos aspectos a tener en cuenta antes de
+A grandes rasgos, podemos describir el proceso de entrenamiento de un
+clasificador de la siguiente manera:
+
+\begin{enumerate}
+
+\item Primero se mide el error actual del model con el conjunto (o un
+      subconjunto) de datos de entrenamiento
+
+\item Luego se actualizan los parámetros del clasificador (\weights{} y
+      \bias{}) para minimizar ese error.
+
+\item Se repiten los pasos anteriores hasta lograr la precisión deseada
+
+\end{enumerate}
+
+Por lo tanto hay dos aspectos a tener en cuenta antes de
 entrenar un modelo: cómo medir efectivamente la tasa de error y cómo
 actualizar sus parámetros para minimizarla. Para el primer caso se
 define lo que se llama una \textit{función de pérdida}, mientras que
@@ -359,8 +370,6 @@ automático denominada \textit{descenso de gradiente}. Esto no
 significa que sea la única alternativa para entrenar modelos, pero al
 ser ampliamente utilizada en redes neuronales artifiales será la única
 que analizaremos.
-
-**** TODO esquema del proceso de entrenamiento: medir error-> actualizar->medir error, etc
 
 **** Función de costo
 
@@ -431,9 +440,46 @@ Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
 ecuacion se puede observar que se modifican los parámetros con
 respecto a la dirección opuesta al gradiente, dado que el mismo indica
 la dirección de crecimiento de una función pero nosotros queremos
-encontrar un mínimo.
+encontrar un mínimo (Figura \ref{fig:gd}).
 
-***** TODO figura de descenso de gradiente, con derivadas y direccion de actualizacion
+#+name: gradient-descent
+#+begin_src python :session :exports none :results silent
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import style
+import os
+import random
+import numpy as np
+from sklearn import svm
+
+style.use("ggplot")
+
+matplotlib.use('Agg')
+
+fig = plt.figure()
+axes = plt.gca()
+axes.set_xlim([0,5])
+axes.set_ylim([0,5])
+ax1 = fig.add_subplot(111)
+ax1.set_axis_bgcolor('white')  
+ax1.grid(False, which='both')
+#plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+#plt.tick_params(axis='y', which='both', bottom='off', top='off', labelbottom='off')
+ax1.axes.get_xaxis().set_ticks([])
+ax1.axes.get_yaxis().set_ticks([])
+ax1.spines['right'].set_visible(False)
+ax1.spines['top'].set_visible(False)
+for spine in ['left', 'bottom']:
+    ax1.spines[spine].set_color('k')
+
+
+
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:gd
+#+caption: Descenso de gradiente
+[[file:images/gradient-descent.pdf]]
 
 Existen variantes mas sofisticadas del descenso de gradiente
 (\textit{Momentum}, \textit{Nesterov Momentum}, \textit{Adagrad},
