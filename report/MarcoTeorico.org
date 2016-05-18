@@ -605,12 +605,13 @@ Nos concentraremos entonces en las unidades \textit{ReLU}, actualmente
 muy populares en las redes convolucionales debido a sus buenas
 propiedades.
 
-Como se muestra en la Figura Hay tres tipos de rectificadores lineales:
+Hay tres tipos de rectificadores lineales:
 
 **** \textit{ReLU}
 Una unidad ReLU establece un umbral en \(0\) a la salida de la
 neurona. Es decir, la activación de una neurona va a ser \(0\) si su
-salida fue negativa o un numero positivo en caso contrario:
+salida fue negativa o un numero positivo en caso contrario (Figura
+\ref{fig:relus}.a):
 
 \begin{equation}
 f(x) = \max{(0,x)}
@@ -644,7 +645,8 @@ a esa neurona "muerta".
 Se puede solucionar el problema de la "muerte" de neuronas agregando
 una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
 negativos de la \textit{ReLU}. Esta función de activación es la que se
-conoce como \textit{Leaky ReLU} \cite{zhang2014improving}:
+conoce como \textit{Leaky ReLU} \cite{zhang2014improving} (Figura
+\ref{fig:relus}.b):
 
 \begin{equation}
 f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
@@ -671,10 +673,9 @@ el problema de las neuronas que se mueren. A pesar de ello tiene la
 desventaja de duplicar los parámetros para cada neurona, lo cual no
 siempre es deseable, pues implica más tiempo de entrenamiento y
 más consumo de memoria y recursos, sobre todo en redes profundas.
-
+ 
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
-
 
 #+name: relus
 #+begin_src python :session :exports none :results silent
@@ -696,21 +697,27 @@ def config_ax(ax):
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
     ax.spines['top'].set_visible(False)
-    ax.plot((0, 0), (0, 5), 'k-')
-    for spine in ['bottom']:
-        ax.spines[spine].set_color('k')
+    ax.spines['bottom'].set_visible(False)
+    ax.plot((0, 0), (0, 5), 'grey')
+    ax.plot((-10, 10), (0, 0), 'grey')
 
-fig, axes = plt.subplots(nrows=1, ncols=3)
+fig, axes = plt.subplots(nrows=1, ncols=2)
 
 for ax in axes:
     config_ax(ax)
     ax.set_xlim([-5, 5])
-    ax.set_ylim([0, 5])
+    ax.set_ylim([-3, 10])
 
-X = np.arange(-5, 5)
+X = np.arange(-10, 10)
 axes[0].plot(X, np.maximum(0, X))
-axes[1].plot(X, np.maximum(0, X))
-axes[2].plot(X, np.maximum(0, X))
+X = np.arange(0, 10)
+Y = np.arange(0, 10)
+X2 = np.arange(-10, 0)
+Y2 = X2 *  5
+print X2, Y2
+X = np.append(X2, X)
+Y = np.append(Y2, Y)
+axes[1].plot(X2, Y2)
 
 plt.savefig('images/relus.pdf')
 #+end_src
