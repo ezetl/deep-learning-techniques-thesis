@@ -605,7 +605,7 @@ Nos concentraremos entonces en las unidades \textit{ReLU}, actualmente
 muy populares en las redes convolucionales debido a sus buenas
 propiedades.
 
-Hay tres tipos de rectificadores lineales:
+Como se muestra en la Figura Hay tres tipos de rectificadores lineales:
 
 **** \textit{ReLU}
 Una unidad ReLU establece un umbral en \(0\) a la salida de la
@@ -675,8 +675,50 @@ más consumo de memoria y recursos, sobre todo en redes profundas.
 Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
-**** TODO dibujo de las pendientes de las 3 funciones de activacion
 
+#+name: relus
+#+begin_src python :session :exports none :results silent
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+from matplotlib import style
+import numpy as np
+
+style.use("ggplot")
+
+
+def config_ax(ax):
+    ax.set_axis_bgcolor('white')
+    ax.grid(False, which='both')
+    ax.axes.get_xaxis().set_ticks([])
+    ax.axes.get_yaxis().set_ticks([])
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.plot((0, 0), (0, 5), 'k-')
+    for spine in ['bottom']:
+        ax.spines[spine].set_color('k')
+
+fig, axes = plt.subplots(nrows=1, ncols=3)
+
+for ax in axes:
+    config_ax(ax)
+    ax.set_xlim([-5, 5])
+    ax.set_ylim([0, 5])
+
+X = np.arange(-5, 5)
+axes[0].plot(X, np.maximum(0, X))
+axes[1].plot(X, np.maximum(0, X))
+axes[2].plot(X, np.maximum(0, X))
+
+plt.savefig('images/relus.pdf')
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:relu
+#+caption: Los tres tipos mas comunes de rectificadores lineales: \textit{ReLU}, \textit{Leaky ReLU} y \textit{Maxout}
+[[file:images/relus.pdf]]
 *** Inspiración biológica de las redes neuronales artificiales
 
 Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
