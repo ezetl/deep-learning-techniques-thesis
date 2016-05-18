@@ -1,6 +1,8 @@
-#+TITLE: Reconocimiento visual empleando técnicas de \textit{deep learning}
-#+AUTHOR:  Ruben Ezequiel Torti Lopez
+#+TITLE: Reconocimiento visual empleando técnicas de apredizaje profundo
+#+AUTHOR:  Rubén Ezequiel Torti López
 #+EMAIL:   ret0110@famaf.unc.edu.ar
+#+CREATOR: Rubén Ezequiel Torti López
+#+LANGUAGE: es
 #+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:nil
 #+STARTUP: indent hideblocks
 #+TAGS: noexport(n)
@@ -245,7 +247,7 @@ la siguiente manera: si la imagen tiene \(32\times32\) píxeles y la
 representamos con un vector columna de dimensión \(D\) (en este caso
 \(D=1024=32*32\)), entonces en ese espacio \textit{D-dimensional} la
 imagen es solamente un punto. Como se observa en la Figura
-\ref{fig-cl} de manera simplificada, nuestro clasificador lineal
+\ref{fig:cl} de manera simplificada, nuestro clasificador lineal
 define una "línea" (un hiperplano en realidad) que separa cada clase
 dentro de ese espacio multidimensional. Notar que en realidad la
 multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
@@ -323,7 +325,7 @@ plt.savefig('images/linear-classifier.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:cl
-#+caption: Clasificador lineal. Cada punto representa una muestra en un espacio de dimension \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorias. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuacion \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo estan graficados dos clasificadores lineales mas con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
+#+caption: Clasificador lineal. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
 Mas adelante veremos como definir \weights{} y \bias{} para obtener un
@@ -437,7 +439,7 @@ entrenamiento, calculamos \(\theta_{n+1}\) de la siguiente manera:
 
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
 \(m\) es la cantidad de elementos en el conjunto de datos. En la
-ecuacion se puede observar que se modifican los parámetros con
+ecuación se puede observar que se modifican los parámetros con
 respecto a la dirección opuesta al gradiente, dado que el mismo indica
 la dirección de crecimiento de una función pero nosotros queremos
 encontrar un mínimo (Figura \ref{fig:gd}).
@@ -446,9 +448,9 @@ encontrar un mínimo (Figura \ref{fig:gd}).
 #+begin_src python :session :exports none :results silent
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.mlab as mlab
 from matplotlib import style
-import os
-import random
 import numpy as np
 from sklearn import svm
 
@@ -458,27 +460,44 @@ matplotlib.use('Agg')
 
 fig = plt.figure()
 axes = plt.gca()
-axes.set_xlim([0,5])
-axes.set_ylim([0,5])
+axes.set_xlim([-2.5,2.5])
+axes.set_ylim([-3,3])
 ax1 = fig.add_subplot(111)
 ax1.set_axis_bgcolor('white')  
 ax1.grid(False, which='both')
-#plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
-#plt.tick_params(axis='y', which='both', bottom='off', top='off', labelbottom='off')
 ax1.axes.get_xaxis().set_ticks([])
 ax1.axes.get_yaxis().set_ticks([])
 ax1.spines['right'].set_visible(False)
 ax1.spines['top'].set_visible(False)
-for spine in ['left', 'bottom']:
-    ax1.spines[spine].set_color('k')
+ax1.spines['left'].set_visible(False)
+ax1.spines['bottom'].set_visible(False)
 
+delta = 0.025
+x = np.arange(-3.0, 3.0, delta)
+y = np.arange(-2.0, 2.0, delta)
+X, Y = np.meshgrid(x, y)
+Z1 = mlab.bivariate_normal(X, Y, 1.0, 1.0, 0.0, 0.0)
 
+CS = plt.contour(X, Y, Z1)
 
+ax1.annotate(r'$w_3$', xy=(-0.22, 0.16), xytext=(-0.49, 0.49),
+             arrowprops=dict(width=2, headwidth=4, facecolor='black', shrink=0.01),)
+
+ax1.annotate(r'$w_2$', xy=(-0.53, 0.53), xytext=(-0.85, 0.73),
+             arrowprops=dict(width=2, headwidth=4, facecolor='black', shrink=0.01),)
+
+ax1.annotate(r'$w_1$', xy=(-0.90, 0.76), xytext=(-1.02, 1.27),
+             arrowprops=dict(width=2, headwidth=4, facecolor='black', shrink=0.01),)
+
+ax1.annotate(r'$w_0$', xy=(-1.04, 1.30), xytext=(-1.61, 1.25),
+             arrowprops=dict(width=2, headwidth=4, facecolor='black', shrink=0.01),)
+
+plt.savefig('images/gradient-descent.pdf')
 #+end_src
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:gd
-#+caption: Descenso de gradiente
+#+caption: Descenso de gradiente. Sea \(w\) un parámetro de \(\theta\), el gráfico ilustra cómo nuestra función de clasificación \(f\) alcaza un mínimo en \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro. Puesto de otra manera, podemos imaginar a \(w\) como una pelota que se suelta desde la cima de una montaña y desciende por la fuerza de la gravedad hasta el valle (instancia \(w_3\)). Una vez que la pelota alcanza el punto más bajo, se detendrá.
 [[file:images/gradient-descent.pdf]]
 
 Existen variantes mas sofisticadas del descenso de gradiente
