@@ -994,7 +994,51 @@ imágenes para entrenar nuestra red, por lo que hay que aumentar
 nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
-***** TODO dibujo con data augmentation, face alignment
+
+#+name: augmentation
+#+begin_src python :session :exports none :results silent
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.cbook as cbook
+
+
+fig, (ax1,ax2,ax3,ax4) = plt.subplots(nrows=1, ncols=4)
+
+
+im1 = plt.imread("images/face-original.jpg")
+im2 = plt.imread("images/face-aligned.jpg")
+im3 = plt.imread("images/face-augmented1.jpg")
+im4 = plt.imread("images/face-augmented2.jpg")
+
+render1 = ax1.imshow(im1)
+render2 = ax2.imshow(im2)
+render3 = ax3.imshow(im3)
+render4 = ax4.imshow(im4)
+
+def setup(ax):
+    ax.axes.get_xaxis().set_ticks([])
+    ax.axes.get_yaxis().set_ticks([])
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+for ax in [ax1,ax2,ax3,ax4]:
+    setup(ax)
+
+ax1.set_xlabel('a) Original')
+ax2.set_xlabel('b) Alineamiento')
+ax3.set_xlabel('c) Color-Brillo')
+ax4.set_xlabel('d) Traslaciones')
+
+plt.savefig('images/augmentation.pdf')
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:augm
+#+caption: Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, utilizando el eje que conforman los ojos (a). Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas.
+[[file:images/augmentation.pdf]]
+
 *** Inicialización de pesos
 
 A la hora de inicializar los pesos es escencial romper con la
@@ -1016,18 +1060,141 @@ red, pero su análisis escapa al alcance de este trabajo final.
 *** Evitando el sobre-ajuste: Regularización y Dropout
 #+LaTeX: \label{sec:regular}
 
-Cuando se ajusta un modelo sobre un conjunto de datos, puede surgir el
-problema del \textit{sobre-ajuste}. Esto significa que nuestro modelo
-ajusto sus parametros demasiado bien al conjunto de datos de
-entrenamiento, provocando que aprendiera detalles insignificantes del
-mismo, principalmente \textit{ruido}. Como consecuencia, cuando se lo
-prueba en un conjunto de datos nuevos, el modelo presenta un bajo
-rendimiento.
+Cuando se aprende un modelo sobre un conjunto de datos, puede surgir
+el problema del \textit{sobre-ajuste}, más conocido por su nombre en
+inglés \textit{overfitting}. El \textit{overfitting} significa que
+nuestro modelo ajustó sus parámetros demasiado bien al conjunto de
+datos de entrenamiento, provocando que aprendiera detalles
+insignificantes del mismo, principalmente \textit{ruido}
+aleatorio. Como consecuencia, cuando se lo aplica en un conjunto de
+datos nuevos, el modelo presenta un bajo rendimiento. En contrapartida
+al \textit{overfitting}, a veces puede pasar que nuestro modelo
+aprendió pocas características de nuestro conjunto de entrenamiento y
+termina siendo muy genérico e inflexible a la hora de ser aplicado en
+un conjunto nuevo, obteniendo también baja precisión (Figura
+\ref{fig:overfit}).
 
-**** TODO  dibujo de overfitting
+#+name: overfitting
+#+begin_src python :session :exports none :results silent
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from sklearn.datasets import make_moons
+from sklearn.cross_validation import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+import numpy as np
+from sklearn.cross_validation import train_test_split, cross_val_score
 
-Queremos elegir los mejores parámetros de \weights{} para evitar este
-problema, y eso lo podemos hacer agregando una penalidad de
+
+def detect_plot_dimension(X, h=0.02, b=0.05):
+    x_min, x_max = X[:, 0].min() - b, X[:, 0].max() + b
+    y_min, y_max = X[:, 1].min() - b, X[:, 1].max() + b
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+    dimension = xx, yy
+    return dimension
+
+
+def detect_decision_boundary(dimension, model):
+    xx, yy = dimension # unpack the dimensions
+    boundary = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    boundary = boundary.reshape(xx.shape) # Put the result into a color plot
+    return boundary
+
+
+def plot_decision_boundary(panel, dimension, boundary, colors=['paleturquoise', 'khaki']):
+    xx, yy = dimension # unpack the dimensions
+    panel.contourf(xx, yy, boundary, cmap=ListedColormap(colors), alpha=1)
+    panel.contour(xx, yy, boundary, colors="brown", alpha=1, linewidths=0.5) # the decision boundary in green
+
+
+def plot_dataset(panel, X, y, colors=["darkorange","darkcyan"], markers=["s", "o"]):
+    panel.scatter(X[y == 1, 0], X[y == 1, 1], color=colors[0], marker=markers[0])
+    panel.scatter(X[y == 0, 0], X[y == 0, 1], color=colors[1], marker=markers[1])
+
+
+def calculate_prediction_error(model, X, y):
+    yPred = model.predict(X)
+    score = 1 - round(metrics.accuracy_score(y, yPred), 2)
+    return score
+
+
+def explore_fitting_boundaries(model, n_neighbors, datasets, width):
+    # determine the height of the plot given the
+    # aspect ration of each panel should be equal
+    height = float(width)/len(n_neighbors) * len(datasets.keys())
+    nrows = len(datasets.keys())
+    ncols = len(n_neighbors)
+    # set up the plot
+    figure, axes = plt.subplots(
+        nrows,
+        ncols,
+        figsize=(width, height),
+        sharex=True,
+        sharey=True
+    )
+    dimension = detect_plot_dimension(X, h=0.02) # the dimension each subplot based on the data
+    # Plotting the dataset and decision boundaries
+    i = 0
+    for n in n_neighbors:
+        model.n_neighbors = n
+        model.fit(datasets["Training Set"][0], datasets["Training Set"][1])
+        boundary = detect_decision_boundary(dimension, model)
+        j = 0
+        for d in datasets.keys():
+            try:
+                panel = axes[j, i]
+            except (TypeError, IndexError):
+                if (nrows * ncols) == 1:
+                    panel = axes
+                elif nrows == 1: # if you only have one dataset
+                    panel = axes[i]
+                elif ncols == 1: # if you only try one number of neighbors
+                    panel = axes[j]
+            plot_decision_boundary(panel, dimension, boundary) # plot the decision boundary
+            plot_dataset(panel, X=datasets[d][0], y=datasets[d][1]) # plot the observations
+            score = calculate_prediction_error(model, X=datasets[d][0], y=datasets[d][1])
+            # make compacted layout
+            panel.set_frame_on(False)
+            panel.set_xticks([])
+            panel.set_yticks([])
+            j += 1
+        if i==0:
+            panel.set_xlabel(r'a) $\mathit{Underfitting}$')
+        elif i==1:
+            panel.set_xlabel(r'b) Ajuste aceptable')
+        elif i==2:
+            panel.set_xlabel(r'c) $\mathit{Overfitting}$')
+        i += 1
+        plt.subplots_adjust(hspace=0, wspace=0) # make compacted layout
+    plt.savefig('images/overfitting.pdf')
+
+
+X, y = make_moons(
+n_samples=500,
+random_state=1,
+noise=0.3
+)
+# Split into training and test sets
+XTrain, XTest, yTrain, yTest = train_test_split(X, y, random_state=1, test_size=0.5)
+
+# specify the model and settings
+model = KNeighborsClassifier()
+n_neighbors = [200, 23, 1]
+datasets = {"Training Set": [XTrain, yTrain]}
+width = 20
+
+# explore_fitting_boundaries(model, n_neighbors, datasets, width)
+explore_fitting_boundaries(model=model, n_neighbors=n_neighbors, datasets=datasets, width=width)
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:overfit
+#+caption: Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (a) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En (c) observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos.
+[[file:images/overfitting.pdf]]
+
+
+Queremos elegir los mejores parámetros de \weights{} para evitar estos
+problemas, y eso lo podemos hacer agregando una penalidad de
 regularización \(R(W)\). Lo que buscamos con esto es poner
 preferencias para algunos conjuntos de \weights{} sobre otros.
 
