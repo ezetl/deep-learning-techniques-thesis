@@ -16,7 +16,6 @@
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{wrapfig}
-#+LATEX_HEADER: \usepackage{subfigure}
 #+LATEX_HEADER: \usepackage{xspace}
 #+LATEX_HEADER: \usepackage{pgfplots}
 #+LATEZ_HEADER: \usepackage{tikz}
@@ -25,6 +24,9 @@
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
 #+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{caption}
+#+LATEX_HEADER: \usepackage{subcaption}
 
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
@@ -250,7 +252,7 @@ representamos con un vector columna de dimensión \(D\) (en este caso
 \(D=1024=32*32\)), entonces en ese espacio \textit{D-dimensional} la
 imagen es solamente un punto. Como se observa en la Figura
 \ref{fig:cl} de manera simplificada, nuestro clasificador lineal
-define una "línea" (un hiperplano en realidad) que separa cada clase
+define una ``línea'' (un hiperplano en realidad) que separa cada clase
 dentro de ese espacio multidimensional. Notar que en realidad la
 multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
 clasificadores en paralelo, donde cada uno es una fila de \weights{}.
@@ -568,12 +570,12 @@ s_3 = W_3 x + b_3
 \end{equation}
 
 Es fácil hacer un chequeo de dimensiones para ver que efectivamente
-podemos "colapsar" las matrices \(W_2\) y \(W_1\) en una sola, por lo
+podemos ``colapsar'' las matrices \(W_2\) y \(W_1\) en una sola, por lo
 cual terminamos con otro clasificador lineal.
 
 Notemos que por más que combinemos miles de clasificadores lineales
 vamos a obtener un nuevo clasificador también lineal.  Una manera de
-romper la linealidad de estas "capas" de clasificadores es, por
+romper la linealidad de estas ``capas'' de clasificadores es, por
 ejemplo, agregar lo que se llama \textit{función de activación}:
  
 \begin{equation}
@@ -623,7 +625,7 @@ Comparada con \(\sigma\) y \(\tanh\), requiere menos operaciones, no
 es saturante y converge hasta 6 veces más rápido que las funciones
 sigmoide y tanh \cite{NIPS2012_4824}.
 
-Una desventaja de las \textit{ReLU} es que pueden provocar la "muerte"
+Una desventaja de las \textit{ReLU} es que pueden provocar la ``muerte''
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
 través de una \textit{ReLU} durante el proceso de
 \textit{backpropagation} entonces va a actualizar los pesos de esa
@@ -640,11 +642,11 @@ Una vez que la ReLU alcanza este estado, es improbable que vuelva a
 activarse, dado que su gradiente en \(0\) es también \(0\), por lo que
 un entrenamiendo mediante descenso de gradiente y
 \textit{backpropagation} no va a modificar los pesos locales, dejando
-a esa neurona "muerta".
+a esa neurona ``muerta''.
 
 **** \textit{Leaky ReLU}
 
-Se puede solucionar el problema de la "muerte" de neuronas agregando
+Se puede solucionar el problema de la muerte de neuronas agregando
 una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
 negativos de la \textit{ReLU}. Esta función de activación es la que se
 conoce como \textit{Leaky ReLU} \cite{zhang2014improving} (Figura
@@ -853,7 +855,7 @@ redundancia, normalizar las dimensiones). Esta tarea se denomina
 preprocesamiento de datos.
 
 También analizaremos varias técnicas para evitar el sobre-ajuste de
-modelos. El sobre-ajuste surge cuando un modelo aprende "ruido" y
+modelos. El sobre-ajuste surge cuando un modelo aprende ``ruido'' y
 detalles particulares del conjunto de datos en vez e características
 generales que ayuden a la tarea de clasificación. 
 
@@ -1320,16 +1322,23 @@ no podríamos hacer tan fácil si tuvieramos neuronas conectadas
 aleatoriamente entre ellas.
 
 El tipo más común de capa de neuronas es la capa \textit{totalmente
-conectada}, en donde cada neurona de la capa anterior se conecta con
-todas las neuronas de la capa siguiente, pero no comparten conexiones
-dentro de la misma capa.
+conectada} (de ahora en más FC, abreviación de su nombre en inglés
+\textit{Fully Connected}), en donde cada neurona de la capa anterior
+se conecta con todas las neuronas de la capa siguiente, pero no
+comparten conexiones dentro de la misma capa.
 
 Usualmente no se cuenta a la capa de entrada de las redes como una
 capa más, y la capa de salida no tiene funciones de activación, dado
 que generalmente representan las puntuaciones de cada clase (en
-clasificación) o alguna métrica (en regresión).
+clasificación) o alguna métrica (en regresión). Las redes neuronales
+suelen tener una o más capas intermedias entre la entrada y la salida,
+denominadas \textit{capas ocultas} (Figura \ref{fig:nnet}).
 
-**** TODO dibujo de capas de una red neuronal artificial (FC, input, output)
+#+attr_latex: width=\textwidth, height=2, placement=[p]
+#+label: fig:nnet
+#+caption: Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.
+[[file:images/neural-net.pdf]]
+
 Las redes neuronales se entrenan partiendo del principio del descenso
 del gradiente que se explicó en la Sección \ref{sec:sgd}. Notemos que
 \loss{} es una función que depende de las imágenes de entrada \img{},
@@ -1408,11 +1417,9 @@ Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
 en dos pasos: primero, evaluamos nuestra función \loss{} en los
 parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
 resultado calculamos el gradiente en cada variable utilizando la
-\textit{regla de la cadena}. De esta manera "propagamos" el error de la
+\textit{regla de la cadena}. De esta manera ``propagamos'' el error de la
 predicción hacia atrás (\textit{backpropagation}) y corregimos
 ligeramente los pesos para mejorar las futuras predicciones.
-
-**** TODO dibujo de regla de la cadena para aplicar backpropagation
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
 \loss{} restándole un porcentaje del gradiente negativo calculado
@@ -1473,7 +1480,8 @@ Una convolución entre un \textit{kernel} y una imagen se realiza
 sumando las multiplicaciones elemento a elemento entre \textit{kernel}
 y una región de la imagen. Por ejemplo, sea \(C\) un \textit{kernel}
 de \(3x3\) y \(A\) un pedazo de una imagen también de dimension
-\(3x3\), entonces la convolución entre \(C\) y \(A\) (denotada con el símbolo\(*\)) es:
+\(3x3\), entonces la convolución entre \(C\) y \(A\) (denotada con el
+símbolo\(*\)) es:
 
 \begin{equation}
 C
@@ -1513,13 +1521,38 @@ por sus siglas en inglés).
 
 \item Uno no realiza una sola convolución con un solo pedazo de la imagen,
 sino que lo hace sobre \textit{toda} la imagen. Esto significa que el
-\textit{kernel} se va "desplazando" a lo largo y ancho de la imagen
+\textit{kernel} se va ``desplazando'' a lo largo y ancho de la imagen
 para generar, en cada ocasión, un escalar que va a formar parte de la
-nueva imagen convolucionada.
+nueva imagen convolucionada. En la Figura \ref{fig:conv} se puede observar
+el resultado de una convolución.
 
 \end{enumerate}
 
-**** TODO ejemplos de convoluciones
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/conv-orig.png}
+        \caption{\(A\)}
+        \label{fig:conv-orig}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \begin{bmatrix}
+         0  &  1 & 0 \\
+         1  & -4 & 1 \\
+         0  &  1 & 0 \\
+        \end{bmatrix}
+        \caption{Matriz convolucional \(K\)}
+        \label{fig:K}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/conv-edge.png}
+        \caption{\(A * K\)}
+        \label{fig:conv-edge}
+    \end{subfigure}
+    \caption{Es muy común convolucionar imágenes con ciertos \texit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
+\end{figure}
+#+END_LaTeX
 
 Las redes convolucionales hacen uso extensivo de estos
 \textit{kernels}. De hecho, \textit{aprenden a generar}
@@ -1567,7 +1600,7 @@ puede bien ser una imagen o las activaciones de otra capa.
 
 Durante el entrenamiento o la clasificación de imagenes, estos filtros
 se convolucionan a traves del ancho y alto de la imagen, produciendo
-un mapa de activaciones en 2-D para cada filtro. Si "apilamos" los
+un mapa de activaciones en 2-D para cada filtro. Si ``apilamos'' los
 mapas de activaciones de todos los filtros de una capa convolucional,
 obtenemos un \textit{volumen} de salida.  En otras palabras, se
 computa un producto punto entre el filtro y las distintas regiones de
@@ -1585,7 +1618,7 @@ totalidad de la profundidad del volumen de entrada.
 Otros hiperparámetros relacionados con las capas convolucionales son
 la cantidad de filtros (\textit{K}), el espacio en píxeles entre cada
 aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
-con ceros o \textit{zero-padding}, donde se le agrega un "marco" de 1
+con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de 1
 o más ceros a la entrada de la capa.
 ***** TODO dibujos de capaz convolucionales
 **** \textit{Pooling}
@@ -1598,7 +1631,7 @@ insertar capas de \textit{pooling} luego de capas convolucionales.
 Un método de \textit{pooling} muy usado es \textit{MAX Pooling}, en el
 cual se calcula el máximo de un área local (generalmente 2x2 o 3x3) en
 el ancho y largo del volumen de entrada y a través de cada una de las
-"rodajas" que conforman la profundidad del volumen. De esta manera se
+``rodajas'' que conforman la profundidad del volumen. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
 ***** TODO dibujo de pooling
 **** Capas Completamente Conectadas (Fully-Connected)
@@ -1747,7 +1780,7 @@ Para SFA, los valores optimos del parámetro m fueron 10 y 100.
 
 La predicción es clasificación con tres capas soft-max loss (para
 traslaciones en X,Y y rotacion en Z respectivamente). Cada SCNN
-minimiza la suma de estas tres "losses".
+minimiza la suma de estas tres ``losses''.
 
 Para que se pueda utilizar clasificación, hay que dividir los rangos
 de traslación en en 7 classes y las rotaciones en 20 clases (donde
@@ -1861,7 +1894,7 @@ El numero total de imagenes usadas para entrenamiento es 20501
 
 **** SF
 Análogo a KITTI, solo que además de las transformaciones en X,Y,Z
-agregan los 3 "euler angles" (no entendi eso).
+agregan los 3 ``euler angles'' (no entendi eso).
 
 *** Arquitectura
 BCNN: C96-P-C256-P-C384-C384-C256-P (dice que estan inspiradas en las
