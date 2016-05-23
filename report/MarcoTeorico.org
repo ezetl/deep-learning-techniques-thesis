@@ -704,34 +704,57 @@ def config_ax(ax):
     ax.plot((0, 0), (0, 5), 'grey')
     ax.plot((-10, 10), (0, 0), 'grey')
 
-fig, axes = plt.subplots(nrows=1, ncols=2)
-
-for ax in axes:
-    config_ax(ax)
-    ax.set_xlim([-5, 5])
-    ax.set_ylim([-1, 10])
-
+#fig, axes = plt.subplots(nrows=1, ncols=1)
+fig = plt.figure(figsize=(4, 4))
+ax = plt.subplot(111)
+#for ax in axes:
+config_ax(ax)
+ax.set_xlim([-5, 5])
+ax.set_ylim([-1, 10])
 X = np.arange(-10, 10)
-axes[0].set_xlabel('a) ReLU')
-axes[0].plot(X, np.maximum(0, X))
+ax.plot(X, np.maximum(0, X))
+ax.set_xlabel('x')
+h = ax.set_ylabel('y')
+h.set_rotation(0)
+plt.tight_layout()
+plt.savefig('images/relu1.pdf')
 
+
+fig = plt.figure(figsize=(4, 4))
+ax = plt.subplot(111)
+#for ax in axes:
+config_ax(ax)
+ax.set_xlim([-5, 5])
+ax.set_ylim([-1, 10])
 X = np.arange(0, 10)
 Y = np.arange(0, 10)
 X2 = np.arange(-10, 0)
 Y2 = X2 *  0.1
-print X2, Y2
 X = np.append(X2, X)
 Y = np.append(Y2, Y)
-axes[1].set_xlabel('b) Leaky ReLU')
-axes[1].plot(X, Y)
-
-plt.savefig('images/relus.pdf')
+ax.plot(X, Y)
+plt.tight_layout()
+plt.savefig('images/relu2.pdf')
 #+end_src
 
-#+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:relu
-#+caption: \textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa de la \textit{Leaky ReLU} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.
-[[file:images/relus.pdf]]
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/relu1.pdf}
+        \caption{\textit{ReLU}}
+        \label{fig:relu1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/relu2.pdf}
+        \caption{\textit{Leaky ReLU}}
+        \label{fig:relu2}
+    \end{subfigure}
+    \caption{\textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
+\end{figure}
+#+END_LaTeX
+
 *** Inspiración biológica de las redes neuronales artificiales
 
 Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
@@ -765,7 +788,7 @@ plt.savefig('images/neuron.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:neuron
-#+caption:
+#+caption: Esquema \textit{näive} de una neurona biológica.
 [[file:images/neuron.pdf]]
 
 El cuerpo de la neurona esta compuesto de tres partes principales, el
@@ -837,12 +860,13 @@ plt.savefig('images/artificial-neuron.pdf')
 #+caption: Esquema de una neurona artificial. Las entradas (\(x\)) interactuan multiplicativamente con los pesos sinapticos (\(w\)) y se adicionan junto con un vector de sesgo (\(b\)). El resultado pasa por una funcion de activacion (\(f\)) que decide si la señal debe propagarse o no.
 [[file:images/artificial-neuron.pdf]]
 
-En la Figura \ref{fid:art-neuron} vemos un model formal de una neurona
+En la Figura \ref{fig:art-neuron} vemos un model formal de una neurona
 estandar, en el que las entradas \(x_i\) interactúan
 multiplicativamente con los pesos \(w_i\). En nuestra analogía con la
 neurona biológica, esas son las sinapsis. Luego, el el cuerpo de la
-célula, esos resultados se suman junto con un \textit{bias}, y luego se
-calcula la función de activación que decide si transmitir o no la salida.
+célula, esos resultados se suman junto con un vector de sesgo y sobre
+eso se calcula la función de activación que decide si transmitir o no
+la salida.
 
 ** Entrenamiento de redes neuronales artificiales
 
@@ -856,7 +880,7 @@ preprocesamiento de datos.
 
 También analizaremos varias técnicas para evitar el sobre-ajuste de
 modelos. El sobre-ajuste surge cuando un modelo aprende ``ruido'' y
-detalles particulares del conjunto de datos en vez e características
+detalles particulares del conjunto de datos en vez de características
 generales que ayuden a la tarea de clasificación. 
 
 Finalizaremos esta sección con un análisis de la organización interna
@@ -879,7 +903,7 @@ neuronales son la substracción de la media y la normalización.
 Como su nombre lo indica, se le resta la media a cada elemento del
 conjunto de datos con el objetivo de \textit{centrar} los datos
 alrededor del origen en todas las dimensiones (Figura
-\ref{fig:mean}.b). En las redes convolucionales esto equivale a
+\ref{fig:mean2}). En las redes convolucionales esto equivale a
 restarle el valor medio de los píxeles a cada píxel de la imagen de
 entrada.
 
@@ -894,88 +918,72 @@ import numpy as np
 matplotlib.use('Agg')
 style.use("ggplot")
 
-fig = plt.figure(figsize=(10, 4)) 
-gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])
-ax0 = plt.subplot(gs[0])
-ax1 = plt.subplot(gs[1])
-ax2 = plt.subplot(gs[2])
-axes = [ax0, ax1, ax2]
+def plot_norm(x, y, color, index='0'):
+    fig = plt.figure(figsize=(4, 4))
+    ax = plt.subplot(111)
+    ax.set_axis_bgcolor('white')
+    ax.grid(False, which='both')
+    ax.axes.get_xaxis().set_ticks([])
+    ax.axes.get_yaxis().set_ticks([])
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.plot((0, 0), (-4, 4), 'grey')
+    ax.plot((-4, 4), (0, 0), 'grey')
+    ax.set_xlim([-4, 4])
+    ax.set_ylim([-4, 4])
+    ax.scatter(x, y, s=30, c=color, marker="o")
+    plt.tight_layout()
+    plt.savefig('images/mean'+index+'.pdf')
 
-axes[0].set_axis_bgcolor('white')
-axes[0].grid(False, which='both')
-axes[0].axes.get_xaxis().set_ticks([])
-axes[0].axes.get_yaxis().set_ticks([])
-axes[0].spines['right'].set_visible(False)
-axes[0].spines['left'].set_visible(False)
-axes[0].spines['top'].set_visible(False)
-axes[0].spines['bottom'].set_visible(False)
-axes[0].plot((0, 0), (-4, 4), 'grey')
-axes[0].plot((-4, 4), (0, 0), 'grey')
-axes[0].set_xlim([-4, 4])
-axes[0].set_ylim([-4, 4])
-
-axes[1].set_axis_bgcolor('white')
-axes[1].grid(False, which='both')
-axes[1].axes.get_xaxis().set_ticks([])
-axes[1].axes.get_yaxis().set_ticks([])
-axes[1].spines['right'].set_visible(False)
-axes[1].spines['left'].set_visible(False)
-axes[1].spines['top'].set_visible(False)
-axes[1].spines['bottom'].set_visible(False)
-axes[1].plot((0, 0), (-4, 4), 'grey')
-axes[1].plot((-4, 4), (0, 0), 'grey')
-axes[1].set_xlim([-4, 4])
-axes[1].set_ylim([-4, 4])
-
-axes[2].set_axis_bgcolor('white')
-axes[2].grid(False, which='both')
-axes[2].axes.get_xaxis().set_ticks([])
-axes[2].axes.get_yaxis().set_ticks([])
-axes[2].spines['right'].set_visible(False)
-axes[2].spines['left'].set_visible(False)
-axes[2].spines['top'].set_visible(False)
-axes[2].spines['bottom'].set_visible(False)
-axes[2].plot((0, 0), (-4, 4), 'grey')
-axes[2].plot((-4, 4), (0, 0), 'grey')
-axes[2].set_xlim([-4, 4])
-axes[2].set_ylim([-4, 4])
-    
+   
 N = 150
 x1 = np.random.normal(2, 0.5, size=N)
 y1 = np.random.normal(2, 0.5, size=N)
+plot_norm(x1, y1, 'royalblue', '1')
 
 mx = np.mean(x1)
 my = np.mean(y1)
-
 x2 = x1 - mx
 y2 = y1 - my
-axes[0].set_xlabel('a) Original', fontsize=15)
-axes[0].scatter(x1, y1, s=20, c='royalblue', marker="s")
-
-axes[1].set_xlabel('b) Substraccion de media', fontsize=15)
-axes[1].scatter(x2, y2, s=20, c='seagreen', marker="s")
+plot_norm(x2, y2, 'seagreen', '2')
 
 x3 = x2 / 2.0
 y3 = y2 / 2.0
-
-axes[2].set_xlabel('c) Normalizacion', fontsize=15)
-axes[2].scatter(x3, y3, s=20, c='firebrick', marker="s")
-
-plt.tight_layout()
-plt.savefig('images/mean.pdf')
+plot_norm(x3, y3, 'firebrick', '3')
 #+end_src
 
-#+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:mean
-#+caption: Se puede observar en b) cómo al substraer la media de a) logramos "centrar" nuestro conjunto de datos. En c) podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.
-[[file:images/mean.pdf
-]]
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean1.pdf}
+        \caption{Original}
+        \label{fig:mean1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean2.pdf}
+        \caption{Substraer media}
+        \label{fig:mean2}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean3.pdf}
+        \caption{Normalizacion}
+        \label{fig:mean3}
+    \end{subfigure}
+    \caption{Se puede observar en \ref{fig:mean2} cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
+\end{figure}
+#+END_LaTeX
+
 **** Normalización
 
 Una manera de normalizar los datos es dividir cada dimensión por su
 desviación estándar una vez que haya sido centrada en cero. De esta
 manera se logra que las dimensiones tengan aproximadamente la misma
-escala (Figura \ref{fig:mean}.c). Notar que en general los píxeles
+escala (Figura \ref{fig:mean3}). Notar que en general los píxeles
 tienen valores en el rango de 0 a 255, por lo que sus dimensiones ya
 se encuentran en escalas parecidas y cuando se trabaja con redes
 convolucionales no es estrictamente necesario normalizar los datos de
@@ -999,51 +1007,36 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-#+name: augmentation
-#+begin_src python :session :exports none :results silent
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.cbook as cbook
-
-
-fig, (ax1,ax2,ax3,ax4) = plt.subplots(nrows=1, ncols=4)
-
-
-im1 = plt.imread("images/face-original.jpg")
-im2 = plt.imread("images/face-aligned.jpg")
-im3 = plt.imread("images/face-augmented1.jpg")
-im4 = plt.imread("images/face-augmented2.jpg")
-
-render1 = ax1.imshow(im1)
-render2 = ax2.imshow(im2)
-render3 = ax3.imshow(im3)
-render4 = ax4.imshow(im4)
-
-def setup(ax):
-    ax.axes.get_xaxis().set_ticks([])
-    ax.axes.get_yaxis().set_ticks([])
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-
-for ax in [ax1,ax2,ax3,ax4]:
-    setup(ax)
-
-fonts = 15
-ax1.set_xlabel('a) Original', fontsize=fonts)
-ax2.set_xlabel('b) Alineamiento', fontsize=fonts)
-ax3.set_xlabel('c) Color-Brillo', fontsize=fonts)
-ax4.set_xlabel('d) Traslaciones', fontsize=fonts)
-
-plt.tight_layout()
-plt.savefig('images/augmentation.pdf')
-#+end_src
-
-#+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:augm
-#+caption: Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el eje que conforman los ojos (a). Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas.
-[[file:images/augmentation.pdf]]
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-original.jpg}
+        \caption{Original}
+        \label{fig:forig}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-aligned.jpg}
+        \caption{Alineacion}
+        \label{fig:falign}
+        \label{fig:falign}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-augmented1.jpg}
+        \caption{Color}
+        \label{fig:faug1}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-augmented2.jpg}
+        \caption{Traslaciones}
+        \label{fig:faug2}
+    \end{subfigure}
+    \caption{Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
+\end{figure}
+#+END_LaTeX
 
 *** Inicialización de pesos
 
@@ -1124,7 +1117,7 @@ def calculate_prediction_error(model, X, y):
     return score
 
 
-def explore_fitting_boundaries(model, n_neighbors, datasets, width):
+def explore_fitting_boundaries(model, n_neighbors, datasets, width, index):
     # determine the height of the plot given the
     # aspect ration of each panel should be equal
     height = float(width)/len(n_neighbors) * len(datasets.keys())
@@ -1132,8 +1125,8 @@ def explore_fitting_boundaries(model, n_neighbors, datasets, width):
     ncols = len(n_neighbors)
     # set up the plot
     figure, axes = plt.subplots(
-        nrows,
-        ncols,
+        1,
+        1,
         figsize=(width, height),
         sharex=True,
         sharey=True
@@ -1164,15 +1157,9 @@ def explore_fitting_boundaries(model, n_neighbors, datasets, width):
             panel.set_xticks([])
             panel.set_yticks([])
             j += 1
-        if i==0:
-            panel.set_xlabel(r'a) $\mathit{Underfitting}$', fontsize=40)
-        elif i==1:
-            panel.set_xlabel(r'b) $\mathit{Aceptable}$', fontsize=40)
-        elif i==2:
-            panel.set_xlabel(r'c) $\mathit{Overfitting}$', fontsize=40)
         i += 1
         plt.subplots_adjust(hspace=0, wspace=0) # make compacted layout
-    plt.savefig('images/overfitting.pdf')
+    plt.savefig('images/overfitting'+index+'.pdf')
 
 
 X, y = make_moons(
@@ -1185,19 +1172,38 @@ XTrain, XTest, yTrain, yTest = train_test_split(X, y, random_state=1, test_size=
 
 # specify the model and settings
 model = KNeighborsClassifier()
-n_neighbors = [200, 23, 1]
 datasets = {"Training Set": [XTrain, yTrain]}
 width = 20
 
 # explore_fitting_boundaries(model, n_neighbors, datasets, width)
-explore_fitting_boundaries(model=model, n_neighbors=n_neighbors, datasets=datasets, width=width)
+explore_fitting_boundaries(model=model, n_neighbors=[200], datasets=datasets, width=width, index='1')
+explore_fitting_boundaries(model=model, n_neighbors=[23], datasets=datasets, width=width, index='2')
+explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, width=width, index='3')
 #+end_src
 
-#+attr_latex: width=\textwidth, height=2, placement=[p]
-#+label: fig:overfit
-#+caption: Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (a) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En (c) observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos.
-[[file:images/overfitting.pdf]]
-
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting1.pdf}
+        \caption{\textit{Underfitting}}
+        \label{fig:over1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting2.pdf}
+        \caption{Aceptable}
+        \label{fig:over2}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting3.pdf}
+        \caption{\textit{Overfitting}}
+        \label{fig:over3}
+    \end{subfigure}
+    \caption{Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1} que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
+\end{figure}
+#+END_LaTeX
 
 Queremos elegir los mejores parámetros de \weights{} para evitar estos
 problemas, y eso lo podemos hacer agregando una penalidad de
@@ -1334,10 +1340,13 @@ clasificación) o alguna métrica (en regresión). Las redes neuronales
 suelen tener una o más capas intermedias entre la entrada y la salida,
 denominadas \textit{capas ocultas} (Figura \ref{fig:nnet}).
 
-#+attr_latex: width=\textwidth, height=2, placement=[p]
-#+label: fig:nnet
-#+caption: Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.
-[[file:images/neural-net.pdf]]
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/neural-net.pdf}
+    \caption{Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.}\label{fig:nnet}
+\end{figure}
+#+END_LaTeX
 
 Las redes neuronales se entrenan partiendo del principio del descenso
 del gradiente que se explicó en la Sección \ref{sec:sgd}. Notemos que
@@ -1537,12 +1546,13 @@ el resultado de una convolución.
         \label{fig:conv-orig}
     \end{subfigure}
     \begin{subfigure}[b]{0.3\textwidth}
+        \centering
         \begin{bmatrix}
          0  &  1 & 0 \\
          1  & -4 & 1 \\
          0  &  1 & 0 \\
         \end{bmatrix}
-        \caption{Matriz convolucional \(K\)}
+        \caption{\textit{Kernel} \(K\)}
         \label{fig:K}
     \end{subfigure}
     \begin{subfigure}[b]{0.3\textwidth}
