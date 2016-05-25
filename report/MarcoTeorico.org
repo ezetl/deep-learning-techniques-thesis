@@ -1647,9 +1647,18 @@ totalidad de la profundidad del volumen de entrada.
 Otros hiperparámetros relacionados con las capas convolucionales son
 la cantidad de filtros (\textit{K}), el espacio en píxeles entre cada
 aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
-con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de 1
-o más ceros a la entrada de la capa.
-***** TODO dibujos de capaz convolucionales
+con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de
+1 o más ceros a la entrada de la capa. En la Figura \ref{fig:conv-lay}
+se observa un esquema del funcionamiento de una capa convolucional.
+
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/conv-layer.pdf}
+    \caption{Ejemplo de una capa convolucional cuyo volumen de entrada es una imagen (\(x\)) con 3 canales RGB. La capa cuenta con 6 filtros y cada uno convoluciona con la imagen a lo largo y ancho. El volumen de salida de esta capa tiene una profundidad de 6 y un ancho y largo que dependen del tamaño de los filtros y el \textit{stride}. Los recuadros más oscuros sobre \(x\) corresponden con el \textit{campo receptivo} de una neurona particular, cuyo tamaño está dado por el tamaño de los filtros.}\label{fig:conv-lay}
+\end{figure}
+#+END_LaTeX
+
 **** \textit{Pooling}
 
 Las capas de \textit{pooling} reducen la dimensión espacial de sus
@@ -1660,9 +1669,60 @@ insertar capas de \textit{pooling} luego de capas convolucionales.
 Un método de \textit{pooling} muy usado es \textit{MAX Pooling}, en el
 cual se calcula el máximo de un área local (generalmente 2x2 o 3x3) en
 el ancho y largo del volumen de entrada y a través de cada una de las
-``rodajas'' que conforman la profundidad del volumen. De esta manera se
+``rodajas'' que conforman la profundidad del volumen. El área local
+está definida por el tamaño del \textit{stride}. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
-***** TODO dibujo de pooling
+
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{images/pool-layer.pdf}
+        \caption{}
+        \label{fig:pool1}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+
+        \colorlet{yel}{yellow!40}
+        \colorlet{re}{red!40}
+        \colorlet{gre}{green!40}
+        \colorlet{blu}{blue!40}
+
+        \begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
+        \draw(A)[step=0.5cm,color=gray] (-1,-1) grid (1,1);
+        \node[fill=yel] at (-0.75,+0.75) {1};
+        \node[fill=yel] at (-0.75,+0.25) {2};
+        \node[fill=yel] at (-0.25,+0.75) {3};
+        \node[fill=yel] at (-0.25,+0.25) {4};
+        \node[fill=re] at (-0.75,-0.25) {8};
+        \node[fill=re] at (-0.75,-0.75) {7};
+        \node[fill=re] at (-0.25,-0.25) {5};
+        \node[fill=re] at (-0.25,-0.75) {4};
+        \node[fill=gre] at (+0.75,-0.25) {2};
+        \node[fill=gre] at (+0.75,-0.75) {3};
+        \node[fill=gre] at (+0.25,-0.25) {2};
+        \node[fill=gre] at (+0.25,-0.75) {1};
+        \node[fill=blu] at (+0.75,+0.25) {0};
+        \node[fill=blu] at (+0.75,+0.75) {7};
+        \node[fill=blu] at (+0.25,+0.25) {4};
+        \node[fill=blu] at (+0.25,+0.75) {3};
+        \draw[black, -latex ] (1.1,0) -- (3.9,0) node [pos=0.46,above,font=\footnotesize] {\textit{MAX Pooling}};
+        \draw(B)[step=0.5cm,color=gray] (4,4) grid (4,4);
+        \node[fill=yel] at (+4.25,+0.25) {4};
+        \node[fill=blu] at (+4.75,+0.25) {7};
+        \node[fill=gre] at (+4.75,-0.25) {3};
+        \node[fill=re] at (+4.25,-0.25) {8};
+        \end{tikzpicture}
+
+        \caption{}
+        \label{fig:pool2}
+    \end{subfigure}
+    \caption{Las capas de \textit{Pooling} reducen las dimensiones espaciales. Notar en \ref{fig:pool1} que la profundidad del volumen se mantiene intacta. En \ref{fig:pool2} observamos cómo funciona una capa \textit{MAX Pooling} con un un \textit{stride} de 2.}\label{fig:pool}
+\end{figure}
+#+END_LaTeX
+
 **** Capas Completamente Conectadas (Fully-Connected)
 
 Como su nombre lo indica, cada neurona de esta capa tiene conexiones a
