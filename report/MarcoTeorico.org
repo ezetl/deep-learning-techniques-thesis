@@ -161,9 +161,8 @@ presenta pensamientos finales y trabajo a futuro.
 * Marco Teórico
 #+LaTeX: \label{sec:marco}
 ** Aprendizaje Automático
-*** Introducción
 
-Las técnicas de aprendizaje automético tienen como objetivo
+Las técnicas de aprendizaje automático tienen como objetivo
 identificar patrones en conjuntos de datos utilizando herramientas de
 la estadística, teoría de la información, cálculo y optimización entre
 otras. De esta manera se pueden automatizar tareas, como por ejemplo
@@ -1471,7 +1470,6 @@ neuronales soportan realizar transferencia de aprendizaje utilizando
 modelos pre-entrenados.
 
 ** Redes Convolucionales
-*** Introducción
 
 Antes de introducirnos en el mundo de las redes convolucionales es
 necesario definir qué es una convolución.
@@ -1776,13 +1774,56 @@ Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5.
 
-* Redes neuronales siamesas
+* Redes neuronales convolucionales siamesas
 #+LaTeX: \label{sec:siamesa}
-* Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
+
+Un tipo particular de arquitectura de redes convolucionales es el de
+redes siamesas. Una red siamesa está compuesta de dos copias exactas
+de la misma red cuyos parámetros son compartidos. La arquitectura toma
+pares de imágenes (\(x_1\) y \(x_2\)) y las salidas de ambas redes son
+redireccionadas a una función de pérdida que calcula alguna métrica
+respecto a las dos entradas (Figura \ref{fig:siamese-diagram}). Las
+redes siamesas no difieren en más que eso de las redes convolucionales
+que ya vimos. Se pueden entrenar mediante \textit{backpropagation} y,
+dependiendo del problema, utilizando hasta las mismas funciones de
+pérdida.
+
+Las redes siamesas fueron utilizadas por primera vez con éxito para la
+verificación de huellas digitales \cite{fingerprint} y de firmas
+\cite{Bromley94signatureverification}. Se han logrado también buenos
+resultados en verificación de rostros
+\cite{Chopra:2005:LSM:1068507.1068961} y más recientemente en tareas
+de clasificación \cite{siamese-oneshot}.
+
+Estos trabajos tienen dos factores en común:
+
+\begin{enumerate}
+\item La función de pérdida se calcula mediante alguna medida de similaridad
+entre las dos imágenes de entrada. Ya sea una probabilidad correspondiente
+a la igualdad de las imágenes (como en \cite{fingerprint}), una distancia
+cosenoidal calculada entre las \textit{features} obtenidas de cada red (como
+en \cite{Bromley94signatureverification}) o una función de energía
+contrastiva \cite{Chopra:2005:LSM:1068507.1068961} \cite{siamese-oneshot}.
+
+\item Se tiene acceso a pocos datos de entrenamiento. Para la verificación
+de huellas dactilares, firmas y rostros se utilizaron 200, 1400 y 1100
+muestras de entrenamiento respectivamente.
+\end{enumerate}
+
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+    \caption{Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
+\end{figure}
+#+END_LaTeX
+
+
+** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
 #+LaTeX: \label{sec:odometry}
-** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
-** Egomotion
-** SFA
+*** datasets, de que son, sobre que cosa van a entrenar (predecir cambios en la imagen)
+*** Egomotion
+*** SFA
 
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
