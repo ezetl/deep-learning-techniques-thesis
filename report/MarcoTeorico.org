@@ -259,7 +259,7 @@ clasificadores en paralelo, donde cada uno es una fila de \weights{}.
 
 
 #+name: linear-classifier
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -449,7 +449,7 @@ la dirección de crecimiento de una función pero nosotros queremos
 encontrar un mínimo (Figura \ref{fig:gd}).
 
 #+name: gradient-descent
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -682,7 +682,7 @@ Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
 #+name: relus
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib
 matplotlib.use('Agg')
 
@@ -762,7 +762,7 @@ sin embargo nos centraremos en el tipo estándar de neurona, un modelo
 \textit{näive}.
 
 #+name: neuron
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.cbook as cbook
@@ -819,7 +819,7 @@ ya vimos. La función de activación representa entonces la frecuencia
 con la que se activa la neurona.
 
 #+name: neuron
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.cbook as cbook
@@ -908,7 +908,7 @@ restarle el valor medio de los píxeles a cada píxel de la imagen de
 entrada.
 
 #+name: mean-substraction
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -1020,7 +1020,6 @@ saturación, incluso hacer leves desplazamientos y rotaciones.
         \includegraphics[width=\textwidth]{images/face-aligned.jpg}
         \caption{Alineacion}
         \label{fig:falign}
-        \label{fig:falign}
     \end{subfigure}
 \quad
    \begin{subfigure}[b]{0.2\textwidth}
@@ -1074,7 +1073,7 @@ un conjunto nuevo, obteniendo también baja precisión (Figura
 \ref{fig:overfit}).
 
 #+name: overfitting
-#+begin_src python :session :exports none :results silent
+#+begin_src python :session :exports none :results silent :cache yes
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import make_moons
@@ -1547,11 +1546,11 @@ el resultado de una convolución.
     \end{subfigure}
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
-        \begin{bmatrix}
+        \(\begin{bmatrix}
          0  &  1 & 0 \\
          1  & -4 & 1 \\
          0  &  1 & 0 \\
-        \end{bmatrix}
+        \end{bmatrix}\)
         \caption{\textit{Kernel} \(K\)}
         \label{fig:K}
     \end{subfigure}
@@ -1560,7 +1559,7 @@ el resultado de una convolución.
         \caption{\(A * K\)}
         \label{fig:conv-edge}
     \end{subfigure}
-    \caption{Es muy común convolucionar imágenes con ciertos \texit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
+    \caption{Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
 \end{figure}
 #+END_LaTeX
 
@@ -1691,7 +1690,7 @@ reduce espacialmente la entrada, pero no su profundidad.
         \colorlet{blu}{blue!40}
 
         \begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
-        \draw(A)[step=0.5cm,color=gray] (-1,-1) grid (1,1);
+        \draw[step=0.5cm,color=gray] (-1,-1) grid (1,1);
         \node[fill=yel] at (-0.75,+0.75) {1};
         \node[fill=yel] at (-0.75,+0.25) {2};
         \node[fill=yel] at (-0.25,+0.75) {3};
@@ -1709,7 +1708,7 @@ reduce espacialmente la entrada, pero no su profundidad.
         \node[fill=blu] at (+0.25,+0.25) {4};
         \node[fill=blu] at (+0.25,+0.75) {3};
         \draw[black, -latex ] (1.1,0) -- (3.9,0) node [pos=0.46,above,font=\footnotesize] {\textit{MAX Pooling}};
-        \draw(B)[step=0.5cm,color=gray] (4,4) grid (4,4);
+        \draw[step=0.5cm,color=gray] (4,4) grid (4,4);
         \node[fill=yel] at (+4.25,+0.25) {4};
         \node[fill=blu] at (+4.75,+0.25) {7};
         \node[fill=gre] at (+4.75,-0.25) {3};
