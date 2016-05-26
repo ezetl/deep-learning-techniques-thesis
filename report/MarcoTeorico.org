@@ -1207,7 +1207,7 @@ explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, widt
         \caption{\textit{Overfitting}}
         \label{fig:over3}
     \end{subfigure}
-    \caption{Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1} que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
+    \caption{Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1}) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
 \end{figure}
 #+END_LaTeX
 
