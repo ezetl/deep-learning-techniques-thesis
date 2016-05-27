@@ -1877,14 +1877,14 @@ utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
 experimentos con los conjuntos KITTI \cite{KITTI} y SF \cite{SF}.
 
 *** Reproducción de resultados
-#+LaTeX: \label{sec:agrawa
+#+LaTeX: \label{sec:agrawal}
 
 **** Nomenclatura
 Vamos a seguir la misma nomenclatura que en el paper original, aunque
 con algunas variantes.
 
 Cada componente de la red siamesa se denotará con BCNN por sus siglas
-en ingles \textit{Base CNN}. Las \textit{features} extraídas de estas
+en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
 redes serán concatenadas y pasadas a otra red llamada TCNN
 (\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
 de pérdida. Las BCNN son las redes sobre las que luego haremos
