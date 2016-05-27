@@ -1832,18 +1832,18 @@ asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \end{figure}
 #+END_LaTeX
 
-Una vez entrenadas las redes siamesas es común elegir alguna de sus
-redes por separado (da lo mismo cual sea pues comparten los mismos
-parámetros) y utilizarla para aplicar transferencia de aprendizaje a
-un nuevo problema. De esta manera se aprovechan los parámetros
-aprendidos y es posible entrenar con menos datos.
+Una vez entrenadas las redes siamesas es común tomar una de sus redes
+(da lo mismo cual sea pues comparten los mismos parámetros) y
+utilizarla para aplicar transferencia de aprendizaje a un nuevo
+problema. De esta manera se aprovechan los parámetros aprendidos y es
+posible entrenar con menos datos.
 
 Podemos concluir que es necesario definir qué función de similitud
 vamos a usar y cómo vamos a generar los pares de entrenamiento antes
 de entrenar redes siamesas. En la siguiente Sección nos vamos a
-adentrar en trabajo de Agrawal et al. \cite{LSM2015} con redes
-siamesas, reproduciendo y analizando sus resultados en lo que conforma
-el eje principal de este trabajo final.
+adentrar en trabajo con redes siamesas de Agrawal et
+al. \cite{LSM2015}, reproduciendo y analizando sus resultados en lo
+que conforma el eje principal de este trabajo final.
 
 ** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
 #+LaTeX: \label{sec:odometry}
@@ -1877,7 +1877,35 @@ utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
 experimentos con los conjuntos KITTI \cite{KITTI} y SF \cite{SF}.
 
 *** Reproducción de resultados
-#+LaTeX: \label{sec:agrawal}
+#+LaTeX: \label{sec:agrawa
+
+**** Nomenclatura
+Vamos a seguir la misma nomenclatura que en el paper original, aunque
+con algunas variantes.
+
+Cada componente de la red siamesa se denotará con BCNN por sus siglas
+en ingles \textit{Base CNN}. Las \textit{features} extraídas de estas
+redes serán concatenadas y pasadas a otra red llamada TCNN
+(\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
+de pérdida. Las BCNN son las redes sobre las que luego haremos
+transferencia de aprendizaje.
+
+Para definir las arquitecturas de cada red de manera sencilla vamos a
+usar las siguientes abreviaciones:
+
+\begin{itemize}
+\item \(N\)C\(k\) para una capa convolucional con \(k\) filtros cuadrados de tamaño \(N*N\).
+\item F\(k\) para una capa completamente conectada (FC) con salida de dimensión \(k\).
+\item P para una capa de \textit{Pooling}. A menos que se diga lo contrario, siempre usaremos \textit{MAX Pooling}.
+\item D para una capa \textit{Dropout}.
+\item Op para la capa de salida. En general nuestras capas de salida van a estar conformadar por una F\(k\) (\(k\) es el número de clases) seguidas por una capa Softmax.
+\end{itemize}
+
+Al igual que en \cite{LSM2015}, y como es usual cuando se entrenan
+CNN's, colocaremos rectificadores lineales ReLU's luego de cada capa
+convolucional y cada cada FC.
+
+
 **** Prueba de concepto con MNIST
 ***** Descripción del conjunto de datos y preprocesamiento
 ***** Descripción de la red
