@@ -10,6 +10,27 @@
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+PROPERTY: session *R* 
 
+#+BEGIN_COMMENT
+######################## ATENCION ###################################
+
+La generacion de figuras de matplotlib esta desactivada para generar
+el reporte mas rapido (algunos code blocks incluyen tareas de
+clasificacion REALES hechas con scipy/numpy y tardan un toque en
+evaluarse).
+
+Como consecuencia, para exportar este documento usando Emacs org-mode
+es necesario primero generar todas las figuras de matplotlib mediante
+el shortcut C-c C-v C-b.
+
+Luego se exporta a un LaTEX con C-c C-e l (dependiendo de la version
+de Emacs, es probable que haya que apretar "l" dos veces para
+seleccionar la opcion "LaTEX").
+
+Luego se corre el script ./compile_report.sh en esta misma carpeta
+para generar y abrir el pdf.
+#####################################################################
+#+END_COMMENT
+
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage{ifthen,figlatex}
@@ -24,9 +45,11 @@
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
 #+LATEX_HEADER: \usepackage{amsmath}
+#+LATES_HEADER: \usepackage{wasysym}
 #+LATEX_HEADER: \usepackage{graphicx}
 #+LATEX_HEADER: \usepackage{caption}
 #+LATEX_HEADER: \usepackage{subcaption}
+#+LATEX_HEADER: \usepackage{babelbib}
 
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
@@ -246,9 +269,9 @@ dado que influencia los \scores{} de salida, pero sin interactuar con
 \img{}.
 
 Para entender mejor a los clasificadores lineales, podemos verlos de
-la siguiente manera: si la imagen tiene \(32\times32\) píxeles y la
+la siguiente manera: si la imagen tiene \(32 \times 32\) píxeles y la
 representamos con un vector columna de dimensión \(D\) (en este caso
-\(D=1024=32*32\)), entonces en ese espacio \textit{D-dimensional} la
+\(D=1024=32 \times 32\)), entonces en ese espacio \textit{D-dimensional} la
 imagen es solamente un punto. Como se observa en la Figura
 \ref{fig:cl} de manera simplificada, nuestro clasificador lineal
 define una ``línea'' (un hiperplano en realidad) que separa cada clase
@@ -258,7 +281,7 @@ clasificadores en paralelo, donde cada uno es una fila de \weights{}.
 
 
 #+name: linear-classifier
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -448,7 +471,7 @@ la dirección de crecimiento de una función pero nosotros queremos
 encontrar un mínimo (Figura \ref{fig:gd}).
 
 #+name: gradient-descent
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -681,7 +704,7 @@ Notar que una \textit{ReLU} normal es básicamente una \textit{maxout}
 con \(w_1,b_1 = 0\).
 
 #+name: relus
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib
 matplotlib.use('Agg')
 
@@ -769,7 +792,7 @@ sin embargo nos centraremos en el tipo estándar de neurona, un modelo
 \textit{näive}.
 
 #+name: neuron
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.cbook as cbook
@@ -826,7 +849,7 @@ ya vimos. La función de activación representa entonces la frecuencia
 con la que se activa la neurona.
 
 #+name: neuron
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.cbook as cbook
@@ -843,11 +866,11 @@ ax.text(75.50, 361.72, r'$x_3$', props, rotation=0, fontsize=15)
 ax.text(84.50, 650.98, r'$x_{n-1}$', props, rotation=0, fontsize=15)
 ax.text(75.50, 822.76, r'$x_n$', props, rotation=0, fontsize=15)
 
-ax.text(419.30, 140.16, r'$* w_1$', props, rotation=-25, fontsize=15)
-ax.text(419.30, 285.41, r'$* w_2$', props, rotation=-15, fontsize=15)
-ax.text(419.30, 387.19, r'$* w_3$', props, rotation=-8, fontsize=15)
-ax.text(450.30, 598.43, r'$* w_{n-1}$', props, rotation=11, fontsize=15)
-ax.text(419.30, 729.36, r'$* w_n$', props, rotation=28, fontsize=15)
+ax.text(419.30, 140.16, r'$\times w_1$', props, rotation=-25, fontsize=15)
+ax.text(419.30, 285.41, r'$\times w_2$', props, rotation=-15, fontsize=15)
+ax.text(419.30, 387.19, r'$\times w_3$', props, rotation=-8, fontsize=15)
+ax.text(450.30, 598.43, r'$\times w_{n-1}$', props, rotation=11, fontsize=15)
+ax.text(419.30, 729.36, r'$\times w_n$', props, rotation=28, fontsize=15)
 
 ax.text(856.71, 470.73, r'$\mathbf{\sum_{i=0}^n w_i x_i + b}$', props, rotation=0, fontsize=18)
 
@@ -915,7 +938,7 @@ restarle el valor medio de los píxeles a cada píxel de la imagen de
 entrada.
 
 #+name: mean-substraction
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
@@ -1080,7 +1103,7 @@ un conjunto nuevo, obteniendo también baja precisión (Figura
 \ref{fig:overfit}).
 
 #+name: overfitting
-#+begin_src python :session :exports none :results silent :cache yes
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.datasets import make_moons
@@ -1280,7 +1303,7 @@ r^{(l)}_{j} \sim Bernoulli(p),
 \end{equation}
 
 \begin{equation}
-\tilde{\boldsymbol{y}}^{(l)} = \boldsymbol{r}^{(l)} * \boldsymbol{y}^{(l)},
+\tilde{\boldsymbol{y}}^{(l)} = \boldsymbol{r}^{(l)} \odot \boldsymbol{y}^{(l)},
 \end{equation}
 
 \begin{equation}
@@ -1291,7 +1314,7 @@ z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \tilde{\boldsymbol{y}}^{l} + b^{(l+1)
 y^{(l+1)}_{i} = A(z^{(l+1)}_{i})
 \end{equation}
 
-Aquí \(*\) denota el producto elemento a elemento y
+Aquí \(\odot\) denota el producto elemento a elemento y
 \(\boldsymbol{r}^{(l)}\) es un vector de variables aleatorias de
 Bernoulli con probabilidad \(p\) de ser \(1\). Para cada capa se
 calcula este vector \(\boldsymbol{r}^{(l)}\) y luego se lo multiplica
@@ -1493,9 +1516,9 @@ aprendizaje automático.
 Una convolución entre un \textit{kernel} y una imagen se realiza
 sumando las multiplicaciones elemento a elemento entre \textit{kernel}
 y una región de la imagen. Por ejemplo, sea \(C\) un \textit{kernel}
-de \(3x3\) y \(A\) un pedazo de una imagen también de dimension
-\(3x3\), entonces la convolución entre \(C\) y \(A\) (denotada con el
-símbolo\(*\)) es:
+de \(3\times3\) y \(A\) un pedazo de una imagen también de dimension
+\(3\times3\), entonces la convolución entre \(C\) y \(A\) (denotada con el
+símbolo \(*\)) es:
 
 \begin{equation}
 C
@@ -1518,7 +1541,7 @@ A
 \end{equation}
 
 \begin{equation}
-A * C = (a*0) + (b*1) + (c*0) + (d*1) + (e*-4) + (f*1) + (g*0) + (h*1) + (i*0)
+A * C = (a\times0) + (b\times1) + (c\times0) + (d\times1) + (e\times-4) + (f\times1) + (g\times0) + (h\times1) + (i\times0)
 \end{equation}
 
 Observemos dos cosas: 
@@ -1605,7 +1628,6 @@ Sección se dará una descripción general de la arquitectura de una red
 convolucional y varios ejemplos de redes convolucionales conocidas.
 
 *** Capas de una red convolucional
-
 **** Capas de Entrada y Salida
 
 Las redes convolucionales se manejan con volumenes (datos en mas de
@@ -1615,7 +1637,7 @@ entrada y un volumen de salida.
 La capa de entrada de una red es la que provee la imagen original como
 un volumen de pixeles. Notar que si una imagen tiene un alto y ancho
 de 256 pixeles y tres canales de colores (RGB) entonces el volumen de
-salida de esta capa va a ser un cubo de ancho \(256 * 256 * 3\).
+salida de esta capa va a ser \(256 \times 256 \times 3\).
 
 En general la capa de salida suele ser una capa completamente
 conectada con los puntajes de cada clase en el caso de tareas de
@@ -1672,7 +1694,7 @@ ayudando a controlar el \textit{overfitting}. Lo más común es
 insertar capas de \textit{pooling} luego de capas convolucionales.
 
 Un método de \textit{pooling} muy usado es \textit{MAX Pooling}, en el
-cual se calcula el máximo de un área local (generalmente 2x2 o 3x3) en
+cual se calcula el máximo de un área local (generalmente \(2 \times 2\) o \(3 \times 3\)) en
 el ancho y largo del volumen de entrada y a través de cada una de las
 ``rodajas'' que conforman la profundidad del volumen. El área local
 está definida por el tamaño del \textit{stride}. De esta manera se
@@ -1876,10 +1898,7 @@ paper previamente citado. Primero haremos una prueba de concepto
 utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
 experimentos con los conjuntos KITTI \cite{KITTI} y SF \cite{SF}.
 
-*** Reproducción de resultados
-#+LaTeX: \label{sec:agrawal}
-
-**** Nomenclatura
+*** Nomenclatura
 Vamos a seguir la misma nomenclatura que en el paper original, aunque
 con algunas variantes.
 
@@ -1894,7 +1913,7 @@ Para definir las arquitecturas de cada red de manera sencilla vamos a
 usar las siguientes abreviaciones:
 
 \begin{itemize}
-\item \(N\)C\(k\) para una capa convolucional con \(k\) filtros cuadrados de tamaño \(N*N\).
+\item \(N\)C\(k\) para una capa convolucional con \(k\) filtros cuadrados de tamaño \(N \times N\).
 \item F\(k\) para una capa completamente conectada (FC) con salida de dimensión \(k\).
 \item P para una capa de \textit{Pooling}. A menos que se diga lo contrario, siempre usaremos \textit{MAX Pooling}.
 \item D para una capa \textit{Dropout}.
@@ -1905,6 +1924,8 @@ Al igual que en \cite{LSM2015}, y como es usual cuando se entrenan
 CNN's, colocaremos rectificadores lineales ReLU's luego de cada capa
 convolucional y cada cada FC.
 
+*** Reproducción de resultados
+#+LaTeX: \label{sec:agrawal}
 
 **** Prueba de concepto con MNIST
 ***** Descripción del conjunto de datos y preprocesamiento
@@ -1922,8 +1943,8 @@ convolucional y cada cada FC.
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
 
-#+LaTeX: \bibliographystyle{abbrv}
-#+LaTex: \bibliography{MarcoTeorico}
+#+LaTeX: \bibliographystyle{babplain}
+#+LaTeX: \bibliography{MarcoTeorico}
 
 * Plan de Trabajo                                :noexport:
 ** Datasets
