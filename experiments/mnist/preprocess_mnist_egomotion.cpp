@@ -1,7 +1,7 @@
 /*
  * This code parses the MNIST dataset files (images and labels).
  *
- * It was done for my low-endian machine, but you can set the LOW_ENDIAN
+ * It was done for my little-endian machine, but you can set the LITTLE_ENDIAN
  * flag off and it will run in high endian mode (TODO)
  *
  * The main idea is to create a database with 5 million images to 
@@ -53,7 +53,7 @@ using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define LOW_ENDIAN true
+#define LITTLE_ENDIAN true
 #define TB 1099511627776
 #define NUM_TRASLATIONS 7
 #define NUM_ROTATIONS 61
@@ -67,12 +67,9 @@ using namespace cv;
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
-#define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
-#define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_ROOT         "/media/ezetl/0C74D0DD74D0CB1A/mnist/"
-#define LMDB_TRAIN        (LMDB_ROOT"mnist_train_lmdb/")
-#define LMDB_TRAIN_LABELS (LMDB_ROOT"mnist_train_labels_lmdb/")
+#define LMDB_ROOT         "../data/"
+#define LMDB_TRAIN        (LMDB_ROOT"mnist_train_egomotion_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -115,7 +112,8 @@ int main(int argc, char** argv)
 
 void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 {
-    /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
+    /* LMDB related code was adapted from Caffe script convert_mnist_data.cpp */
+    /* We dont use labels in this case */
 
     // lmdb data 
     MDB_env *mdb_env;

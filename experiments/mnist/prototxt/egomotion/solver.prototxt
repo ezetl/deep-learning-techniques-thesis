@@ -1,11 +1,11 @@
-net: "siamese_mnist_contrastive.prototxt"
+net: "siamese_mnist.prototxt"
 type: "SGD"
 
 #test_state: { stage: 'test-on-train' }
 #test_iter: 500
 #test_interval: 1000
 
-base_lr: 0.0001
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -18,9 +18,8 @@ gamma: 0.5
 display: 100
 max_iter: 40000
 
-
 snapshot: 40000
-snapshot_prefix: "../snapshots/snapshot_mnist_pretraining_contrastivelr0.0001"
+snapshot_prefix: "../../snapshots/snapshot_mnist_egomotion_lr0.01"
 
 
 # solver mode: CPU or GPU

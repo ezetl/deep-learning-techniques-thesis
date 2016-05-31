@@ -1,4 +1,4 @@
-net: "siamese_mnist.prototxt"
+net: "siamese_mnist_contrastive.prototxt"
 type: "SGD"
 
 #test_state: { stage: 'test-on-train' }
@@ -19,9 +19,9 @@ display: 100
 max_iter: 40000
 
 
-snapshot: 1000
-snapshot_prefix: "../snapshots/snapshot_mnist"
+snapshot: 40000
+snapshot_prefix: "../../snapshots/snapshot_mnist_contrastivelr0.01"
 
 
 # solver mode: CPU or GPU
-solver_mode: CPU
+solver_mode: GPU

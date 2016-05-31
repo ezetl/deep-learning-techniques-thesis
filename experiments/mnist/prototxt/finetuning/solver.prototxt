@@ -5,7 +5,7 @@ test_state: { stage: 'test-on-train' }
 test_iter: 500
 test_interval: 3000
 
-base_lr: 0.000001
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -18,9 +18,9 @@ display: 100
 max_iter: 4000
 
 
-snapshot: 1000
-snapshot_prefix: "../snapshots/snapshot_finetuning_mnist"
+snapshot: 4000
+snapshot_prefix: "../../snapshots/snapshot_finetuning_mnist"
 
 
 # solver mode: CPU or GPU
-solver_mode: CPU
+solver_mode: GPU
