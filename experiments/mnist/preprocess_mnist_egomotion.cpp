@@ -4,7 +4,7 @@
  * It was done for my little-endian machine, but you can set the LITTLE_ENDIAN
  * flag off and it will run in high endian mode (TODO)
  *
- * The main idea is to create a database with 5 million images to 
+ * The main idea is to create a database with million of images to 
  * reproduce the results obtained in "Learning to See by Moving" by 
  * Agrawal el al.
  *
@@ -53,7 +53,7 @@ using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define LITTLE_ENDIAN true
+#define L_ENDIAN true //LITTLE ENDIAN
 #define TB 1099511627776
 #define NUM_TRASLATIONS 7
 #define NUM_ROTATIONS 61
@@ -159,7 +159,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 
     std::ostringstream s;
 
-    // Processing and generating 5 million images at once will consume too much RAM (>7GB)
+    // Processing and generating million of images at once will consume too much RAM (>7GB)
     // and it will (probably) throw a std::bad_alloc exception.
     // Lets split the processing in several batches instead. 
     // list_imgs.size() has to be multiple of BATCHES (to simplify things)
@@ -169,9 +169,9 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         unsigned int begin = i * len_batch; 
         unsigned int end = begin + len_batch - 1;
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 83;
+        unsigned int amount_pairs = 16;
         if (i==0 || i==1){
-            amount_pairs = 85;
+            amount_pairs = 17;
         } 
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
