@@ -7,11 +7,11 @@ layer {
   include {
     phase: TRAIN
   }
-  transform_param {
-    mean_file: "../../data/mean_mnist.binaryproto"
-  }
+  #transform_param {
+  #  mean_file: "../../data/mean_mnist.binaryproto"
+  #}
   data_param {
-    source: "../../mnist_train_standar_lmdb"
+    source: "../../data/mnist_train_standar_lmdb"
     batch_size: 125 
     backend: LMDB
   }
@@ -26,11 +26,11 @@ layer {
     phase: TEST
     stage: "test-on-train"
   }
-  transform_param {
-    mean_file: "../../data/mean_mnist.binaryproto"
-  }
+  #transform_param {
+  #  mean_file: "../../data/mean_mnist.binaryproto"
+  #}
   data_param {
-    source: "../../mnist_train_standar_lmdb"
+    source: "../../data/mnist_train_standar_lmdb"
     batch_size: 20 
     backend: LMDB
   }
@@ -45,11 +45,11 @@ layer {
     phase: TEST
     stage: "test-on-test"
   }
-  transform_param {
-    mean_file: "../../data/mean_mnist.binaryproto"
-  }
+  #transform_param {
+  #  mean_file: "../../data/mean_mnist.binaryproto"
+  #}
   data_param {
-    source: "../../mnist_test_lmdb"
+    source: "../../data/mnist_test_lmdb"
     batch_size: 20 
     backend: LMDB
   }

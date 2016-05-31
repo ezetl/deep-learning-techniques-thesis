@@ -66,7 +66,7 @@ using namespace cv;
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_ROOT         "/media/ezetl/0C74D0DD74D0CB1A/mnist/"
+#define LMDB_ROOT         "../data/"
 #define LMDB_TRAIN        (LMDB_ROOT"mnist_train_contrastive_lmdb/")
 
 typedef char Byte;
@@ -166,9 +166,9 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         unsigned int begin = i * len_batch; 
         unsigned int end = begin + len_batch - 1;
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 83;
+        unsigned int amount_pairs = 16;
         if (i==0 || i==1){
-            amount_pairs = 85;
+            amount_pairs = 17;
         } 
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {

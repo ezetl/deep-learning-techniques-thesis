@@ -7,7 +7,7 @@ layer {
     phase: TRAIN
   }
   data_param {
-    source: "mnist_train_contrastive_lmdb"
+    source: "../../data/mnist_train_contrastive_lmdb"
     batch_size: 125 
     backend: LMDB
   }
@@ -22,7 +22,7 @@ layer {
     stage: "test-on-train"
   }
   data_param {
-    source: "mnist_train_contrastive_lmdb"
+    source: "../../data/mnist_train_contrastive_lmdb"
     batch_size: 50 
     backend: LMDB
   }
