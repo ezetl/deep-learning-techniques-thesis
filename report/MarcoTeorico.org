@@ -28,6 +28,9 @@ seleccionar la opcion "LaTEX").
 
 Luego se corre el script ./compile_report.sh en esta misma carpeta
 para generar y abrir el pdf.
+
+Una vez generadas las figuras, ya no es necesario correr los code
+blocks de nuevo.
 #####################################################################
 #+END_COMMENT
 
