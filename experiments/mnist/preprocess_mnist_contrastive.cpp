@@ -141,22 +141,17 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     string data_value, label_value;
     
     // Data datum
-    // This datum has 2 + NUM_CLASSES dimensions.
-    // 2 dimensiones because we are merging 2 one channel images into one, 
-    // plus NUM_CLASSES (3) because we are also merging the labels into the data.
-    // This allow us to slice the data later on training phase and retrieve the labels.
-    // Basically I am adding 3 "images" with all zeros in it except the index where the class 
-    // is active. Then with the Argmax Layer of Caffe I retrieve these labels index again and pass them 
-    // to the loss function.
+    // This datum has 2 dimensions because we are merging 2 one channel images into one, 
+    // This allow us to slice the data later on training phase and retrieve both images.
     // Chek the loop below to see how it is done.
     Datum datum;
-    datum.set_channels(2+NUM_CLASSES);
+    datum.set_channels(2);
     datum.set_height(rows);
     datum.set_width(cols);
 
     std::ostringstream s;
 
-    // Processing and generating 5 million images at once will consume too much RAM (>7GB)
+    // Processing and generating millions of images at once will consume too much RAM (>7GB for 5m)
     // and it will (probably) throw a std::bad_alloc exception.
     // Lets split the processing in several batches instead. 
     // list_imgs.size() has to be multiple of BATCHES (to simplify things)
@@ -166,60 +161,32 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         unsigned int begin = i * len_batch; 
         unsigned int end = begin + len_batch - 1;
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 16;
+        unsigned int amount_pairs = 43;
         if (i==0 || i==1){
-            amount_pairs = 17;
+            amount_pairs = 45;
         } 
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
-            // Dont use item_id as key here since we have 83/85 images per original image,
-            // meaning that we will overwrite the same image 83/85 times instead of creating 
+            // Dont use item_id as key here since we have several pairs per original image,
+            // meaning that we will overwrite the same image several times instead of creating 
             // a new entry
             s << std::setw(8) << std::setfill('0') << count; 
             string key_str = s.str();
             s.str(std::string());
 
-            // Set Data
-            // Create a char pointer and copy the images first, the labels at the end
-            char * data_label;
-            data_label = (char*)calloc(rows*cols*5, sizeof(uByte));
-            data_label = (char*)memcpy(data_label, (void*)batch_data[item_id].img.data, 2*rows*cols);
-
-            char * labels;
-            unsigned int labelx = (unsigned int)batch_data[item_id].x;
-            unsigned int labely = (unsigned int)batch_data[item_id].y;
-            unsigned int labelz = (unsigned int)batch_data[item_id].z;
-
             // Translations similarities
             // index:  0  1  2 3 4 5 6
             // value: -3 -2 -1 0 1 2 3
             // if the label was between certain indexes, then the images are similar
-            if (labelx>=2 && labelx<=4){
-                labelx = 1; // similar images
-            } else {
-                labelx = 0; // similar images
-            }
+            unsigned int labelx = (unsigned int)batch_data[item_id].x;
+            unsigned int labely = (unsigned int)batch_data[item_id].y;
+            unsigned int labelz = (unsigned int)batch_data[item_id].z;
+            int label = labelx>=2 && labelx<=4 && labely>=2 && labely<=4 && (labelz==9 || labelz==10);
 
-            if (labely>=2 && labely<=4){
-                labely = 1;
-            } else {
-                labely = 0;
-            }
+            // Set Data and Label
+            datum.set_data((char*)batch_data[item_id].img.data, 2*rows*cols);
+            datum.set_label(label);
 
-            // Rotation similarity
-            if (labelz==9 || labelz==10){
-                labelz = 1;
-            } else {
-                labelz = 0;
-            }
-
-            labels = (char*) calloc(rows*cols*3, sizeof(uByte));
-            labels[labelx] = 1;
-            labels[cols*rows + labely] = 1;
-            labels[cols*rows*2 + labelz] = 1;
-            memcpy(data_label+(cols*rows*2), (void*)labels, 3*rows*cols);
-
-            datum.set_data((char*)data_label, 5*rows*cols);
             datum.SerializeToString(&data_value);
 
             // Save Data
@@ -237,8 +204,6 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
             if (count % 50000 == 0) {
                 cout << "Processed " << count << "\r" << flush;
             }
-            free(data_label);
-            free(labels);
         }
     }
     // Last batch
@@ -249,6 +214,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     }
 
     cout << "\nFinished creation of LMDB's\n";
+    cout << count << " images processed\n";
     return;
 }
 
