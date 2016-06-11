@@ -62,15 +62,9 @@ using namespace cv;
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_SIZE1 100
-#define LMDB_SIZE2 300
-#define LMDB_SIZE3 1000
-#define LMDB_SIZE4 10000
+#define LMDB_SIZE 60000
 #define LMDB_ROOT         "../data/"
-#define LMDB_TRAIN1        (LMDB_ROOT"mnist_train_standar100_lmdb/")
-#define LMDB_TRAIN2        (LMDB_ROOT"mnist_train_standar300_lmdb/")
-#define LMDB_TRAIN3        (LMDB_ROOT"mnist_train_standar1000_lmdb/")
-#define LMDB_TRAIN4        (LMDB_ROOT"mnist_train_standar10000_lmdb/")
+#define LMDB_TRAIN      (LMDB_ROOT"mnist_train_standar_lmdb/")
 #define LMDB_TEST       (LMDB_ROOT"mnist_test_standar_lmdb/")
 
 typedef char Byte;
@@ -97,10 +91,7 @@ vector<Label> load_labels(string path);
 int main(int argc, char** argv)
 {
     cout << "Creating train LMDB\n";
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN1, LMDB_SIZE1);
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN2, LMDB_SIZE2);
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN3, LMDB_SIZE3);
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN4, LMDB_SIZE4);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN, LMDB_SIZE);
     cout << "Creating test LMDB\n";
     create_lmdbs(TEST_IMAGES, TEST_LABELS, LMDB_TEST, 10000);
     return 0;
