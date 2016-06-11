@@ -11,8 +11,8 @@ layer {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "../../data/mnist_train_standar_lmdb"
-    batch_size: 125 
+    source: "../../data/mnist_finetuning_standar10000_lmdb"
+    batch_size: 25 
     backend: LMDB
   }
 }
@@ -197,8 +197,8 @@ layer {
 
 layer {
   bottom: "fc_finetune"
-  top: "fc"
-  name: "fc"
+  top: "fcn"
+  name: "fcn"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -225,7 +225,7 @@ layer {
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc"
+  bottom: "fcn"
   bottom: "label"
   top: "loss"
   loss_weight:1
@@ -238,7 +238,7 @@ layer {
 layer {
   name: "train_accuracy"
   type: "Accuracy"
-  bottom: "fc"
+  bottom: "fcn"
   bottom: "label"
   top: "train_accuracy"
   include {
@@ -250,7 +250,7 @@ layer {
 layer {
   name: "test_accuracy"
   type: "Accuracy"
-  bottom: "fc"
+  bottom: "fcn"
   bottom: "label"
   top: "test_accuracy"
   include {
@@ -262,7 +262,7 @@ layer {
 layer {
   name: "test_train_loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc"
+  bottom: "fcn"
   bottom: "label"
   top: "test_train_loss"
   loss_weight:1
@@ -275,7 +275,7 @@ layer {
 layer {
   name: "test_loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc"
+  bottom: "fcn"
   bottom: "label"
   top: "test_loss"
   loss_weight:1
