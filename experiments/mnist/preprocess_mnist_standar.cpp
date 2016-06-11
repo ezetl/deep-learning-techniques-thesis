@@ -62,9 +62,15 @@ using namespace cv;
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
-#define LMDB_SIZE 300
+#define LMDB_SIZE1 100
+#define LMDB_SIZE2 300
+#define LMDB_SIZE3 1000
+#define LMDB_SIZE4 10000
 #define LMDB_ROOT         "../data/"
-#define LMDB_TRAIN        (LMDB_ROOT"mnist_train_standar_lmdb/")
+#define LMDB_TRAIN1        (LMDB_ROOT"mnist_train_standar100_lmdb/")
+#define LMDB_TRAIN2        (LMDB_ROOT"mnist_train_standar300_lmdb/")
+#define LMDB_TRAIN3        (LMDB_ROOT"mnist_train_standar1000_lmdb/")
+#define LMDB_TRAIN4        (LMDB_ROOT"mnist_train_standar10000_lmdb/")
 #define LMDB_TEST       (LMDB_ROOT"mnist_test_standar_lmdb/")
 
 typedef char Byte;
@@ -78,7 +84,7 @@ typedef struct
     uint32_t rows;
 } MNIST_metadata;
 
-void create_lmdbs(const char* images, const char* labels, const char* lmdb_path);
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, unsigned int size);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
@@ -91,13 +97,16 @@ vector<Label> load_labels(string path);
 int main(int argc, char** argv)
 {
     cout << "Creating train LMDB\n";
-    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN1, LMDB_SIZE1);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN2, LMDB_SIZE2);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN3, LMDB_SIZE3);
+    create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN4, LMDB_SIZE4);
     cout << "Creating test LMDB\n";
-    create_lmdbs(TEST_IMAGES, TEST_LABELS, LMDB_TEST);
+    create_lmdbs(TEST_IMAGES, TEST_LABELS, LMDB_TEST, 10000);
     return 0;
 }
 
-void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
+void create_lmdbs(const char* images, const char* labels, const char* lmdb_path, unsigned int size)
 {
     /*LMDB related code was taken from Caffe script convert_mnist_data.cpp*/
 
@@ -143,7 +152,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
 
     std::ostringstream s;
 
-    for (unsigned int i = 0; i<LMDB_SIZE; i++)
+    for (unsigned int i = 0; i<size; i++)
     {
         s << std::setw(8) << std::setfill('0') << i; 
         string key_str = s.str();

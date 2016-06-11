@@ -3,12 +3,13 @@ layer {
   name: "data"
   type: "Data" 
   top: "data"
+  top: "label"
   include {
     phase: TRAIN
   }
   data_param {
     source: "../../data/mnist_train_contrastive_lmdb"
-    batch_size: 125 
+    batch_size: 512 
     backend: LMDB
   }
 }
@@ -17,6 +18,7 @@ layer {
   name: "data"
   type: "Data" 
   top: "data"
+  top: "label"
   include {
     phase: TEST
     stage: "test-on-train"
@@ -35,37 +37,10 @@ layer {
     bottom: "data"
     top: "data0"
     top: "data1"
-    top: "labelx"
-    top: "labely"
-    top: "labelz"
     slice_param {
       axis: 1
       slice_point: 1 
-      slice_point: 2
-      slice_point: 3
-      slice_point: 4
     }
-}
-
-layer {
-  name: "argmaxX"
-  type: "ArgMax"
-  bottom: "labelx"
-  top: "simX"
-}
-
-layer {
-  name: "argmaxY"
-  type: "ArgMax"
-  bottom: "labely"
-  top: "simY"
-}
-
-layer {
-  name: "argmaxZ"
-  type: "ArgMax"
-  bottom: "labelz"
-  top: "simZ"
 }
 
 
@@ -163,12 +138,6 @@ layer {
     kernel_size: 2
     stride: 2
   }
-}
-layer{
-  name : "flat"
-  type: "Flatten"
-  bottom: "pool2"
-  top: "flat"
 }
 
 
@@ -268,53 +237,198 @@ layer {
   }
 }
 
-layer{
-  name : "flat_p"
-  type: "Flatten"
+
+
+
+
+##### OUTPUT
+## FIRST COMPONENT
+layer {
+  bottom: "pool2"
+  top: "ip1"
+  name: "ip1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 500 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "ip1relu"
+  type: "ReLU"
+  bottom: "ip1"
+  top: "ip1"
+}
+
+layer {
+  bottom: "ip1"
+  top: "ip1_2"
+  name: "ip1_2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  bottom: "ip1_2"
+  top: "feat"
+  name: "feat"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 2 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+
+## SECOND COMPONENT
+layer {
   bottom: "pool2_p"
-  top: "flat_p"
-}
-
-layer {
-  name: "loss_x"
-  type: "ContrastiveLoss"
-  contrastive_loss_param {
-    margin: 10.0
+  top: "ip2"
+  name: "ip2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
   }
-  bottom: "flat"
-  bottom: "flat_p"
-  bottom: "simX"
-  top: "loss_x"
-  include {
-    phase: TRAIN
+  param {
+    lr_mult: 2
+    decay_mult: 0
   }
-}
-
-layer {
-  name: "loss_y"
-  type: "ContrastiveLoss"
-  contrastive_loss_param {
-    margin: 10.0
-  }
-  bottom: "flat"
-  bottom: "flat_p"
-  bottom: "simY"
-  top: "loss_y"
-  include {
-    phase: TRAIN
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 500 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
 layer {
-  name: "loss_z"
+  name: "ip2relu"
+  type: "ReLU"
+  bottom: "ip2"
+  top: "ip2"
+}
+
+layer {
+  bottom: "ip2"
+  top: "ip2_2"
+  name: "ip2_2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  bottom: "ip2_2"
+  top: "feat_p"
+  name: "feat_p"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 2 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+
+
+
+#### LOSS
+layer {
+  name: "contrastive_loss"
   type: "ContrastiveLoss"
   contrastive_loss_param {
-    margin: 10.0
+    margin: 100.0
   }
-  bottom: "flat"
-  bottom: "flat_p"
-  bottom: "simZ"
-  top: "loss_z"
+  bottom: "feat"
+  bottom: "feat_p"
+  bottom: "label"
+  top: "contrastive_loss"
   include {
     phase: TRAIN
   }
