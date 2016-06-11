@@ -1929,11 +1929,58 @@ convolucional y cada cada FC.
 
 *** Reproducción de resultados
 #+LaTeX: \label{sec:agrawal}
-
+**** TODO \textit{Slow Feature Analysis} y Automovimiento
 **** Prueba de concepto con MNIST
-***** Descripción del conjunto de datos y preprocesamiento
+***** Conjunto de datos
+
+El conjunto de datos MNIST cuenta con 60000 imágenes de caracteres
+numéricos manuscritos para entrenamiento, más 10000 imágenes para
+evaluación. La dimensión de cada imagen es \(1 \times 28 \times 28\),
+es decir son de un solo canal. Para el entrenamiento mediante
+\textit{automovimiento} se crearon pares de imágenes siguiendo los
+lineamientos del paper. Esto es, cada para esta compuesto de la imagen
+original más la imagen con transformaciones en los ejes X, y Z. Las
+transformaciones en X e Y varían entre los -3 y +3 píxeles, mientras
+que la rotación en Z varía entre los -30° y los 30°. Tanto las
+rotaciones como las traslaciones son números enteros. Para cada par
+creado las transformaciones son aleatorias.
+
+Según se explica en el trabajo de Agrawal et al., utilizaron 5
+millones de pares de imágenes para entrenar la red siamesa. Si bien
+realicé experimentos con esa cantidad, llegué a la conclusión que se
+pueden obtener resultados con igual precisión utilizando muchas menos
+(alrededor de 2 millones).
 ***** Descripción de la red
+
+La arquitectura utilizada para las BCNN fue C96-P-C256-P, y para la
+TCNN se eligió F1000-D-Op. Tener en cuenta que para el caso del
+\textit{automovimiento} es necesario utilizar una combinación
+FC-Softmax para calcular la pérdida en cada una de las
+transformaciones.
+
+Para transferencia de aprendizaje se añadió F500-D-F10-Softmax a una
+BCNN.
+
 ***** Entrenamiento y evaluación
+
+Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
+tasa de aprendizaje de 0.001 para automovimiento y de 0.0001 para
+SFA. Siguiendo los lineamientos del paper se utilizaron márgenes de 10
+y 100 para SFA. En ambos casos la tasa de aprendizaje se reduce a la
+mitad cada 10000 iteraciones. El tamaño del \textit{batch} fue de 125,
+lo cual equivale a procesar 5 millones de pares de imágenes.
+
+La etapa de transferencia de aprendizaje se hizo con 4000 iteraciones
+a una tasa de aprendizaje constante de 0.001
+
+Para evaluar la calidad de las \textit{features} aprendidas por las
+redes siamesas se estableció la tasa de aprendizaje de las capas
+convolucionales a cero.
+
+En la Tabla \ref{ALGUNA TABLA} se puede observar la tasa de error
+obtenida mediante la transferencia de aprendizaje con 100, 300, 1000 y
+10000 imágenes.
+
 **** Pruebas con KITTI
 ***** Descripción del conjunto de datos y preprocesamiento
 ***** Descripción de la red
@@ -2017,7 +2064,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [66%] Entrenamiento
+*** [100%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2048,7 +2095,7 @@ reducido en un factor de 2 cada 10K iteraciones.
 
 Para finetuning: 4K iteraciones con un learning rate constante de
 0.01.
-**** TODO [84%] Experimentos a realizar
+**** DONE [84%] Experimentos a realizar
 Todos se basan en el pre-entrenamiento descripto en el item y luego
 finetuning.
 

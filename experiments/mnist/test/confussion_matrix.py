@@ -8,7 +8,7 @@ import sys
 
 classes = [str(i) for i in range(0,10)]
 
-ROOT_IMAGES = '/media/ezetl/0C74D0DD74D0CB1A/mnist/images/mnist_test_standar/'
+ROOT_IMAGES = '../data/mnist_test_standar'
 IMGS_LIST = './test_mnist.txt'
 DEPLOY_FILE = './deploy/deploy_finetuning_mnist.prototxt'
 MEAN_PATH = './deploy/mean_mnist.binaryproto'
@@ -91,12 +91,10 @@ if __name__ == "__main__":
     pretrained = sys.argv[1]
     print(pretrained)
     paths = load_paths(IMGS_LIST)
-    mean = load_mean()
     net = load_net(pretrained)
-    transformer = create_transformer(net, mean[0].mean(1).mean(1))
+    transformer = create_transformer(net, None)
 
     ok = 0
-    off1 = 0
     total = 0
     wrong = 0
     conf_matrix = [[0]*len(classes)for i in range(0, len(classes))]

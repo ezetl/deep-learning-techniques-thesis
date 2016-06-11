@@ -16,3 +16,4 @@ build/
 experiments/mnist/data
 experiments/mnist/logs
 experiments/mnist/snapshots
+test_mnist.txt
