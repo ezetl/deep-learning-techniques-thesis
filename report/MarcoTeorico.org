@@ -1902,6 +1902,7 @@ utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
 experimentos con los conjuntos KITTI \cite{KITTI} y SF \cite{SF}.
 
 *** Nomenclatura
+
 Vamos a seguir la misma nomenclatura que en el paper original, aunque
 con algunas variantes.
 
@@ -1927,9 +1928,37 @@ Al igual que en \cite{LSM2015}, y como es usual cuando se entrenan
 CNN's, colocaremos rectificadores lineales ReLU's luego de cada capa
 convolucional y cada cada FC.
 
+*** Medidas de similaridad: \textit{Slow Feature Analysis} y Automovimiento
+
+Agrawal et al. proponen analizar el automovimiento del agente para
+aprender \textit{features} útiles y lo comparan con otro método muy
+utilizado en redes siamesas, \textit{Slow Feature Analysis} (SFA), que
+formulan de la siguiente manera:
+
+\begin{equation}
+L(x_{t_1}, x_{t_2}, W) = \begin{cases}
+                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
+                           1 - \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
+                         \end{cases}
+\end{equation}
+
+Donde \(x_{t_1}\) y \(x_{t_2}\) son las \textit{features} obtenidas
+por las redes siamesas en los tiempos \(t_1\) y \(t_2\), con
+parámetros compartidos \(W\), \(m\) es el margen y \(T\) es el umbral
+que determina si dos \textit{features} se consideran cercanas. La
+distancia \(D\) se eligió como la norma L2. SFA se basa en que las
+características relevantes cambian poco en una ventana de tiempo
+pequeña.
+
+Por otro lado, la técnica de analizar el automovimiento se plantea
+como una tarea de clasificación en donde las redes tienen que predecir
+cuál transformación fue efectuada en cada uno de los ejes. Para ello
+agrupan todas las posibles transformaciones en clases de rangos
+iguales, y la tarea de la red es predecir a que clase pertenece la
+imagen.
+
 *** Reproducción de resultados
 #+LaTeX: \label{sec:agrawal}
-**** TODO \textit{Slow Feature Analysis} y Automovimiento
 **** Prueba de concepto con MNIST
 ***** Conjunto de datos
 
@@ -1977,9 +2006,22 @@ Para evaluar la calidad de las \textit{features} aprendidas por las
 redes siamesas se estableció la tasa de aprendizaje de las capas
 convolucionales a cero.
 
-En la Tabla \ref{ALGUNA TABLA} se puede observar la tasa de error
-obtenida mediante la transferencia de aprendizaje con 100, 300, 1000 y
-10000 imágenes.
+En la Tabla \ref{tab:one} se puede observar la tasa de error obtenida
+mediante la transferencia de aprendizaje con 100, 300, 1000 y 10000
+imágenes de los tres métodos utilizados: entrenamiento desde cero,
+automovimiento y SFA.
+
+#+caption: Tasa de error de los dos métodos de pre-entrenamiento utilizados.
+#+name: tab:one
+|---+----------------+------+------+------+-------|
+|   | método         |  100 |  300 | 1000 | 10000 |
+| / | <>             |    < |    > |    < |     > |
+|---+----------------+------+------+------+-------|
+| # | Desde cero     |      |      |      |       |
+| # | SFA(m=100)     | 23.1 | 11.9 | 5.07 |  1.96 |
+| # | SFA(m=10)      | 22.1 |   12 |    5 |   1.8 |
+| # | Automovimiento |  2.1 |  9.1 |  2.1 |   2.2 |
+|---+----------------+------+------+------+-------|
 
 **** Pruebas con KITTI
 ***** Descripción del conjunto de datos y preprocesamiento
