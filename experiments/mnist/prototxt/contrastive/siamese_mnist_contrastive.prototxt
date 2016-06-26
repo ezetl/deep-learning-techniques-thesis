@@ -9,7 +9,7 @@ layer {
   }
   data_param {
     source: "../../data/mnist_train_contrastive_lmdb"
-    batch_size: 512 
+    batch_size: 125 
     backend: LMDB
   }
 }
@@ -62,13 +62,15 @@ layer {
   }
   convolution_param {
     num_output: 96
-    kernel_size: 5
-    stride: 1
+    kernel_size: 11 
+    stride: 4
     weight_filler {
-      type: "xavier"
+      type: "gaussian"
+      std: 0.01
     }
     bias_filler {
       type: "constant"
+      value: 0
     }
   }
 }
@@ -87,7 +89,7 @@ layer {
   top: "pool1"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -109,13 +111,17 @@ layer {
   }
   convolution_param {
     num_output: 256 
+    pad: 2
+    group: 2
     kernel_size: 5
-    stride: 1
+    # stride: 1
     weight_filler {
-      type: "xavier"
+      type: "gaussian"
+      std: 0.01
     }
     bias_filler {
       type: "constant"
+      value: 0
     }
   }
 } 
@@ -135,7 +141,7 @@ layer {
   top: "pool2"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -159,13 +165,15 @@ layer {
   }
   convolution_param {
     num_output: 96
-    kernel_size: 5
-    stride: 1
+    kernel_size: 11 
+    stride: 4
     weight_filler {
-      type: "xavier"
+      type: "gaussian"
+      std: 0.01
     }
     bias_filler {
       type: "constant"
+      value: 0
     }
   }
 }
@@ -184,7 +192,7 @@ layer {
   top: "pool1_p"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -206,13 +214,17 @@ layer {
   }
   convolution_param {
     num_output: 256 
+    pad: 2
+    group: 2
     kernel_size: 5
-    stride: 1
+    # stride: 1
     weight_filler {
-      type: "xavier"
+      type: "gaussian"
+      std: 0.01
     }
     bias_filler {
       type: "constant"
+      value: 0
     }
   }
 } 
@@ -232,7 +244,7 @@ layer {
   top: "pool2_p"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -423,7 +435,7 @@ layer {
   name: "contrastive_loss"
   type: "ContrastiveLoss"
   contrastive_loss_param {
-    margin: 100.0
+    margin: 10.0
   }
   bottom: "feat"
   bottom: "feat_p"

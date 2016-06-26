@@ -5,7 +5,7 @@ type: "SGD"
 #test_iter: 500
 #test_interval: 3000
 
-base_lr: 0.001
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -20,7 +20,7 @@ max_iter: 40000
 
 
 snapshot: 40000
-snapshot_prefix: "/home/ezetl/tesis/experiments/mnist/snapshots/mnist_standarlr0.001"
+snapshot_prefix: "/home/ezetl/tesis/experiments/mnist/snapshots/mnist_standar_300_lr0.01"
 
 
 # solver mode: CPU or GPU
