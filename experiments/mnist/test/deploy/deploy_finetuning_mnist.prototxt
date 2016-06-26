@@ -100,8 +100,8 @@ layer {
 
 layer {
   bottom: "fc_finetune"
-  top: "fc"
-  name: "fc"
+  top: "fcf"
+  name: "fcf"
   type: "InnerProduct"
   inner_product_param {
     num_output: 10 
@@ -112,6 +112,6 @@ layer {
 layer {
   name: "prob"
   type: "Softmax"
-  bottom: "fc"
+  bottom: "fcf"
   top: "prob"
 }

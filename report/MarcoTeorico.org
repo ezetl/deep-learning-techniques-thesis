@@ -2015,12 +2015,12 @@ automovimiento y SFA.
 #+name: tab:one
 |---+----------------+------+------+------+-------|
 |   | método         |  100 |  300 | 1000 | 10000 |
-| / | <>             |    < |    > |    < |     > |
+| / | <>             |    < |      |      |     > |
 |---+----------------+------+------+------+-------|
-| # | Desde cero     |      |      |      |       |
-| # | SFA(m=100)     | 23.1 | 11.9 | 5.07 |  1.96 |
-| # | SFA(m=10)      | 22.1 |   12 |    5 |   1.8 |
-| # | Automovimiento |  2.1 |  9.1 |  2.1 |   2.2 |
+| # | Desde cero     |   10 | 5.57 |    5 |   1.8 |
+| # | SFA(m=10)      | 22.1 | 12.1 |  5.6 |   2.0 |
+| # | SFA(m=100)     | 23.3 | 11.9 |  5.5 |   2.1 |
+| # | Automovimiento |   17 |  8.6 |  4.6 |   2.3 |
 |---+----------------+------+------+------+-------|
 
 **** Pruebas con KITTI
@@ -2106,7 +2106,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [100%] Entrenamiento
+*** [75%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2137,7 +2137,7 @@ reducido en un factor de 2 cada 10K iteraciones.
 
 Para finetuning: 4K iteraciones con un learning rate constante de
 0.01.
-**** DONE [84%] Experimentos a realizar
+**** DONE [100%] Experimentos a realizar
 Todos se basan en el pre-entrenamiento descripto en el item y luego
 finetuning.
 
@@ -2195,14 +2195,16 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 ***** DONE SFA, lr 0.001. Finetuning con 1000 imagenes lr 0.0001
 ***** DONE SFA, lr 0.001. Finetuning con 10000 imagenes lr 0.0001
 
-***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 100 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 300 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 1000 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.01. Finetuning con 10000 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 100 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
-***** TODO Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.01. Finetuning con 100 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.01. Finetuning con 300 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.01. Finetuning con 1000 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.01. Finetuning con 10000 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 100 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
+***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
+**** TODO Probar swapeando las imagenes (1. modificada, 2. original) uniformemente.
+**** Probar con conv1: 96 x 11 x 11 (en lugar de 96 x 5 x 5) y conv2: 256 x 5 x 5
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
