@@ -13,8 +13,8 @@ layer {
   top: "conv1"
   convolution_param {
     num_output: 96
-    kernel_size: 5
-    stride: 1
+    kernel_size: 11 
+    stride: 4
   }
 }
 
@@ -32,7 +32,7 @@ layer {
   top: "pool1"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
@@ -45,7 +45,8 @@ layer {
   convolution_param {
     num_output: 256 
     kernel_size: 5
-    stride: 1
+    pad: 2 
+    group: 2
   }
 } 
 
@@ -64,15 +65,17 @@ layer {
   top: "pool2"
   pooling_param {
     pool: MAX
-    kernel_size: 2
+    kernel_size: 3
     stride: 2
   }
 }
 
 layer {
   bottom: "pool2"
-  top: "fc_finetune"
-  name: "fc_finetune"
+  #top: "fc_finetune"
+  #name: "fc_finetune"
+  top: "fc"
+  name: "fc"
   type: "InnerProduct"
   inner_product_param {
     num_output: 500 
@@ -82,15 +85,19 @@ layer {
 layer {
   name: "relu3"
   type: "ReLU"
-  bottom: "fc_finetune"
-  top: "fc_finetune"
+  #bottom: "fc_finetune"
+  #top: "fc_finetune"
+  bottom: "fc"
+  top: "fc"
 }
 
 layer {
   name: "drop"
   type: "Dropout"
-  bottom: "fc_finetune"
-  top: "fc_finetune"
+  #bottom: "fc_finetune"
+  #top: "fc_finetune"
+  bottom: "fc"
+  top: "fc"
   dropout_param {
     dropout_ratio: 0.5
   }
@@ -99,9 +106,12 @@ layer {
 
 
 layer {
-  bottom: "fc_finetune"
-  top: "fcf"
-  name: "fcf"
+  bottom: "fc"
+  #bottom: "fc_finetune"
+  #top: "fcf"
+  #name: "fcf"
+  top: "fc10"
+  name: "fc10"
   type: "InnerProduct"
   inner_product_param {
     num_output: 10 
@@ -112,6 +122,7 @@ layer {
 layer {
   name: "prob"
   type: "Softmax"
-  bottom: "fcf"
+  #bottom: "fcf"
+  bottom: "fc10"
   top: "prob"
 }

@@ -2013,15 +2013,16 @@ automovimiento y SFA.
 
 #+caption: Tasa de error de los dos métodos de pre-entrenamiento utilizados.
 #+name: tab:one
-|---+----------------+------+------+------+-------|
-|   | método         |  100 |  300 | 1000 | 10000 |
-| / | <>             |    < |      |      |     > |
-|---+----------------+------+------+------+-------|
-| # | Desde cero     |   10 | 5.57 |    5 |   1.8 |
-| # | SFA(m=10)      | 22.1 | 12.1 |  5.6 |   2.0 |
-| # | SFA(m=100)     | 23.3 | 11.9 |  5.5 |   2.1 |
-| # | Automovimiento |   17 |  8.6 |  4.6 |   2.3 |
-|---+----------------+------+------+------+-------|
+
+       |---+-----------------------------+------+------+------+-------|
+       |   | método\#datos entrenamiento |  100 |  300 | 1000 | 10000 |
+       | / | <>                          |    < |      |      |     > |
+       |---+-----------------------------+------+------+------+-------|
+       | # | Desde cero                  | 30.9 |      |      |       |
+       | # | SFA(m=10)                   | 22.1 | 12.1 |  5.6 |   2.0 |
+       | # | SFA(m=100)                  | 23.3 | 11.9 |  5.5 |   2.1 |
+       | # | Automovimiento              |   17 |  8.6 |  4.6 |   2.3 |
+       |---+-----------------------------+------+------+------+-------|
 
 **** Pruebas con KITTI
 ***** Descripción del conjunto de datos y preprocesamiento
@@ -2106,7 +2107,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [75%] Entrenamiento
+*** [77%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2203,8 +2204,12 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
-**** TODO Probar swapeando las imagenes (1. modificada, 2. original) uniformemente.
-**** Probar con conv1: 96 x 11 x 11 (en lugar de 96 x 5 x 5) y conv2: 256 x 5 x 5
+**** TODO Probar swapeando orden en los pares de imagenes (1. modificada, 2. original) uniformemente.
+**** DONE Probar con conv1: 96 x 11 x 11 (en lugar de 96 x 5 x 5) y conv2: 256 x 5 x 5
+**** DONE Probar con conv1: 96 x 16 x 16 (en lugar de 96 x 5 x 5) y conv2: 256 x 7 x 7
+**** DONE Probar con conv1: 96 x 13 x 13 y conv2: 256 x 7 x 7. lr0.001 para from scratch parece andar bien.
+**** DONE Probar con conv1: 96 x 7 x 7 y conv2: 256 x 5 x 5
+**** TODO Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
