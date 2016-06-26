@@ -1974,11 +1974,6 @@ que la rotación en Z varía entre los -30° y los 30°. Tanto las
 rotaciones como las traslaciones son números enteros. Para cada par
 creado las transformaciones son aleatorias.
 
-Según se explica en el trabajo de Agrawal et al., utilizaron 5
-millones de pares de imágenes para entrenar la red siamesa. Si bien
-realicé experimentos con esa cantidad, llegué a la conclusión que se
-pueden obtener resultados con igual precisión utilizando muchas menos
-(alrededor de 2 millones).
 ***** Descripción de la red
 
 La arquitectura utilizada para las BCNN fue C96-P-C256-P, y para la
@@ -1993,14 +1988,15 @@ BCNN.
 ***** Entrenamiento y evaluación
 
 Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
-tasa de aprendizaje de 0.001 para automovimiento y de 0.0001 para
-SFA. Siguiendo los lineamientos del paper se utilizaron márgenes de 10
-y 100 para SFA. En ambos casos la tasa de aprendizaje se reduce a la
-mitad cada 10000 iteraciones. El tamaño del \textit{batch} fue de 125,
-lo cual equivale a procesar 5 millones de pares de imágenes.
+tasa de aprendizaje de 0.01. Siguiendo los lineamientos del paper se
+utilizaron márgenes de 10 y 100 para SFA por ser los que mejores
+resultados lograron. En ambas redes la tasa de aprendizaje se reduce a
+la mitad cada 10000 iteraciones. El tamaño del \textit{batch} fue de
+125, lo cual equivale a procesar 5 millones de pares de imágenes
+durante las 40000 iteraciones del entrenamiento.
 
 La etapa de transferencia de aprendizaje se hizo con 4000 iteraciones
-a una tasa de aprendizaje constante de 0.001
+a una tasa de aprendizaje constante de 0.01.
 
 Para evaluar la calidad de las \textit{features} aprendidas por las
 redes siamesas se estableció la tasa de aprendizaje de las capas
@@ -2008,24 +2004,56 @@ convolucionales a cero.
 
 En la Tabla \ref{tab:one} se puede observar la tasa de error obtenida
 mediante la transferencia de aprendizaje con 100, 300, 1000 y 10000
-imágenes de los tres métodos utilizados: entrenamiento desde cero,
+imágenes de los dos métodos utilizados y una comparación con el
+entrenamiento desde cero utilizando esa misma cantidad de imágenes.
 automovimiento y SFA.
 
-#+caption: Tasa de error de los dos métodos de pre-entrenamiento utilizados.
+#+caption: Tasa de error de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
 #+name: tab:one
 
        |---+-----------------------------+------+------+------+-------|
        |   | método\#datos entrenamiento |  100 |  300 | 1000 | 10000 |
        | / | <>                          |    < |      |      |     > |
        |---+-----------------------------+------+------+------+-------|
-       | # | Desde cero                  | 30.9 |      |      |       |
+       | # | Desde cero                  | 30.9 | 13.3 |  7.5 |   2.8 |
        | # | SFA(m=10)                   | 22.1 | 12.1 |  5.6 |   2.0 |
        | # | SFA(m=100)                  | 23.3 | 11.9 |  5.5 |   2.1 |
-       | # | Automovimiento              |   17 |  8.6 |  4.6 |   2.3 |
+       | # | Automovimiento              |      |      |      |       |
        |---+-----------------------------+------+------+------+-------|
 
 **** Pruebas con KITTI
-***** Descripción del conjunto de datos y preprocesamiento
+***** Conjunto de datos
+
+El conjunto de datos KITTI \cite{Geiger2012CVPR} consiste en 11
+secuencias que registran el movimiento de un automóvil en una
+ciudad. Además de proveer cuadros de video, se encuentra la
+información odométrica recolectada por sensores montados en el
+automóvil. Esa misma información es la que usa Agrawal et al. a la
+hora de computar las transformaciones en la cámara entre pares de
+imágenes, y es la que intentaremos reproducir en esta sección.
+
+Se asume que la dirección a la que apunta la cámara es el eje Z y el
+plano de la imagen es el plano XY (ejes horizontales y
+verticales). Dado que las transformaciones más significativas de la
+cámara ocurren en los ejes Z/X (a medida que el automóvil avanza por
+la calle) y sobre el eje Y (cuando el automóvil gira), sólo se tomaron
+en cuenta esas tres dimensiones a la hora de analizar las
+transformaciones.
+
+Nuevamente, la predicción de transformaciones se establece como una
+tarea de clasificación, esta vez con 20 clases para las
+transformaciones en cada eje. Siguiendo los lineamientos originales
+del paper, los pares de entrenamiento se tomaron de cuadros separados
+a lo sumo por 7 cuadros intermedios. Similarmente, para entrenamiento
+por SFA se consideraron a los cuadros separados por \(\pm 7\) cuadros
+intermedios como similares.
+
+Finalmente, las redes siamesas fueron entrenadas a partir de parches
+de \(227 \times 227\) extraídos aleatoriamente de las imágenes
+originales de \(1241 \times 376\) píxeles. No se aplicaron
+transformaciones extras más allá de las otorgadas por el movimiento de
+la cámara.
+
 ***** Descripción de la red
 ***** Entrenamiento y evaluación
 **** Pruebas con SF
