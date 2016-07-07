@@ -26,6 +26,7 @@
 #include <string> 
 #include <string.h>
 #include <vector>
+#include <array>
 #include <tuple>
 #include <cinttypes>
 #include <sys/stat.h>
@@ -50,12 +51,18 @@ using namespace cv;
 
 #define TB 1099511627776
 #define NUM_BINS 20
+#define HEIGHT 227
+#define WIDTH 227
+#define REAL_WIDTH 1241 
+#define REAL_HEIGHT 376
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
 #define PAIRS_PER_SPLIT 500
 
 #define DATA_ROOT    "../data/"
+#define PATHS_FILES  (DATA_ROOT"paths/")
 #define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
+#define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
 
 #define LMDB_ROOT       DATA_ROOT 
 #define LMDB_TRAIN      (LMDB_ROOT"kitti_train_egomotion_lmdb/")
@@ -64,6 +71,16 @@ using namespace cv;
 typedef char Byte;
 typedef unsigned char uByte;
 typedef uByte Label;
+typedef array< array<float, 4>, 3> TransformMatrix;
+typedef struct
+{
+    string path1;
+    TransformMatrix t1;
+    int i1;
+    string path2;
+    TransformMatrix t2;
+    int i2;
+} ImgPair;
 typedef struct
 {
     Mat img1;
@@ -74,257 +91,192 @@ typedef struct
 } DataBlob;
 
 // 9 Sequences for training, 2 for validation
-const vector<string> SPLITS = {"00.txt", "01.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt", "08.txt", "09.txt", "10.txt"};
+const vector<string> TRAIN_SPLITS = {"00.txt", "01.txt", "02.txt", "03.txt", "04.txt", "05.txt", "06.txt", "07.txt", "08.txt"};
+const vector<string> VAL_SPLITS = {"09.txt", "10.txt"};
 
 unsigned int generate_rand(int range_limit);
-void create_lmdbs(const char* images, const char* lmdb_train_path, const char* lmdb_val_path);
-vector< vector< tuple<string, string> > > generate_pairs(const char* split);
-vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs);
+void create_lmdbs(const char* images, const char* lmdb_path, const vector<string> split);
+vector<ImgPair> generate_pairs(const vector<string> split);
+DataBlob process_images(ImgPair p);
 
-vector< vector< tuple<string, string> > > generate_pairs(const vector<string> splits) {
-    vector< vector< tuple<string, string> > > res;
-    for (unsigned int i=0; i<splits.size(); ++i) {
-        ifstream fsplit;
-        fsplit.open(IMAGES+splits[i]);
-        string path;
+vector<ImgPair> generate_pairs(const vector<string> split) {
+    vector<ImgPair> pairs_paths;
+    for (unsigned int i=0; i<split.size(); ++i) {
         // Load original paths
+        ifstream fsplit;
+        fsplit.open(PATHS_FILES+split[i]);
+        string path;
         vector<string> split_paths;
         while (fsplit >> path) {
             split_paths.push_back(IMAGES+path);
         }
+        fsplit.close();
+
+        // Load transform matrix 
+        fsplit.open(POSES+split[i]);
+        TransformMatrix m;
+        vector<TransformMatrix> split_matrix;
+        while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
+                         m[1][0] >> m[1][1] >> m[1][2] >> m[1][3] >> 
+                         m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
+            split_matrix.push_back(m);
+        }
+
         // Generate pairs
-        vector< tuple<string, string> > pairs_paths;
         for (unsigned int j=0; j<PAIRS_PER_SPLIT; ++j) {
             int index = generate_rand(split_paths.size());
             int pair_index = 0;
             int pair_offset = generate_rand(7)+1;
             if (index==0) {
                 pair_index = index + pair_offset;
-            } else if (index == split_paths.size()-1) {
+            } else if (static_cast<unsigned int>(index) == split_paths.size()-1) {
                 pair_index = index - pair_offset;
             } else {
                 if (generate_rand(2)) { // go to the left
                     // Careful with this substraction. If the 2 operands were unsigned int we could get in trouble (overflow)
                     pair_index = (index - pair_offset >= 0) ? index - pair_offset : 0;  
                 } else { // go to the right
-                    pair_index = (index + pair_offset <= split_paths.size()-1) ? index + pair_offset : split_paths.size()-1;  
+                    pair_index = (static_cast<unsigned int>(index + pair_offset) <= split_paths.size()-1) ? index + pair_offset : split_paths.size()-1;  
                 }
             }
-            tuple<string, string> pair = make_tuple(split_paths[index], split_paths[pair_index]);
+            ImgPair pair = {split_paths[index], split_matrix[index], index, split_paths[pair_index], split_matrix[pair_index], pair_index};
             pairs_paths.push_back(pair);
         }
-        res.push_back(pairs_paths);
     }
-    return res;
+    return pairs_paths;
 }
 
-int main(int argc, char** argv)
+void create_lmdbs(const char* images, const char* lmdb_path, const vector<string> split)
 {
-    cout << "Creating train/val LMDB's\n";
-    create_lmdbs(IMAGES, LMDB_TRAIN, LMDB_VAL);
-    return 0;
-}
-
-void create_lmdbs(const char* images, const char* lmdb_train_path, const char* lmdb_val_path)
-{
-    // lmdb data ('v' suffix is for validation LMDB) 
-    MDB_env *mdb_env, *mdb_envv;
-    MDB_dbi mdb_dbi, mdb_dbiv;
-    MDB_val mdb_key, mdb_data, mdb_keyv, mdb_datav;
-    MDB_txn *mdb_txn, *mdb_txnv;
+    // lmdb data 
+    MDB_env *mdb_env;
+    MDB_dbi mdb_dbi;
+    MDB_val mdb_key, mdb_data;
+    MDB_txn *mdb_txn;
 
     // Set database environment
-    mkdir(lmdb_train_path, 0744);
-    mkdir(lmdb_val_path, 0744);
+    mkdir(lmdb_path, 0744);
 
     // Create Data LMDBs
     mdb_env_create(&mdb_env);
     mdb_env_set_mapsize(mdb_env, TB);
-    mdb_env_open(mdb_env, lmdb_train_path, 0, 0664);
+    mdb_env_open(mdb_env, lmdb_path, 0, 0664);
     mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
     mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
 
-    mdb_env_create(&mdb_envv);
-    mdb_env_set_mapsize(mdb_envv, TB);
-    mdb_env_open(mdb_envv, lmdb_val_path, 0, 0664);
-    mdb_txn_begin(mdb_envv, NULL, 0, &mdb_txnv);
-    mdb_open(mdb_txnv, NULL, 0, &mdb_dbiv);
-
     // Generate pairs of images for each sequence 
-    vector< vector< tuple<string, string> > > train_pairs = generate_pairs(SPLITS);
-    vector< vector< tuple<string, string> > >::iterator it;
-    vector< tuple<string, string> >::iterator it2;
+    vector<ImgPair> pairs = generate_pairs(split);
+    random_shuffle(std::begin(pairs), std::end(pairs));
 
-    for(it=train_pairs.begin(); it!=train_pairs.end(); ++it){
-        for (it2=(*it).begin(); it2!=(*it).end(); ++it2){
-            cout << get<0>(*it2) << " " << get<1>(*it2) << endl;
-        }
-    } 
-    //random_shuffle(std::begin(list_imgs), std::end(list_imgs));
-
-
-    /*
     // Dimensions of Data LMDB 
-    unsigned int rows = list_imgs[0].rows;
-    unsigned int cols = list_imgs[0].cols;
+    unsigned int rows = HEIGHT;
+    unsigned int cols = WIDTH;
 
     int count = 0;
     string data_value, label_value;
     
     // Data datum
-    // This datum has 2 + NUM_CLASSES dimensions.
-    // 2 dimensiones because we are merging 2 one channel images into one, 
-    // plus NUM_CLASSES (3) because we are also merging the labels into the data.
+    // This datum has 3 + 3 + NUM_CLASSES dimensions.
+    // The first 3 dimensions correspond to the first image, the second 3 to the second image 
+    // respectively. NUM_CLASSES (3) because we are also merging the labels into the data.
     // This allow us to slice the data later on training phase and retrieve the labels.
     // Basically I am adding 3 "images" with all zeros in it except the index where the class 
     // is active. Then with the Argmax Layer of Caffe I retrieve these labels index again and pass them 
     // to the loss function.
     // Chek the loop below to see how it is done.
     Datum datum;
-    datum.set_channels(2+NUM_CLASSES);
+    datum.set_channels(6+NUM_CLASSES);
     datum.set_height(rows);
     datum.set_width(cols);
 
     std::ostringstream s;
 
-    // Processing and generating million of images at once will consume too much RAM (>7GB)
-    // and it will (probably) throw a std::bad_alloc exception.
-    // Lets split the processing in several batches instead. 
-    // list_imgs.size() has to be multiple of BATCHES (to simplify things)
-    int len_batch = list_imgs.size() / BATCHES;
-    for (unsigned int i = 0; i<BATCHES; i++)
+    for (unsigned int i = 0; i<pairs.size(); i++)
     {
-        unsigned int begin = i * len_batch; 
-        unsigned int end = begin + len_batch - 1;
-        vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 16;
-        if (i==0 || i==1){
-            amount_pairs = 17;
-        } 
-        vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
-        for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
-            // Dont use item_id as key here since we have 83/85 images per original image,
-            // meaning that we will overwrite the same image 83/85 times instead of creating 
-            // a new entry
-            s << std::setw(8) << std::setfill('0') << count; 
-            string key_str = s.str();
-            s.str(std::string());
+        DataBlob data = process_images(pairs[i]);
+        /*
+        s << std::setw(8) << std::setfill('0') << count; 
+        string key_str = s.str();
+        s.str(std::string());
 
-            // Set Data
-            // Create a char pointer and copy the images first, the labels at the end
-            char * data_label;
-            data_label = (char*)calloc(rows*cols*5, sizeof(uByte));
-            data_label = (char*)memcpy(data_label, (void*)batch_data[item_id].img.data, 2*rows*cols);
+        // Set Data
+        // Create a char pointer and copy the images first, the labels at the end
+        char * data_label;
+        data_label = (char*)calloc(rows*cols*(6+NUM_CLASSES), sizeof(uByte));
+        data_label = (char*)memcpy(data_label, (void*)data.img1.data, 3*rows*cols);
+        memcpy(data_label+(cols*rows*3), (void*)data.img2.data, 3*rows*cols);
 
-            char * labels;
-            unsigned int labelx = (unsigned int)batch_data[item_id].x;
-            unsigned int labely = (unsigned int)batch_data[item_id].y;
-            unsigned int labelz = (unsigned int)batch_data[item_id].z;
-            labels = (char*) calloc(rows*cols*3, sizeof(uByte));
-            labels[labelx] = 1;
-            labels[cols*rows + labely] = 1;
-            labels[cols*rows*2 + labelz] = 1;
-            memcpy(data_label+(cols*rows*2), (void*)labels, 3*rows*cols);
+        char * labels;
+        unsigned int labelx = (unsigned int)data.x;
+        unsigned int labely = (unsigned int)data.y;
+        unsigned int labelz = (unsigned int)data.z;
+        labels = (char*) calloc(rows*cols*3, sizeof(uByte));
+        labels[labelx] = 1;
+        labels[cols*rows + labely] = 1;
+        labels[cols*rows*2 + labelz] = 1;
+        memcpy(data_label+(cols*rows*6), (void*)labels, 3*rows*cols);
 
-            datum.set_data((char*)data_label, 5*rows*cols);
-            datum.SerializeToString(&data_value);
+        datum.set_data((char*)data_label, (6+NUM_CLASSES)*rows*cols);
+        datum.SerializeToString(&data_value);
 
-            // Save Data
-            mdb_data.mv_size = data_value.size();
-            mdb_data.mv_data = reinterpret_cast<void*>(&data_value[0]);
-            mdb_key.mv_size = key_str.size();
-            mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
-            mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
+        // Save Data
+        mdb_data.mv_size = data_value.size();
+        mdb_data.mv_data = reinterpret_cast<void*>(&data_value[0]);
+        mdb_key.mv_size = key_str.size();
+        mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
+        mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
 
-            if (++count % 1000 == 0) {
-                // Commit txn Data
-                mdb_txn_commit(mdb_txn);
-                mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
-            }
-            if (count % 50000 == 0) {
-                cout << "Processed " << count << "\r" << flush;
-            }
-            free(data_label);
-            free(labels);
+        if (++count % 1000 == 0) {
+            // Commit txn Data
+            mdb_txn_commit(mdb_txn);
+            mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+            cout << "Processed " << count << "\r" << flush;
         }
+        free(data_label);
+        free(labels);
+        */
     }
+    /*
     // Last batch
     if (count % 1000 != 0) {
         mdb_txn_commit(mdb_txn);
         mdb_close(mdb_env, mdb_dbi);
         mdb_env_close(mdb_env);
     }
+    */
 
     cout << "\nFinished creation of LMDB's\n";
-    */
     return;
 }
 
-vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs)
+DataBlob process_images(ImgPair p)
 {
-    vector<DataBlob> final_data;
+    DataBlob final_data;
+
+    Mat im1 = imread(p.path1, CV_LOAD_IMAGE_COLOR);
+    Mat im2 = imread(p.path2, CV_LOAD_IMAGE_COLOR);
+    assert(im1.cols>0 && im2.cols>0 && im1.rows>0 && im2.rows>0);
+
+    unsigned int top = generate_rand(min(im1.rows, im2.rows) - HEIGHT);
+    unsigned int left = generate_rand(min(im1.cols, im2.cols) - WIDTH);
+    Rect r(left, top, WIDTH, HEIGHT);
+
+    Mat crop1 = im1(r);
+    Mat crop2 = im2(r);
+    
+    float x,y,z;
+    x = p.t1[0][3];
+    y = p.t1[1][3];
+    z = p.t1[2][3];
+
+
     /*
-    srand(0);
-    unsigned int rand_index = 0;
-    vector<float> translations(7);
-    float value = 0;
-    for (unsigned int i=0; i<translations.size(); i++)
-    {
-        translations[i] = value++;
-    }
-
-    value = 100;
-    vector<float> rotations(100);
-    for (unsigned int i=0; i<rotations.size(); i++)
-    {
-        rotations[i] = value++;
-    }
-
     // Debugging
-    //namedWindow("Normal");
-    //namedWindow("Transformed");
-    for (unsigned int i=0; i<list_imgs.size(); i++)
-    {
-        // Use white background
-        //bitwise_not(list_imgs[i], list_imgs[i]);
-
-        for (unsigned int j=0; j<amount_pairs; j++)
-        {
-            DataBlob d;
-            // Generate random X translation
-            rand_index = generate_rand(100);
-            d.x = rand_index; 
-            float tx = translations[rand_index];
-            // Generate random Y translation
-            rand_index = generate_rand(100);
-            d.y = rand_index; 
-            float ty = translations[rand_index];
-            // Calculate random bin of rotation (0 to 19)
-            rand_index = generate_rand(1000);
-            d.z = rand_index;
-            // Calculate the real index of the array of rotations (0 to 61)
-            rand_index *= 3;
-            rand_index += generate_rand(3);
-            float rot = rotations[rand_index];
-
-            // Finally, apply the selected transformations to the image
-            //Mat new_img = transform_image(list_imgs[i], tx, ty, rot);
-
-            // Merge the original img and the transformed one into a unique Mat
-            // Then we split the channels in Caffe using the SLICE layer
-            auto channels = vector<Mat>{list_imgs[i], new_img};
-            Mat merged_mats;
-            merge(channels, merged_mats);
-            d.img = merged_mats;
-
-            final_data.push_back(d);
-
-            // Debugging
-            //imshow("Normal", list_imgs[i]);
-            //imshow("Transformed", new_img);
-            //waitKey(100);
-        }
-    }
+    namedWindow("im1");
+    namedWindow("im2");
+    imshow("im1", crop1);
+    imshow("im2", crop2);
+    waitKey(100);
     */
     return final_data;
 }
@@ -335,4 +287,15 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pair
 unsigned int generate_rand(int range_limit)
 {
     return rand() % range_limit;
+}
+
+
+int main(int argc, char** argv)
+{
+    srand(0);
+    cout << "Creating train LMDB's\n";
+    create_lmdbs(IMAGES, LMDB_TRAIN, TRAIN_SPLITS);
+    cout << "Creating val LMDB's\n";
+    create_lmdbs(IMAGES, LMDB_VAL, VAL_SPLITS);
+    return 0;
 }
