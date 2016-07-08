@@ -56,19 +56,8 @@ using namespace cv;
 #define WIDTH 227
 #define REAL_WIDTH 1241 
 #define REAL_HEIGHT 376
-#define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT  3000 
-// Translation bins
-// Maximum and minimum distances between pair of frames (rounded):
-// maxx: 18 minx: -18
-// maxz: 14 minz: -14
-#define X_STEP 1.8
-#define X_MIN -18
-#define Z_STEP 1.3
-#define Z_MIN -14
-#define Y_MIN -0.563547
-#define Y_STEP 0.0563547
+#define PAIRS_PER_SPLIT 80 
 
 
 #define DATA_ROOT    "../data/"
@@ -77,8 +66,8 @@ using namespace cv;
 #define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
 
 #define LMDB_ROOT       DATA_ROOT 
-#define LMDB_TRAIN      ("/media/eze/0F4A13791A35DD40/kitti_train_egomotion_lmdb/")
-#define LMDB_VAL        ("/media/eze/0F4A13791A35DD40/kitti_val_egomotion_lmdb/")
+#define LMDB_TRAIN      (LMDB_ROOT"kitti_train_contrastive_lmdb/")
+#define LMDB_VAL        (LMDB_ROOT"kitti_val_contrastive_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -87,19 +76,15 @@ typedef array< array<float, 4>, 3> TransformMatrix;
 typedef struct
 {
     string path1;
-    TransformMatrix t1;
     int i1;
     string path2;
-    TransformMatrix t2;
     int i2;
 } ImgPair;
 typedef struct
 {
     Mat img1;
     Mat img2;
-    Label x;
-    Label y;
-    Label z;
+    int label;
 } DataBlob;
 
 // 9 Sequences for training, 2 for validation
@@ -124,21 +109,11 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
         }
         fsplit.close();
 
-        // Load transform matrix 
-        fsplit.open(POSES+split[i]);
-        TransformMatrix m;
-        vector<TransformMatrix> split_matrix;
-        while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
-                         m[1][0] >> m[1][1] >> m[1][2] >> m[1][3] >> 
-                        m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
-            split_matrix.push_back(m);
-        }
-
         // Generate pairs
         for (unsigned int j=0; j<PAIRS_PER_SPLIT; ++j) {
             int index = generate_rand(split_paths.size());
             int pair_index = 0;
-            int pair_offset = generate_rand(7)+1;
+            int pair_offset = generate_rand(30);
             if (index==0) {
                 pair_index = index + pair_offset;
             } else if (static_cast<unsigned int>(index) == split_paths.size()-1) {
@@ -151,7 +126,7 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
                     pair_index = (static_cast<unsigned int>(index + pair_offset) <= split_paths.size()-1) ? index + pair_offset : split_paths.size()-1;  
                 }
             }
-            ImgPair pair = {split_paths[index], split_matrix[index], index, split_paths[pair_index], split_matrix[pair_index], pair_index};
+            ImgPair pair = {split_paths[index], index, split_paths[pair_index], pair_index};
             pairs_paths.push_back(pair);
         }
     }
@@ -188,16 +163,13 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
     string data_value, label_value;
     
     // Data datum
-    // This datum has 3 + 3 + NUM_CLASSES dimensions.
+    // This datum has 3 + 3 dimensions.
     // The first 3 dimensions correspond to the first image, the second 3 to the second image 
-    // respectively. NUM_CLASSES (3) because we are also merging the labels into the data.
+    // respectively. 
     // This allow us to slice the data later on training phase and retrieve the labels.
-    // Basically I am adding 3 "images" with all zeros in it except the index where the class 
-    // is active. Then with the Argmax Layer of Caffe I retrieve these labels index again and pass them 
-    // to the loss function.
     // Chek the loop below to see how it is done.
     Datum datum;
-    datum.set_channels(6+NUM_CLASSES);
+    datum.set_channels(6);
     datum.set_height(rows);
     datum.set_width(cols);
 
@@ -212,22 +184,13 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
 
         // Set Data
         // Create a char pointer and copy the images first, the labels at the end
-        char * data_label;
-        data_label = (char*)calloc(rows*cols*(6+NUM_CLASSES), sizeof(uByte));
-        data_label = (char*)memcpy(data_label, (void*)data.img1.data, 3*rows*cols);
-        memcpy(data_label+(cols*rows*3), (void*)data.img2.data, 3*rows*cols);
+        char * imgs_data;
+        imgs_data = (char*)calloc(rows*cols*(6), sizeof(uByte));
+        imgs_data = (char*)memcpy(imgs_data, (void*)data.img1.data, 3*rows*cols);
+        memcpy(imgs_data+(cols*rows*3), (void*)data.img2.data, 3*rows*cols);
 
-        char * labels;
-        unsigned int labelx = (unsigned int)data.x;
-        unsigned int labely = (unsigned int)data.y;
-        unsigned int labelz = (unsigned int)data.z;
-        labels = (char*) calloc(rows*cols*3, sizeof(uByte));
-        labels[labelx] = 1;
-        labels[cols*rows + labely] = 1;
-        labels[cols*rows*2 + labelz] = 1;
-        memcpy(data_label+(cols*rows*6), (void*)labels, 3*rows*cols);
-
-        datum.set_data((char*)data_label, (6+NUM_CLASSES)*rows*cols);
+        datum.set_data((char*)imgs_data, (6)*rows*cols);
+        datum.set_label((int)data.label);
         datum.SerializeToString(&data_value);
 
         // Save Data
@@ -243,8 +206,7 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
             mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
             cout << "Processed " << count << "\r" << flush;
         }
-        free(data_label);
-        free(labels);
+        free(imgs_data);
     }
     // Last batch
     if (count % 1000 != 0) {
@@ -271,44 +233,8 @@ DataBlob process_images(ImgPair p)
 
     final_data.img1 = im1(r);
     final_data.img2 = im2(r);
+    final_data.label = abs(p.i1 - p.i2) <= 7;
     
-    float x,y,z;
-    int bin_x = 0, bin_y = 0, bin_z = 0;
-    // Translations
-    x = p.t1[0][3] - p.t2[0][3];
-    z = p.t1[2][3] - p.t2[2][3];
-
-    // bin for x
-    float base_x = X_MIN;
-    while ((base_x += X_STEP) < x) {
-        ++bin_x;
-    }
-    // bin for z
-    float base_z = Z_MIN;
-    while ((base_z += Z_STEP) < z) {
-        ++bin_z;
-    }
-
-    // Euler angle
-    y = -asin(p.t1[2][0]) + asin(p.t2[2][0]);
-    // bin for y
-    float base_y = Y_MIN;
-    while ((base_y += Y_STEP) < y) {
-        ++bin_y;
-    }
-
-    final_data.x = bin_x;
-    final_data.y = bin_y;
-    final_data.z = bin_z;
-
-    /*
-    // Debugging
-    namedWindow("im1");
-    namedWindow("im2");
-    imshow("im1", crop1);
-    imshow("im2", crop2);
-    waitKey(100);
-    */
     return final_data;
 }
 

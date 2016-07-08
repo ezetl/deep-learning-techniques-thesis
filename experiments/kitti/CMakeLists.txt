@@ -28,3 +28,4 @@ MACRO(add_code name)
 ENDMACRO()
 
 add_code(preprocess_kitti_egomotion)
+add_code(preprocess_kitti_contrastive)

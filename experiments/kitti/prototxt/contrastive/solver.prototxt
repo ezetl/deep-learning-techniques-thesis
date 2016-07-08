@@ -1,0 +1,28 @@
+net: "siamese_kitti.prototxt"
+type: "SGD"
+
+test_interval: 10000
+test_state: { stage: 'test-on-train' }
+test_iter: 500
+test_state: { stage: 'test-on-test' }
+test_iter: 500
+
+base_lr: 0.001
+momentum: 0.9
+weight_decay: 0.0005
+
+# The learning rate policy
+lr_policy: "step"
+stepsize: 20000 
+gamma: 0.5
+
+# Display every 100 iterations
+display: 100
+max_iter: 60000
+
+snapshot: 60000
+snapshot_prefix: "/home/ezetl/tesis/experiments/mnist/snapshots/snapshot_kitti_contrastive_lr0.001"
+
+
+# solver mode: CPU or GPU
+solver_mode: GPU
