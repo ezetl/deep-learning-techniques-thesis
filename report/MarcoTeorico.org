@@ -2054,6 +2054,19 @@ originales de \(1241 \times 376\) píxeles. No se aplicaron
 transformaciones extras más allá de las otorgadas por el movimiento de
 la cámara.
 
+***** Odometria 
+
+KITTI provee anotaciones con las poses de la camara (es decir, su
+trayectoria) para las secuencias de imágenes. Estas poses estan dadas
+por una matriz de transformación de \(3 \times 4\), siendo la última
+columna las traslaciones en X, Y, Z. De esa matriz se puede extraer el
+ángulo de Euler correspondiente a las rotaciones sobre el eje Y si
+asumimos que el primer bloque \(3 \times 3\) es una matriz de rotación
+\(R\).
+
+http://robotics.stackexchange.com/questions/7040/how-to-get-the-projection-matrix-from-odometry-tf-data
+http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
+
 ***** Descripción de la red
 ***** Entrenamiento y evaluación
 **** Pruebas con SF
