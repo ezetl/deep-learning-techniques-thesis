@@ -27,6 +27,7 @@
 #include <string.h>
 #include <vector>
 #include <array>
+#include <cmath>
 #include <tuple>
 #include <cinttypes>
 #include <sys/stat.h>
@@ -57,7 +58,18 @@ using namespace cv;
 #define REAL_HEIGHT 376
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT 500
+#define PAIRS_PER_SPLIT 80 
+// Translation bins
+// Maximum and minimum distances between pair of frames (rounded):
+// maxx: 18 minx: -18
+// maxz: 14 minz: -14
+#define X_STEP 1.8
+#define X_MIN -18
+#define Z_STEP 1.3
+#define Z_MIN -14
+#define Y_MIN -0.563547
+#define Y_STEP 0.0563547
+
 
 #define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
@@ -118,7 +130,7 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
         vector<TransformMatrix> split_matrix;
         while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
                          m[1][0] >> m[1][1] >> m[1][2] >> m[1][3] >> 
-                         m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
+                        m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
             split_matrix.push_back(m);
         }
 
@@ -194,7 +206,6 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
     for (unsigned int i = 0; i<pairs.size(); i++)
     {
         DataBlob data = process_images(pairs[i]);
-        /*
         s << std::setw(8) << std::setfill('0') << count; 
         string key_str = s.str();
         s.str(std::string());
@@ -234,16 +245,13 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
         }
         free(data_label);
         free(labels);
-        */
     }
-    /*
     // Last batch
     if (count % 1000 != 0) {
         mdb_txn_commit(mdb_txn);
         mdb_close(mdb_env, mdb_dbi);
         mdb_env_close(mdb_env);
     }
-    */
 
     cout << "\nFinished creation of LMDB's\n";
     return;
@@ -261,14 +269,37 @@ DataBlob process_images(ImgPair p)
     unsigned int left = generate_rand(min(im1.cols, im2.cols) - WIDTH);
     Rect r(left, top, WIDTH, HEIGHT);
 
-    Mat crop1 = im1(r);
-    Mat crop2 = im2(r);
+    final_data.img1 = im1(r);
+    final_data.img2 = im2(r);
     
     float x,y,z;
-    x = p.t1[0][3];
-    y = p.t1[1][3];
-    z = p.t1[2][3];
+    int bin_x = 0, bin_y = 0, bin_z = 0;
+    // Translations
+    x = p.t1[0][3] - p.t2[0][3];
+    z = p.t1[2][3] - p.t2[2][3];
 
+    // bin for x
+    float base_x = X_MIN;
+    while ((base_x += X_STEP) < x) {
+        ++bin_x;
+    }
+    // bin for z
+    float base_z = Z_MIN;
+    while ((base_z += Z_STEP) < z) {
+        ++bin_z;
+    }
+
+    // Euler angle
+    y = -asin(p.t1[2][0]) + asin(p.t2[2][0]);
+    // bin for y
+    float base_y = Y_MIN;
+    while ((base_y += Y_STEP) < y) {
+        ++bin_y;
+    }
+
+    final_data.x = bin_x;
+    final_data.y = bin_y;
+    final_data.z = bin_z;
 
     /*
     // Debugging

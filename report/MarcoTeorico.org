@@ -2086,7 +2086,7 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
 2. KITTI (odometry): http://www.cvlibs.net/datasets/kitti/eval_odometry.php
 
-3. SF: aparentemente es un challenge de ICMLA 2011, hay que mandar un mail para pedirlo: http://www.icmla-conference.org/icmla11/challenge.htm
+3. SF: https://embed.stanford.edu/iframe/?url=https%3A%2F%2Fpurl.stanford.edu%2Fvn158kj2087
 
 4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
 
