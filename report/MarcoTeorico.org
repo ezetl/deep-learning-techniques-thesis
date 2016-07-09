@@ -2088,7 +2088,9 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
 3. SF: https://embed.stanford.edu/iframe/?url=https%3A%2F%2Fpurl.stanford.edu%2Fvn158kj2087
 
-4. ILSVRC2012: http://www.image-net.org/download-images (hay que crearse una cuenta)
+4. ILSVRC2012: http://www.image-net.org/challenges/LSVRC/2012/nonpub-downloads (hay que crearse una cuenta)
+
+5. SUN Dataset (Scene categorization) http://vision.princeton.edu/projects/2010/SUN/
 
 ** Prueba de Concepto con MNIST
 DEADLINE: <2016-04-29 vie> 
