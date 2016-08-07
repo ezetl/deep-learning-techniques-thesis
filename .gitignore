@@ -19,3 +19,7 @@ experiments/mnist/data
 experiments/mnist/logs
 experiments/mnist/snapshots
 test_mnist.txt
+experiments/kitti/logs/
+experiments/kitti/snapshots/
+experiments/sf/logs/
+experiments/sf/snapshots/
