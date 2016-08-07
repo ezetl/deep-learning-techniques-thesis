@@ -16,20 +16,20 @@ layer {
   }
 }
 
-layer {
-  name: "data"
-  type: "Data" 
-  top: "data"
-  include {
-    phase: TEST
-    stage: "test-on-test"
-  }
-  data_param {
-    source: "../../data/kitti_val_egomotion_lmdb"
-    batch_size: 50 
-    backend: LMDB
-  }
-}
+#layer {
+#  name: "data"
+#  type: "Data" 
+#  top: "data"
+#  include {
+#    phase: TEST
+#    stage: "test-on-test"
+#  }
+#  data_param {
+#    source: "../../data/kitti_val_egomotion_lmdb"
+#    batch_size: 50 
+#    backend: LMDB
+#  }
+#}
 
 ## SLICE DIMENSIONS
 layer {
@@ -114,7 +114,7 @@ layer {
 }
 layer {
   name: "norm1"
-  type: LRN
+  type: "LRN"
   bottom: "pool1"
   top: "norm1"
   lrn_param {
@@ -164,7 +164,7 @@ layer {
 }
 layer {
   name: "norm2"
-  type: LRN
+  type: "LRN"
   bottom: "pool2"
   top: "norm2"
   lrn_param {
@@ -309,7 +309,7 @@ layer {
 }
 layer {
   name: "norm1_p"
-  type: LRN
+  type: "LRN"
   bottom: "pool1_p"
   top: "norm1_p"
   lrn_param {
@@ -359,7 +359,7 @@ layer {
 }
 layer {
   name: "norm2_p"
-  type: LRN
+  type: "LRN"
   bottom: "pool2_p"
   top: "norm2_p"
   lrn_param {
