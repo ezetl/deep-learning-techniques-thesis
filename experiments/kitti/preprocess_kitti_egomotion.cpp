@@ -75,12 +75,12 @@ using namespace cv;
 
 #define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
-#define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
-#define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
+#define IMAGES       "/media/ezetl/0C74D0DD74D0CB1A/KITTI/dataset/sequences/"
+#define POSES        "/media/ezetl/0C74D0DD74D0CB1A/KITTI/dataset/poses/"
 
 #define LMDB_ROOT       DATA_ROOT 
-#define LMDB_TRAIN      ("/media/eze/0F4A13791A35DD40/kitti_train_egomotion_lmdb/")
-#define LMDB_VAL        ("/media/eze/0F4A13791A35DD40/kitti_val_egomotion_lmdb/")
+#define LMDB_TRAIN      ("/media/ezetl/0C74D0DD74D0CB1A/KITTI/kitti_train_egomotion_lmdb/")
+#define LMDB_VAL        ("/media/ezetl/0C74D0DD74D0CB1A/KITTI/kitti_val_egomotion_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -337,16 +337,25 @@ unsigned int generate_rand(int range_limit)
 }
 
 RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2){
+    cv::Mat cvt1(3,3,CV_32FC1,&t1);
+    cv::Mat cvt2(3,3,CV_32FC1,&t2);
+    cv::Mat cvres = cvt2.t() * cvt1;
     RotMatrix res;
-    memset((void*)&res, 0, sizeof(RotMatrix));
-    unsigned int rot_size = t1.size();
-    for (unsigned int k=0; k<rot_size; ++k) {
-        for (unsigned int i=0; i<rot_size; ++i){
-            for (unsigned int j = 0; j<rot_size; ++j){
-                res[i][k] += t1[i][j] * t2[j][k];
-            }
-        }
+    for (int i = 0; i < cvres.rows; i++) {
+      const float *cvr = cvres.ptr<float>(i);
+      for (int j = 0; j < cvres.cols; j++) {
+        res[i][j] = cvr[j];
+      }
     }
+    //memset((void*)&res, 0, sizeof(RotMatrix));
+    //unsigned int rot_size = t1.size();
+    //for (unsigned int k=0; k<rot_size; ++k) {
+    //    for (unsigned int i=0; i<rot_size; ++i){
+    //        for (unsigned int j = 0; j<rot_size; ++j){
+    //            res[i][k] += t1[i][j] * t2[j][k];
+    //        }
+    //    }
+    //}
     return res;
 }
 
