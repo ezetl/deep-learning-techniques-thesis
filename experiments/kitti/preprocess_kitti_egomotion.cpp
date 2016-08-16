@@ -59,7 +59,7 @@ using namespace cv;
 #define REAL_HEIGHT 376
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT  3000 
+#define PAIRS_PER_SPLIT  6000 
 // Translation bins
 // Maximum and minimum distances between pair of frames (rounded):
 // maxx: 18 minx: -18
@@ -69,9 +69,8 @@ using namespace cv;
 #define X_MIN -18
 #define Z_STEP 1.3
 #define Z_MIN -14
-#define Y_MIN -1.53587
-#define Y_STEP 0.1543775
-
+#define Y_MIN -0.563987
+#define Y_STEP 0.0536 // approximate
 
 #define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
@@ -269,6 +268,7 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
     return;
 }
 
+//float maxy=-40000.0, miny=40000.0;
 DataBlob process_images(ImgPair p)
 {
     DataBlob final_data;
@@ -307,6 +307,9 @@ DataBlob process_images(ImgPair p)
     RotMatrix rot = multiply_rot_matrix(r1, r2);
     EulerAngles eu = mat2euler(rot);
     y = eu.y;
+    //maxy = (y>maxy) ? y : maxy;
+    //miny = (y<miny) ? y : miny;
+    //std::cout << "maxy: " << maxy << " miny: " << miny << std::endl;
     // bin for y
     float base_y = Y_MIN;
     while ((base_y += Y_STEP) < y && bin_y < NUM_BINS) {
