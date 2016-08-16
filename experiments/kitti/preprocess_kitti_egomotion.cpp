@@ -51,6 +51,7 @@ using namespace std;
 using namespace cv;
 
 #define TB 1099511627776
+#define THRESHOLD 8.8817841970012523e-16
 #define NUM_BINS 20
 #define HEIGHT 227
 #define WIDTH 227
@@ -63,12 +64,13 @@ using namespace cv;
 // Maximum and minimum distances between pair of frames (rounded):
 // maxx: 18 minx: -18
 // maxz: 14 minz: -14
+// maxy: 1.55734 miny: -1.53587
 #define X_STEP 1.8
 #define X_MIN -18
 #define Z_STEP 1.3
 #define Z_MIN -14
-#define Y_MIN -0.563547
-#define Y_STEP 0.0563547
+#define Y_MIN -1.53587
+#define Y_STEP 0.1543775
 
 
 #define DATA_ROOT    "../data/"
@@ -84,6 +86,7 @@ typedef char Byte;
 typedef unsigned char uByte;
 typedef uByte Label;
 typedef array< array<float, 4>, 3> TransformMatrix;
+typedef array< array<float, 3>, 3> RotMatrix;
 typedef struct
 {
     string path1;
@@ -93,6 +96,12 @@ typedef struct
     TransformMatrix t2;
     int i2;
 } ImgPair;
+typedef struct 
+{
+    float x;
+    float y;
+    float z;
+} EulerAngles;
 typedef struct
 {
     Mat img1;
@@ -107,6 +116,9 @@ const vector<string> TRAIN_SPLITS = {"00.txt", "01.txt", "02.txt", "03.txt", "04
 const vector<string> VAL_SPLITS = {"09.txt", "10.txt"};
 
 unsigned int generate_rand(int range_limit);
+RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2);
+RotMatrix get_rot_matrix(TransformMatrix& t);
+EulerAngles mat2euler(RotMatrix& m);
 void create_lmdbs(const char* images, const char* lmdb_path, const vector<string> split);
 vector<ImgPair> generate_pairs(const vector<string> split);
 DataBlob process_images(ImgPair p);
@@ -130,7 +142,7 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
         vector<TransformMatrix> split_matrix;
         while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
                          m[1][0] >> m[1][1] >> m[1][2] >> m[1][3] >> 
-                        m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
+                         m[2][0] >> m[2][1] >> m[2][2] >> m[2][3]) {
             split_matrix.push_back(m);
         }
 
@@ -275,25 +287,29 @@ DataBlob process_images(ImgPair p)
     float x,y,z;
     int bin_x = 0, bin_y = 0, bin_z = 0;
     // Translations
-    x = p.t1[0][3] - p.t2[0][3];
-    z = p.t1[2][3] - p.t2[2][3];
+    x = p.t2[0][3] - p.t1[0][3];
+    z = p.t2[2][3] - p.t1[2][3];
 
     // bin for x
     float base_x = X_MIN;
-    while ((base_x += X_STEP) < x) {
+    while ((base_x += X_STEP) < x && bin_x < NUM_BINS) {
         ++bin_x;
     }
     // bin for z
     float base_z = Z_MIN;
-    while ((base_z += Z_STEP) < z) {
+    while ((base_z += Z_STEP) < z && bin_z < NUM_BINS) {
         ++bin_z;
     }
 
     // Euler angle
-    y = -asin(p.t1[2][0]) + asin(p.t2[2][0]);
+    RotMatrix r1 = get_rot_matrix(p.t1);
+    RotMatrix r2 = get_rot_matrix(p.t2);
+    RotMatrix rot = multiply_rot_matrix(r1, r2);
+    EulerAngles eu = mat2euler(rot);
+    y = eu.y;
     // bin for y
     float base_y = Y_MIN;
-    while ((base_y += Y_STEP) < y) {
+    while ((base_y += Y_STEP) < y && bin_y < NUM_BINS) {
         ++bin_y;
     }
 
@@ -318,6 +334,46 @@ DataBlob process_images(ImgPair p)
 unsigned int generate_rand(int range_limit)
 {
     return rand() % range_limit;
+}
+
+RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2){
+    RotMatrix res;
+    memset((void*)&res, 0, sizeof(RotMatrix));
+    unsigned int rot_size = t1.size();
+    for (unsigned int k=0; k<rot_size; ++k) {
+        for (unsigned int i=0; i<rot_size; ++i){
+            for (unsigned int j = 0; j<rot_size; ++j){
+                res[i][k] += t1[i][j] * t2[j][k];
+            }
+        }
+    }
+    return res;
+}
+
+RotMatrix get_rot_matrix(TransformMatrix& t){
+    RotMatrix rot;
+    for (unsigned int i = 0; i<t.size(); ++i){
+        for (unsigned int j = 0; j<t.size(); ++j){ // t is square
+            rot[i][j] = t[i][j];
+        }
+    }
+    return rot;
+}
+
+EulerAngles mat2euler(RotMatrix& m){
+    float threshold = THRESHOLD;
+	float cy = sqrt(m[2][2]*m[2][2] + m[1][2]*m[1][2]);
+    float z=0.0, y=0.0, x=0.0;
+    if (cy > threshold) {
+        z = atan2(-m[0][1], m[0][0]);
+        y = atan2(m[0][2], cy);
+        x = atan2(-m[1][2], m[2][2]);
+    } else {
+        z = atan2(-m[1][0], m[1][1]);
+        y = atan2(m[0][2], cy);
+        x = 0.0;
+    }
+    return (EulerAngles){x,y,z};
 }
 
 
