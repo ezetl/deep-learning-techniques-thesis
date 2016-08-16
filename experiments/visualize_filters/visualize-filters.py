@@ -16,8 +16,12 @@ plt.rcParams['image.cmap'] = 'gray'  # use grayscale output rather than a (poten
 # Params
 # CAFFEMODEL = '../mnist/snapshots/mnist_standar_finetuning_1000_lr0.001_iter_4000.caffemodel'
 # DEPLOY = '../mnist/test/deploy/deploy_finetuning_mnist.prototxt'
-CAFFEMODEL = '../kitti/snapshots/lr0.001/snapshot_kitti_egomotion_lr0.001_iter_60000.caffemodel'
-DEPLOY = '../kitti/test/deploy/deploy.prototxt'
+
+
+#CAFFEMODEL = '../kitti/snapshots/lr0.001/snapshot_kitti_egomotion_lr0.001_iter_60000.caffemodel'
+CAFFEMODEL = '/home/ezetl/Documents/lsm/kittinet_con-conv5_scratch_pad24_imS227_con-conv_iter_60000.caffemodel'
+#DEPLOY = '../kitti/test/deploy/deploy.prototxt'
+DEPLOY = '/home/ezetl/Documents/lsm/kitti_finetune_conv5_deploy.prototxt'
 IMSIZE = 227  # 28 for mnist, 227 for kitti
 IMCHANNEL = 3  # 1 for mnist, 3 for kitti
 # image number 4 containing picture of a number "5"
