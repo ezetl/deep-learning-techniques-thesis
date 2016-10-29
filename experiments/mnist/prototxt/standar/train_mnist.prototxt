@@ -11,11 +11,50 @@ layer {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "../../data/mnist_finetuning_standar300_lmdb"
+    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_finetuning_standar10000_lmdb"
     batch_size: 125 
     backend: LMDB
   }
 }
+
+layer {
+  name: "data_test_train"
+  type: "Data" 
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+  #transform_param {
+  #  mean_file: "../../data/mean_mnist.binaryproto"
+  #}
+  data_param {
+    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_finetuning_standar10000_lmdb"
+    batch_size: 125 
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "data_test"
+  type: "Data" 
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+  #transform_param {
+  #  mean_file: "../../data/mean_mnist.binaryproto"
+  #}
+  data_param {
+    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_test_standar_lmdb"
+    batch_size: 125 
+    backend: LMDB
+  }
+}
+
 
 
 # BCNN 
@@ -204,5 +243,56 @@ layer {
   loss_weight:1
   include {
       phase: TRAIN
+  }
+}
+
+### TEST
+layer {
+  name: "train_accuracy"
+  type: "Accuracy"
+  bottom: "fc10"
+  bottom: "label"
+  top: "train_accuracy"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
+
+layer {
+  name: "test_accuracy"
+  type: "Accuracy"
+  bottom: "fc10"
+  bottom: "label"
+  top: "test_accuracy"
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+}
+
+layer {
+  name: "test_train_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc10"
+  bottom: "label"
+  top: "test_train_loss"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
+
+layer {
+  name: "test_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc10"
+  bottom: "label"
+  top: "test_loss"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-test"
   }
 }

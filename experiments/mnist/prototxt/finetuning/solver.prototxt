@@ -5,7 +5,7 @@ test_state: { stage: 'test-on-train' }
 test_iter: 500
 test_interval: 3000
 
-base_lr: 0.01
+base_lr: 0.001
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -18,7 +18,7 @@ max_iter: 4000
 
 
 snapshot: 4000
-snapshot_prefix: "/home/ezetl/tesis/experiments/mnist/snapshots/mnist_standar_finetuning_100_lr0.01"
+snapshot_prefix: "../../snapshots/mnist_standar_finetuning_10000_lr0.001"
 
 # solver mode: CPU or GPU
 solver_mode: GPU

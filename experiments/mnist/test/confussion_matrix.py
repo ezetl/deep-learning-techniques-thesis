@@ -8,10 +8,10 @@ import sys
 
 classes = [str(i) for i in range(0,10)]
 
-ROOT_IMAGES = '../data/mnist_test_standar'
-IMGS_LIST = './test_mnist.txt'
+ROOT_IMAGES = '/media/eze/0F4A13791A35DD40/MNIST/mnist_test_standar'
+IMGS_LIST = './test.txt'
 DEPLOY_FILE = './deploy/deploy_finetuning_mnist.prototxt'
-MEAN_PATH = './deploy/mean_mnist.binaryproto'
+MEAN_PATH = '../data/mean_mnist.binaryproto'
 
 
 def load_mean():
