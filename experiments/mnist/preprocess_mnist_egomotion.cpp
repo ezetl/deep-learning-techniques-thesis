@@ -56,19 +56,19 @@ using namespace cv;
 #define L_ENDIAN true //LITTLE ENDIAN
 #define TB 1099511627776
 #define NUM_TRASLATIONS 7
-#define NUM_ROTATIONS 61
+#define NUM_ROTATIONS 60
 #define NUM_BIN_ROTATIONS 20
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BIN_ROTATIONS
-#define LOWER_ANGLE -30
+#define LOWER_ANGLE -31
 #define LOWER_TRASLATION -3
-#define BATCHES 10 
+#define BATCHES 6 
 
 #define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
 
-#define LMDB_ROOT         "../data/"
+#define LMDB_ROOT         "/media/eze/0F4A13791A35DD40/MNIST/"
 #define LMDB_TRAIN        (LMDB_ROOT"mnist_train_egomotion_lmdb/")
 
 typedef char Byte;
@@ -84,7 +84,8 @@ typedef struct
 
 typedef struct
 {
-    Mat img;
+    Mat img1;
+    Mat img2;
     Label x;
     Label y;
     Label z;
@@ -167,13 +168,15 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
     for (unsigned int i = 0; i<BATCHES; i++)
     {
         unsigned int begin = i * len_batch; 
-        unsigned int end = begin + len_batch - 1;
+        unsigned int end = begin + len_batch;
         vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin()+begin, list_imgs.begin()+end);
-        unsigned int amount_pairs = 16;
-        if (i==0 || i==1){
-            amount_pairs = 17;
+        unsigned int amount_pairs = 83;
+        if (i==0){
+            amount_pairs = 85;
         } 
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
+        cout << "Batch images: " << batch_imgs.size() << endl;
+        cout << "Batch pairs: " << batch_data.size() << endl;
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
             // Dont use item_id as key here since we have 83/85 images per original image,
             // meaning that we will overwrite the same image 83/85 times instead of creating 
@@ -186,7 +189,8 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
             // Create a char pointer and copy the images first, the labels at the end
             char * data_label;
             data_label = (char*)calloc(rows*cols*5, sizeof(uByte));
-            data_label = (char*)memcpy(data_label, (void*)batch_data[item_id].img.data, 2*rows*cols);
+            memcpy(data_label, (void*)batch_data[item_id].img1.data, rows*cols);
+            memcpy(data_label + (rows*cols), (void*)batch_data[item_id].img2.data, rows*cols);
 
             char * labels;
             unsigned int labelx = (unsigned int)batch_data[item_id].x;
@@ -227,7 +231,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         mdb_env_close(mdb_env);
     }
 
-    cout << "\nFinished creation of LMDB's\n";
+    cout << "\nFinished creation of LMDB with " << count << " pairs of images.\n";
     return;
 }
 
@@ -399,7 +403,7 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pair
     vector<float> rotations(NUM_ROTATIONS);
     for (unsigned int i=0; i<rotations.size(); i++)
     {
-        rotations[i] = value++;
+        rotations[i] = (++value == 0) ? ++value : value;
     }
 
     // Debugging
@@ -434,10 +438,20 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pair
 
             // Merge the original img and the transformed one into a unique Mat
             // Then we split the channels in Caffe using the SLICE layer
-            auto channels = vector<Mat>{list_imgs[i], new_img};
-            Mat merged_mats;
-            merge(channels, merged_mats);
-            d.img = merged_mats;
+
+            //Mat merged_mats;
+            if (generate_rand(2) < 1){
+                d.img1 = new_img;
+                d.img2 = list_imgs[i];
+                //auto channels = vector<Mat>{list_imgs[i], new_img};
+                //merge(channels, merged_mats);
+            } else {
+                d.img1 = list_imgs[i];
+                d.img2 = new_img;
+                //auto channels = vector<Mat>{new_img, list_imgs[i]};
+                //merge(channels, merged_mats);
+            }
+            //d.img = merged_mats;
 
             final_data.push_back(d);
 
