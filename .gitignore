@@ -24,3 +24,4 @@ experiments/kitti/snapshots/
 experiments/sf/logs/
 experiments/sf/snapshots/
 .ipynb_checkpoints/
+experiments/mnist/test/test.txt
