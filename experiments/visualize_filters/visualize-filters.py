@@ -2,8 +2,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-CAFFE_ROOT = '/home/ezetl/Software/caffe'
-sys.path.insert(0, CAFFE_ROOT + 'python')
 import caffe
 
 caffe.set_mode_cpu()
@@ -13,24 +11,8 @@ plt.rcParams['figure.figsize'] = (10, 10)        # large images
 plt.rcParams['image.interpolation'] = 'nearest'  # don't interpolate: show square pixels
 plt.rcParams['image.cmap'] = 'gray'  # use grayscale output rather than a (potentially misleading) color heatmap
 
-# Params
-# CAFFEMODEL = '../mnist/snapshots/mnist_standar_finetuning_1000_lr0.001_iter_4000.caffemodel'
-# DEPLOY = '../mnist/test/deploy/deploy_finetuning_mnist.prototxt'
-
-
-#CAFFEMODEL = '../kitti/snapshots/lr0.001/snapshot_kitti_egomotion_lr0.001_iter_60000.caffemodel'
-CAFFEMODEL = '/home/ezetl/Documents/lsm/kittinet_con-conv5_scratch_pad24_imS227_con-conv_iter_60000.caffemodel'
-#DEPLOY = '../kitti/test/deploy/deploy.prototxt'
-DEPLOY = '/home/ezetl/Documents/lsm/kitti_finetune_conv5_deploy.prototxt'
-IMSIZE = 227  # 28 for mnist, 227 for kitti
-IMCHANNEL = 3  # 1 for mnist, 3 for kitti
-# image number 4 containing picture of a number "5"
-# TEST_IM = './images/mnist_4_5.bmp'
-TEST_IM = './images/kitti_000889.png' # kitti
-
-
 def set_net(deploy, caffemodel, num_channels, im_size):
-    net = caffe.Net(DEPLOY, CAFFEMODEL, caffe.TEST)  # test mode (e.g., don't perform dropout)
+    net = caffe.Net(deploy, caffemodel, caffe.TEST)  # test mode (e.g., don't perform dropout)
 
     # create transformer for the input called 'data'
     transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
@@ -80,7 +62,29 @@ def vis_square(data):
 
 
 if __name__ == "__main__":
-    net, transformer = set_net(DEPLOY, CAFFEMODEL, IMCHANNEL, IMSIZE)
+    if len(sys.argv) < 4:
+        print("You have to provide the paths to the caffemodel, deploy\n\
+               \rprototxt and a flag telling which experiment you ran\n\
+               \r('mnist', 'sf', 'kitti'):\n\
+               \r\n{} /path/to/caffemodel /path/to/deploy/prototxt 'mnist'\n".format(sys.argv[0]))
+        sys.exit(1)
+
+    caffemodel = sys.argv[1]
+    deploy = sys.argv[2]
+    experiment_id = sys.argv[3]
+
+    if experiment_id == 'mnist':
+        imsize = 28 # 28 for mnist, 227 for kitti
+        imchannel = 1
+        test_im = './images/mnist_4_5.bmp'
+    else: # kitti or sf
+        imsize = 227
+        imchannel = 3
+        test_im = './images/kitti_000889.png'
+
+
+    net, transformer = set_net(deploy, caffemodel, imchannel, imsize)
     # the parameters are a list of [weights, biases]
     filters = get_conv_filters(net, 'conv1')
     vis_square(filters)
+    sys.exit(0)
