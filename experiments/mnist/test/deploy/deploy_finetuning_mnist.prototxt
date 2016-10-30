@@ -72,8 +72,6 @@ layer {
 
 layer {
   bottom: "pool2"
-  #top: "fc_finetune"
-  #name: "fc_finetune"
   top: "fc"
   name: "fc"
   type: "InnerProduct"
@@ -85,8 +83,6 @@ layer {
 layer {
   name: "relu3"
   type: "ReLU"
-  #bottom: "fc_finetune"
-  #top: "fc_finetune"
   bottom: "fc"
   top: "fc"
 }
@@ -94,8 +90,6 @@ layer {
 layer {
   name: "drop"
   type: "Dropout"
-  #bottom: "fc_finetune"
-  #top: "fc_finetune"
   bottom: "fc"
   top: "fc"
   dropout_param {
@@ -106,9 +100,6 @@ layer {
 
 
 layer {
-  #bottom: "fc_finetune"
-  #top: "fcf"
-  #name: "fcf"
   bottom: "fc"
   top: "fc10"
   name: "fc10"
@@ -122,7 +113,6 @@ layer {
 layer {
   name: "prob"
   type: "Softmax"
-  #bottom: "fcf"
   bottom: "fc10"
   top: "prob"
 }

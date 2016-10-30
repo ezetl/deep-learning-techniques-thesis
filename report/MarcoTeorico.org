@@ -2150,7 +2150,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [77%] Entrenamiento
+*** [100%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2247,12 +2247,12 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 300 imagenes
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 1000 imagenes
 ***** DONE Entrenamiento standar desde cero, lr 0.001. Finetuning con 10000 imagenes
-**** TODO Probar swapeando orden en los pares de imagenes (1. modificada, 2. original) uniformemente.
+**** DONE Probar swapeando orden en los pares de imagenes (1. modificada, 2. original) uniformemente.
 **** DONE Probar con conv1: 96 x 11 x 11 (en lugar de 96 x 5 x 5) y conv2: 256 x 5 x 5
 **** DONE Probar con conv1: 96 x 16 x 16 (en lugar de 96 x 5 x 5) y conv2: 256 x 7 x 7
 **** DONE Probar con conv1: 96 x 13 x 13 y conv2: 256 x 7 x 7. lr0.001 para from scratch parece andar bien.
 **** DONE Probar con conv1: 96 x 7 x 7 y conv2: 256 x 5 x 5
-**** TODO Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
+**** DONE Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
@@ -2260,6 +2260,51 @@ conjuntos de entrenamiento de 100,300, 1K y 10K obtenidos del training
 set de MNIST (sin transformaciones).  El test set que viene con MNIST
 se utiliza para testing.
 
+*** Resultados
+**** Finetuning sobre egomotion
+Total: 10000  - Accuracy: 0.93 - Error rate: 0.066
+****************************************************************************************************
+Final Results
+
+Total cases: 10000 - Cases OK: 9343
+Accuracy: 0.93
+Confussion Matrix:
+
+97.8	0.1	0.3	0.0	0.0	0.2	0.6	0.2	0.8	0.0			958	1	3	0	0	2	6	2	8	0
+0.0	98.0	0.3	0.3	0.1	0.0	0.5	0.1	0.8	0.0			0	1112	3	3	1	0	6	1	9	0
+0.3	0.0	95.2	2.0	0.0	0.4	0.0	0.4	1.6	0.1			3	0	982	21	0	4	0	4	17	1
+0.0	0.1	3.5	91.8	0.1	1.6	0.0	1.1	1.7	0.2			0	1	35	927	1	16	0	11	17	2
+0.0	0.1	0.6	0.0	95.0	0.0	0.6	0.3	0.5	2.9			0	1	6	0	933	0	6	3	5	28
+0.3	0.0	1.0	2.6	0.3	90.9	0.6	0.3	3.4	0.6			3	0	9	23	3	811	5	3	30	5
+1.3	0.2	0.2	0.0	0.3	0.7	96.9	0.0	0.4	0.0			12	2	2	0	3	7	928	0	4	0
+0.0	0.6	2.8	0.7	0.8	0.0	0.1	92.5	1.3	1.3			0	6	29	7	8	0	1	951	13	13
+1.4	0.0	1.1	1.7	0.8	1.5	0.0	0.4	92.5	0.4			14	0	11	17	8	15	0	4	901	4
+0.3	1.0	0.3	1.7	3.8	0.7	0.0	5.7	3.3	83.3			3	10	3	17	38	7	0	58	33	840
+Error rate: 0.0657
+
+****************************************************************************************************
+
+**** Entrenando desde cero, red standar
+****************************************************************************************************
+Final Results
+
+Total cases: 10000 - Cases OK: 9751
+Accuracy: 0.98
+Confussion Matrix:
+
+98.4	0.0	0.1	0.0	0.2	0.1	0.5	0.2	0.2	0.3			964	0	1	0	2	1	5	2	2	3
+0.0	99.4	0.3	0.0	0.0	0.0	0.2	0.1	0.1	0.0			0	1128	3	0	0	0	2	1	1	0
+0.2	0.0	98.0	0.4	0.0	0.0	0.2	1.0	0.3	0.0			2	0	1011	4	0	0	2	10	3	0
+0.1	0.0	1.2	97.5	0.0	0.9	0.0	0.2	0.1	0.0			1	0	12	985	0	9	0	2	1	0
+0.0	0.0	0.1	0.0	97.3	0.0	0.5	0.2	0.4	1.5			0	0	1	0	955	0	5	2	4	15
+0.2	0.0	0.1	1.1	0.1	97.4	0.3	0.1	0.2	0.3			2	0	1	10	1	869	3	1	2	3
+0.5	0.2	0.1	0.1	0.6	0.6	97.5	0.0	0.3	0.0			5	2	1	1	6	6	934	0	3	0
+0.0	0.5	1.1	0.3	0.0	0.0	0.0	97.6	0.0	0.6			0	5	11	3	0	0	0	1003	0	6
+0.4	0.0	0.3	0.5	0.1	0.8	0.2	0.3	96.4	0.9			4	0	3	5	1	8	2	3	939	9
+0.4	0.5	0.0	0.3	0.9	0.7	0.1	1.0	0.7	95.4			4	5	0	3	9	7	1	10	7	963
+Error rate: 0.0249
+
+****************************************************************************************************
 ** Experimentos con KITTI y SF
 *** Preprocesamiento
 DEADLINE: <2016-05-13 vie>

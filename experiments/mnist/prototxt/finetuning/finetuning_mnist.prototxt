@@ -156,8 +156,8 @@ layer {
 
 layer {
   bottom: "pool2"
-  top: "fc_finetune"
-  name: "fc_finetune"
+  top: "fc"
+  name: "fc"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -183,15 +183,15 @@ layer {
 layer {
   name: "relu3"
   type: "ReLU"
-  bottom: "fc_finetune"
-  top: "fc_finetune"
+  bottom: "fc"
+  top: "fc"
 }
 
 layer {
   name: "drop"
   type: "Dropout"
-  bottom: "fc_finetune"
-  top: "fc_finetune"
+  bottom: "fc"
+  top: "fc"
   dropout_param {
     dropout_ratio: 0.5
   }
@@ -201,9 +201,9 @@ layer {
 
 
 layer {
-  bottom: "fc_finetune"
-  top: "fcf"
-  name: "fcf"
+  bottom: "fc"
+  top: "fc10"
+  name: "fc10"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -230,7 +230,7 @@ layer {
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "fcf"
+  bottom: "fc10"
   bottom: "label"
   top: "loss"
   loss_weight:1
@@ -243,7 +243,7 @@ layer {
 layer {
   name: "train_accuracy"
   type: "Accuracy"
-  bottom: "fcf"
+  bottom: "fc10"
   bottom: "label"
   top: "train_accuracy"
   include {
@@ -255,7 +255,7 @@ layer {
 layer {
   name: "test_accuracy"
   type: "Accuracy"
-  bottom: "fcf"
+  bottom: "fc10"
   bottom: "label"
   top: "test_accuracy"
   include {
@@ -267,7 +267,7 @@ layer {
 layer {
   name: "test_train_loss"
   type: "SoftmaxWithLoss"
-  bottom: "fcf"
+  bottom: "fc10"
   bottom: "label"
   top: "test_train_loss"
   loss_weight:1
@@ -280,7 +280,7 @@ layer {
 layer {
   name: "test_loss"
   type: "SoftmaxWithLoss"
-  bottom: "fcf"
+  bottom: "fc10"
   bottom: "label"
   top: "test_loss"
   loss_weight:1

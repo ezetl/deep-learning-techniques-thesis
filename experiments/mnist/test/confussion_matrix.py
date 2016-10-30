@@ -5,6 +5,8 @@ import caffe
 import os
 import sys
 
+caffe.set_mode_gpu();
+caffe.set_device(0);
 
 classes = [str(i) for i in range(0,10)]
 
