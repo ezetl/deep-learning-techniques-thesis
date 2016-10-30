@@ -59,7 +59,7 @@ using namespace cv;
 #define REAL_HEIGHT 376
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT  6000 
+#define PAIRS_PER_SPLIT  20000 
 // Translation bins
 // Maximum and minimum distances between pair of frames (rounded):
 // maxx: 18 minx: -18
@@ -74,12 +74,12 @@ using namespace cv;
 
 #define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
-#define IMAGES       "/media/ezetl/0C74D0DD74D0CB1A/KITTI/dataset/sequences/"
-#define POSES        "/media/ezetl/0C74D0DD74D0CB1A/KITTI/dataset/poses/"
+#define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
+#define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
 
 #define LMDB_ROOT       DATA_ROOT 
-#define LMDB_TRAIN      ("/media/ezetl/0C74D0DD74D0CB1A/KITTI/kitti_train_egomotion_lmdb/")
-#define LMDB_VAL        ("/media/ezetl/0C74D0DD74D0CB1A/KITTI/kitti_val_egomotion_lmdb/")
+#define LMDB_TRAIN      ("/media/eze/0F4A13791A35DD40/KITTI/kitti_train_egomotion_lmdb/")
+#define LMDB_VAL        ("/media/eze/0F4A13791A35DD40/KITTI/kitti_val_egomotion_lmdb/")
 
 typedef char Byte;
 typedef unsigned char uByte;
