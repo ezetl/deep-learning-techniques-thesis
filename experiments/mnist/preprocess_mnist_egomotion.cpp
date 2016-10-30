@@ -436,16 +436,8 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pair
             // Finally, apply the selected transformations to the image
             Mat new_img = transform_image(list_imgs[i], tx, ty, rot);
 
-            // Merge the original img and the transformed one into a unique Mat
-            // Then we split the channels in Caffe using the SLICE layer
-
-           //if (generate_rand(2) < 1){
-           //    d.img1 = new_img;
-           //    d.img2 = list_imgs[i];
-           //} else {
-                d.img1 = list_imgs[i];
-                d.img2 = new_img;
-            //}
+            d.img1 = list_imgs[i];
+            d.img2 = new_img;
 
             final_data.push_back(d);
 
