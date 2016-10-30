@@ -65,7 +65,7 @@ using namespace cv;
 #define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
 #define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
 
-#define LMDB_ROOT       DATA_ROOT 
+#define LMDB_ROOT       "/media/eze/0F4A13791A35DD40/KITTI/" 
 #define LMDB_TRAIN      (LMDB_ROOT"kitti_train_contrastive_lmdb/")
 #define LMDB_VAL        (LMDB_ROOT"kitti_val_contrastive_lmdb/")
 

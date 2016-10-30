@@ -16,20 +16,38 @@ layer {
   }
 }
 
-#layer {
-#  name: "data"
-#  type: "Data" 
-#  top: "data"
-#  include {
-#    phase: TEST
-#    stage: "test-on-test"
-#  }
-#  data_param {
-#    source: "/media/eze/0F4A13791A35DD40/KITTI/kitti_val_egomotion_lmdb"
-#    batch_size: 50 
-#    backend: LMDB
-#  }
-#}
+layer {
+  name: "data"
+  type: "Data" 
+  top: "data"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+  #transform_param {
+  #  mean_file: "../data/mean_mnist.binaryproto"
+  #}
+  data_param {
+    source: "/media/eze/0F4A13791A35DD40/KITTI/kitti_train_egomotion_lmdb"
+    batch_size: 128
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "data"
+  type: "Data" 
+  top: "data"
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+  data_param {
+    source: "/media/eze/0F4A13791A35DD40/KITTI/kitti_val_egomotion_lmdb"
+    batch_size: 50 
+    backend: LMDB
+  }
+}
 
 ## SLICE DIMENSIONS
 layer {
