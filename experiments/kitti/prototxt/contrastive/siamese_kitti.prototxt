@@ -11,7 +11,7 @@ layer {
   #  mean_file: "../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "../../data/kitti_train_contrastive_lmdb"
+    source: "/media/eze/6BB4B1AE068CE0EC/KITTI/kitti_train_contrastive_lmdb"
     batch_size: 128
     backend: LMDB
   }
@@ -27,7 +27,7 @@ layer {
     stage: "test-on-test"
   }
   data_param {
-    source: "../../data/kitti_val_contrastive_lmdb"
+    source: "/media/eze/6BB4B1AE068CE0EC/KITTI/kitti_val_contrastive_lmdb"
     batch_size: 50 
     backend: LMDB
   }

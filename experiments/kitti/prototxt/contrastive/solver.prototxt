@@ -21,7 +21,7 @@ display: 100
 max_iter: 60000
 
 snapshot: 60000
-snapshot_prefix: "/home/ezetl/tesis/experiments/mnist/snapshots/snapshot_kitti_contrastive_lr0.001"
+snapshot_prefix: "snapshots/contrastive/snapshot_kitti_contrastive_lr0.001"
 
 
 # solver mode: CPU or GPU

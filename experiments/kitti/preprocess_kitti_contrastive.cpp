@@ -57,7 +57,7 @@ using namespace cv;
 #define REAL_WIDTH 1241 
 #define REAL_HEIGHT 376
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT 80 
+#define PAIRS_PER_SPLIT 20000 
 
 
 #define DATA_ROOT    "../data/"
@@ -65,7 +65,7 @@ using namespace cv;
 #define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
 #define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
 
-#define LMDB_ROOT       "/media/eze/0F4A13791A35DD40/KITTI/" 
+#define LMDB_ROOT       "/media/eze/6BB4B1AE068CE0EC/KITTI/" 
 #define LMDB_TRAIN      (LMDB_ROOT"kitti_train_contrastive_lmdb/")
 #define LMDB_VAL        (LMDB_ROOT"kitti_val_contrastive_lmdb/")
 
