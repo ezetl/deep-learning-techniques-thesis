@@ -1,13 +1,13 @@
 net: "siamese_kitti.prototxt"
 type: "SGD"
 
-test_interval: 10000
-test_state: { stage: 'test-on-train' }
-test_iter: 500
-test_state: { stage: 'test-on-test' }
-test_iter: 500
+#test_interval: 1000
+#test_state: { stage: 'test-on-train' }
+#test_iter: 500
+#test_state: { stage: 'test-on-test' }
+#test_iter: 500
 
-base_lr: 0.001
+base_lr: 0.0001
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -21,7 +21,7 @@ display: 100
 max_iter: 60000
 
 snapshot: 1000
-snapshot_prefix: "/home/eze/Projects/tesis/experiments/kitti/snapshots/egomotion/snapshot_kitti_egomotion_lr0.001"
+snapshot_prefix: "/home/eze/Projects/tesis/experiments/kitti/snapshots/egomotion/snapshot_kitti_egomotion_lr0.0001"
 
 
 # solver mode: CPU or GPU

@@ -2262,25 +2262,24 @@ se utiliza para testing.
 
 *** Resultados
 **** Finetuning sobre egomotion
-Total: 10000  - Accuracy: 0.93 - Error rate: 0.066
 ****************************************************************************************************
 Final Results
 
-Total cases: 10000 - Cases OK: 9343
-Accuracy: 0.93
+Total cases: 10000 - Cases OK: 9602
+Accuracy: 0.96
 Confussion Matrix:
 
-97.8	0.1	0.3	0.0	0.0	0.2	0.6	0.2	0.8	0.0			958	1	3	0	0	2	6	2	8	0
-0.0	98.0	0.3	0.3	0.1	0.0	0.5	0.1	0.8	0.0			0	1112	3	3	1	0	6	1	9	0
-0.3	0.0	95.2	2.0	0.0	0.4	0.0	0.4	1.6	0.1			3	0	982	21	0	4	0	4	17	1
-0.0	0.1	3.5	91.8	0.1	1.6	0.0	1.1	1.7	0.2			0	1	35	927	1	16	0	11	17	2
-0.0	0.1	0.6	0.0	95.0	0.0	0.6	0.3	0.5	2.9			0	1	6	0	933	0	6	3	5	28
-0.3	0.0	1.0	2.6	0.3	90.9	0.6	0.3	3.4	0.6			3	0	9	23	3	811	5	3	30	5
-1.3	0.2	0.2	0.0	0.3	0.7	96.9	0.0	0.4	0.0			12	2	2	0	3	7	928	0	4	0
-0.0	0.6	2.8	0.7	0.8	0.0	0.1	92.5	1.3	1.3			0	6	29	7	8	0	1	951	13	13
-1.4	0.0	1.1	1.7	0.8	1.5	0.0	0.4	92.5	0.4			14	0	11	17	8	15	0	4	901	4
-0.3	1.0	0.3	1.7	3.8	0.7	0.0	5.7	3.3	83.3			3	10	3	17	38	7	0	58	33	840
-Error rate: 0.0657
+98.7	0.0	0.1	0.0	0.1	0.2	0.4	0.1	0.4	0.0			967	0	1	0	1	2	4	1	4	0
+0.1	99.1	0.5	0.2	0.1	0.0	0.0	0.0	0.0	0.0			1	1125	6	2	1	0	0	0	0	0
+0.7	0.4	97.2	0.2	0.1	0.0	0.1	0.6	0.7	0.1			7	4	1003	2	1	0	1	6	7	1
+0.0	0.1	2.1	95.0	0.1	0.8	0.0	0.8	0.9	0.3			0	1	21	959	1	8	0	8	9	3
+0.0	0.2	0.2	0.0	95.9	0.0	0.6	0.1	0.8	2.1			0	2	2	0	942	0	6	1	8	21
+0.4	0.0	0.2	2.4	0.3	94.5	0.0	0.1	1.5	0.6			4	0	2	21	3	843	0	1	13	5
+1.1	0.2	0.4	0.0	0.2	1.3	95.9	0.0	0.6	0.2			11	2	4	0	2	12	919	0	6	2
+0.2	0.9	1.7	0.4	0.5	0.0	0.0	94.9	0.3	1.2			2	9	17	4	5	0	0	976	3	12
+0.9	0.0	0.7	0.9	0.4	0.7	0.2	0.2	94.9	1.0			9	0	7	9	4	7	2	2	924	10
+0.2	0.4	0.0	0.5	2.1	0.6	0.0	1.0	1.7	93.6			2	4	0	5	21	6	0	10	17	944
+Error rate: 0.0398
 
 ****************************************************************************************************
 
@@ -2305,13 +2304,8 @@ Confussion Matrix:
 Error rate: 0.0249
 
 ****************************************************************************************************
-** Experimentos con KITTI y SF
+** Experimentos con KITTI
 *** Preprocesamiento
-DEADLINE: <2016-05-13 vie>
-
-Analizar como se eligen las clases (es un problema de
-clasificacion). Hacer todos los scripts de preprocesamiento.
-Crear las lmdb.
 
 **** KITTI
 Tiene 20501 imágenes. Se calculan las transformaciones entre las
@@ -2341,6 +2335,12 @@ DEADLINE: <2016-05-31 mar>
 Se entrena por 60K iteraciones con batch size de 128, learning rate
 inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
+**** DONE Crear dataset para egomotion
+**** DONE Entrenar egomotion
+**** TODO Crear dataset para SFA
+**** TODO Entrenar SFA
+
+
 *** Evaluación
 Los modelos KITTI-Net y SF-Net deben ser entrenados utilizando
 alrededor de 20K imagenes unicas. Para hacer la comparacion mas justa
@@ -2353,6 +2353,15 @@ Utilizar SUN database para el finetuning de las redes (SF-Net,
 KITTI-Net y AlexNet-20K). El paper no aporta informacion sobre la
 cantidad de iteraciones ni el learning rate usado.  Referirse al paper
 para comparar resultados obtenidos.
+
+***** TODO Descargar ILSVRC'12
+***** TODO Conseguir AlexNet prototxt
+***** TODO Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
+***** TODO Preprocesar SUN (solo resize?). Utilizar solo 3 splits, como en el paper. Crear LMDBs, uno para cada split
+***** TODO Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
+***** TODO Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
+***** TODO Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
+
 **** Object Recognition
 Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
 clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
