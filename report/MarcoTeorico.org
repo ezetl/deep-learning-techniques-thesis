@@ -2337,6 +2337,7 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
+**** TODO Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original)
 **** TODO Crear dataset para SFA
 **** TODO Entrenar SFA
 
@@ -2354,10 +2355,11 @@ KITTI-Net y AlexNet-20K). El paper no aporta informacion sobre la
 cantidad de iteraciones ni el learning rate usado.  Referirse al paper
 para comparar resultados obtenidos.
 
-***** TODO Descargar ILSVRC'12
-***** TODO Conseguir AlexNet prototxt
+***** TODO [#B] Descargar ILSVRC'12
+***** DONE Conseguir AlexNet prototxt
 ***** TODO Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
-***** TODO Preprocesar SUN (solo resize?). Utilizar solo 3 splits, como en el paper. Crear LMDBs, uno para cada split
+***** TODO Preprocesar SUN: crop por el centro con dimension mas chica
+***** TODO Crear LMDBS SUN. Utilizar solo 3 splits, como en el paper. Crea un LMDB para cada split
 ***** TODO Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
 ***** TODO Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
 ***** TODO Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
