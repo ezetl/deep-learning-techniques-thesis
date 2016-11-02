@@ -2331,7 +2331,6 @@ primeras capas de AlexNet, extraer tamaño de filtros de esa red)
 TCNN: C256-C128-F500-D-Op. Los kernels convolucionales con 3x3.
 
 *** Entrenamiento
-DEADLINE: <2016-05-31 mar>
 Se entrena por 60K iteraciones con batch size de 128, learning rate
 inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
@@ -2370,7 +2369,6 @@ clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
 (AlexNet con pesos inicializados de manera aleatoria). Nuevamente el
 paper no explica las iteraciones ni el learning rate utilizados.
 ** Mejoras al sistema
-DEADLINE: <2016-06-17 vie>
 Probar con otras redes.
 Otros datasets (elegir datasets pequeños y ver que pasa).
 
