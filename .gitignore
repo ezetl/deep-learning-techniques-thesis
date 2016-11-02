@@ -25,5 +25,6 @@ experiments/kitti/logs/
 experiments/kitti/snapshots/
 experiments/sf/logs/
 experiments/sf/snapshots/
+experiments/scene_recognition/data/paths
 .ipynb_checkpoints/
 experiments/mnist/test/test.txt
