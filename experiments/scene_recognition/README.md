@@ -31,10 +31,12 @@ to train those models.
    message.
 
 5. Once you have the list of images and have preprocessed them, it's time to
-   create a LMDB database.  There's a handy script in
+   create a LMDB databases.  There's a handy script in
    experiments/utils/create_lmdb.sh which takes a list of images/labels and creates
    a LMDB in a specified path by using Caffe tools. Run the script with the -h
-   option to see the help message.
+   option to see the help message. You can also use the script ./create_SUN_lmdbs.sh 
+   which creates all the needed databases for this experiment automatically. 
+   Please read the script and change the paths as needed.
 
 6. After you have created the LMDB, you can finetune the pretrained weights
    (Kitti, SF, AlexNet). In the folder ./prototxt you can find several networks
