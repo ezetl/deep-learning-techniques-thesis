@@ -2150,7 +2150,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [100%] Entrenamiento
+*** [90%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2253,6 +2253,9 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 **** DONE Probar con conv1: 96 x 13 x 13 y conv2: 256 x 7 x 7. lr0.001 para from scratch parece andar bien.
 **** DONE Probar con conv1: 96 x 7 x 7 y conv2: 256 x 5 x 5
 **** DONE Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
+**** TODO Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
+**** DONE Probar el codigo de Agrawal, la parte de mnist. Resultado: el codigo es horrible, no pude entender bien nada, logre correr un entrenamiento de MNIST pero los resultados fueron los mismos
+
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
@@ -2336,8 +2339,11 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
-**** TODO Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original)
-**** TODO Crear dataset para SFA
+**** TODO [#B] Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original)
+**** TODO Crear dos lmdbs: una para las imagenes y otra para los labels (guardados como data y luego spliteados).
+     De esa forma va a ser mas facil restar la media. Centrar los
+     datos mediante mean substraction podria aumentar la performance.
+**** DONE Crear lmdb para SFA
 **** TODO Entrenar SFA
 
 
