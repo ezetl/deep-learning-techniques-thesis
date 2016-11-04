@@ -79,7 +79,9 @@ using namespace cv;
 
 #define LMDB_ROOT       "/media/eze/0F4A13791A35DD40/KITTI/" 
 #define LMDB_TRAIN      (LMDB_ROOT"kitti_train_egomotion_lmdb/")
+#define LMDB_LABEL_TRAIN (LMDB_ROOT"kitti_train_label_egomotion_lmdb")
 #define LMDB_VAL        (LMDB_ROOT"kitti_val_egomotion_lmdb/")
+#define LMDB_LABEL_VAL (LMDB_ROOT"kitti_val_label_egomotion_lmdb")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -118,7 +120,7 @@ unsigned int generate_rand(int range_limit);
 RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2);
 RotMatrix get_rot_matrix(TransformMatrix& t);
 EulerAngles mat2euler(RotMatrix& m);
-void create_lmdbs(const char* images, const char* lmdb_path, const vector<string> split);
+void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_label_path, const vector<string> split);
 vector<ImgPair> generate_pairs(const vector<string> split);
 DataBlob process_images(ImgPair p);
 
@@ -169,23 +171,42 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
     return pairs_paths;
 }
 
-void create_lmdbs(const char* images, const char* lmdb_path, const vector<string> split)
+void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_label_path, const vector<string> split)
 {
+    /***********************************************/
     // lmdb data 
     MDB_env *mdb_env;
     MDB_dbi mdb_dbi;
     MDB_val mdb_key, mdb_data;
     MDB_txn *mdb_txn;
-
     // Set database environment
     mkdir(lmdb_path, 0744);
-
     // Create Data LMDBs
     mdb_env_create(&mdb_env);
     mdb_env_set_mapsize(mdb_env, TB);
     mdb_env_open(mdb_env, lmdb_path, 0, 0664);
     mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
     mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
+    /***********************************************/
+
+
+    /***********************************************/
+    // lmdb labels 
+    MDB_env *mdb_envl;
+    MDB_dbi mdb_dbil;
+    MDB_val mdb_keyl, mdb_datal;
+    MDB_txn *mdb_txnl;
+    // Set database environment
+    mkdir(lmdb_label_path, 0744);
+    // Create Data LMDBs
+    mdb_env_create(&mdb_envl);
+    mdb_env_set_mapsize(mdb_envl, TB);
+    mdb_env_open(mdb_envl, lmdb_label_path, 0, 0664);
+    mdb_txn_begin(mdb_envl, NULL, 0, &mdb_txnl);
+    mdb_open(mdb_txnl, NULL, 0, &mdb_dbil);
+    /***********************************************/
+
+
 
     // Generate pairs of images for each sequence 
     vector<ImgPair> pairs = generate_pairs(split);
@@ -198,7 +219,9 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
     int count = 0;
     string data_value, label_value;
     
+    /***********************************************/
     // Data datum
+    // TODO (ezetlopez): update this comment if the changes work.
     // This datum has 3 + 3 + NUM_CLASSES dimensions.
     // The first 3 dimensions correspond to the first image, the second 3 to the second image 
     // respectively. NUM_CLASSES (3) because we are also merging the labels into the data.
@@ -208,9 +231,19 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
     // to the loss function.
     // Chek the loop below to see how it is done.
     Datum datum;
-    datum.set_channels(6+NUM_CLASSES);
+    //datum.set_channels(6+NUM_CLASSES);
+    datum.set_channels(6);
     datum.set_height(rows);
     datum.set_width(cols);
+    /***********************************************/
+
+    /***********************************************/
+    // Labels datum
+    Datum datuml;
+    datuml.set_channels(NUM_CLASSES);
+    datuml.set_height(1);
+    datuml.set_width(1);
+    /***********************************************/
 
     std::ostringstream s;
 
@@ -221,24 +254,16 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
         string key_str = s.str();
         s.str(std::string());
 
+        /***********************************************/
         // Set Data
         // Create a char pointer and copy the images first, the labels at the end
         char * data_label;
-        data_label = (char*)calloc(rows*cols*(6+NUM_CLASSES), sizeof(uByte));
+        //data_label = (char*)calloc(rows*cols*(6+NUM_CLASSES), sizeof(uByte));
+        data_label = (char*)calloc(rows*cols*(6), sizeof(uByte));
         data_label = (char*)memcpy(data_label, (void*)data.img1.data, 3*rows*cols);
         memcpy(data_label+(cols*rows*3), (void*)data.img2.data, 3*rows*cols);
 
-        char * labels;
-        unsigned int labelx = (unsigned int)data.x;
-        unsigned int labely = (unsigned int)data.y;
-        unsigned int labelz = (unsigned int)data.z;
-        labels = (char*) calloc(rows*cols*3, sizeof(uByte));
-        labels[labelx] = 1;
-        labels[cols*rows + labely] = 1;
-        labels[cols*rows*2 + labelz] = 1;
-        memcpy(data_label+(cols*rows*6), (void*)labels, 3*rows*cols);
-
-        datum.set_data((char*)data_label, (6+NUM_CLASSES)*rows*cols);
+        datum.set_data((char*)data_label, 6*rows*cols);
         datum.SerializeToString(&data_value);
 
         // Save Data
@@ -247,11 +272,33 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
         mdb_key.mv_size = key_str.size();
         mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
         mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
+        /***********************************************/
+
+        /***********************************************/
+        // Set Labels 
+        // Create a char pointer and copy the images first, the labels at the end
+        char * labels = (char*) calloc(NUM_CLASSES, sizeof(uByte));
+        labels[0] = (char)data.x;
+        labels[1] = (char)data.y;
+        labels[2] = (char)data.z;
+        datuml.set_data((char*)labels, NUM_CLASSES);
+        datuml.SerializeToString(&label_value);
+
+        // Save Data
+        mdb_datal.mv_size = label_value.size();
+        mdb_datal.mv_data = reinterpret_cast<void*>(&label_value[0]);
+        mdb_keyl.mv_size = key_str.size();
+        mdb_keyl.mv_data = reinterpret_cast<void*>(&key_str[0]);
+        mdb_put(mdb_txnl, mdb_dbil, &mdb_keyl, &mdb_datal, 0);
+        /***********************************************/
 
         if (++count % 1000 == 0) {
             // Commit txn Data
             mdb_txn_commit(mdb_txn);
             mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
+            // Commit txn labels 
+            mdb_txn_commit(mdb_txnl);
+            mdb_txn_begin(mdb_envl, NULL, 0, &mdb_txnl);
             cout << "Processed " << count << "\r" << flush;
         }
         free(data_label);
@@ -262,6 +309,10 @@ void create_lmdbs(const char* images, const char* lmdb_path, const vector<string
         mdb_txn_commit(mdb_txn);
         mdb_close(mdb_env, mdb_dbi);
         mdb_env_close(mdb_env);
+
+        mdb_txn_commit(mdb_txnl);
+        mdb_close(mdb_envl, mdb_dbil);
+        mdb_env_close(mdb_envl);
     }
 
     cout << "\nFinished creation of LMDB. " << count << " images processed.\n";
@@ -393,8 +444,8 @@ int main(int argc, char** argv)
 {
     srand(0);
     cout << "Creating train LMDB's\n";
-    create_lmdbs(IMAGES, LMDB_TRAIN, TRAIN_SPLITS);
+    create_lmdbs(IMAGES, LMDB_TRAIN, LMDB_LABEL_TRAIN, TRAIN_SPLITS);
     cout << "Creating val LMDB's\n";
-    create_lmdbs(IMAGES, LMDB_VAL, VAL_SPLITS);
+    create_lmdbs(IMAGES, LMDB_VAL, LMDB_LABEL_VAL, VAL_SPLITS);
     return 0;
 }
