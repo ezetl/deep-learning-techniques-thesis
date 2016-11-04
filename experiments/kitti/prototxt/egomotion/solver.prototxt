@@ -21,7 +21,7 @@ display: 100
 max_iter: 60000
 
 snapshot: 1000
-snapshot_prefix: "/home/eze/Projects/tesis/experiments/kitti/snapshots/egomotion/snapshot_kitti_egomotion_lr0.0001"
+snapshot_prefix: "../../snapshots/egomotion_lrnbeforepool/snapshot_kitti_egomotion_lr0.0001"
 
 
 # solver mode: CPU or GPU
