@@ -2081,6 +2081,10 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 #+LaTeX: \bibliography{MarcoTeorico}
 
 * Plan de Trabajo                                :noexport:
+** Backlog
+*** DONE Hacer visualizador de lmdbs para chequear que esten bien guardados los datos (basarse en el que ya hice para mnist)
+*** TODO Abstraer creacion de lmdb en una clase en codigos de preprocessing (C++).
+*** TODO Hacer gif con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
@@ -2093,7 +2097,6 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 5. SUN Dataset (Scene categorization) http://vision.princeton.edu/projects/2010/SUN/
 
 ** Prueba de Concepto con MNIST
-DEADLINE: <2016-04-29 vie> 
 
 EL objetivo es entender como hacer redes siamesas con Caffe
 
@@ -2339,8 +2342,9 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
+**** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
 **** TODO [#B] Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original)
-**** TODO Crear dos lmdbs: una para las imagenes y otra para los labels (guardados como data y luego spliteados).
+**** DONE Crear dos lmdbs: una para las imagenes y otra para los labels (guardados como data y luego spliteados).
      De esa forma va a ser mas facil restar la media. Centrar los
      datos mediante mean substraction podria aumentar la performance.
 **** DONE Crear lmdb para SFA
@@ -2379,8 +2383,3 @@ Probar con otras redes.
 Otros datasets (elegir datasets pequeños y ver que pasa).
 
 
-
-
-** TODOs
-*** TODO Hacer gif con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
-Por ejemplo, con filters_conv1_kitti_egomotion_213iters.png  y filters_conv1_kitti_egomotion_2307iters.png, ya se empiezan a ver algunas diferencias (filtros que empiezan a detectar algun color especifico por ejemplo).
