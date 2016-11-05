@@ -44,6 +44,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/util/io.hpp"
 
 
 using namespace caffe;
@@ -59,7 +60,8 @@ using namespace cv;
 #define REAL_HEIGHT 376
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
-#define PAIRS_PER_SPLIT  20000 
+#define NUM_CHANNELS 3
+#define PAIRS_PER_SPLIT 20000 
 // Translation bins
 // Maximum and minimum distances between pair of frames (rounded):
 // maxx: 18 minx: -18
@@ -123,6 +125,7 @@ EulerAngles mat2euler(RotMatrix& m);
 void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_label_path, const vector<string> split);
 vector<ImgPair> generate_pairs(const vector<string> split);
 DataBlob process_images(ImgPair p);
+void CVMatsToDatum(const Mat& img1, const Mat& img2, Datum* datum);
 
 vector<ImgPair> generate_pairs(const vector<string> split) {
     vector<ImgPair> pairs_paths;
@@ -232,7 +235,7 @@ void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_la
     // Chek the loop below to see how it is done.
     Datum datum;
     //datum.set_channels(6+NUM_CLASSES);
-    datum.set_channels(6);
+    datum.set_channels(NUM_CHANNELS);
     datum.set_height(rows);
     datum.set_width(cols);
     /***********************************************/
@@ -256,16 +259,10 @@ void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_la
 
         /***********************************************/
         // Set Data
-        // Create a char pointer and copy the images first, the labels at the end
-        char * data_label;
-        //data_label = (char*)calloc(rows*cols*(6+NUM_CLASSES), sizeof(uByte));
-        data_label = (char*)calloc(rows*cols*(6), sizeof(uByte));
-        data_label = (char*)memcpy(data_label, (void*)data.img1.data, 3*rows*cols);
-        memcpy(data_label+(cols*rows*3), (void*)data.img2.data, 3*rows*cols);
-
-        datum.set_data((char*)data_label, 6*rows*cols);
+        assert (data.img1.isContinuous());
+        assert (data.img2.isContinuous());
+        CVMatsToDatum(data.img1, data.img2, &datum);
         datum.SerializeToString(&data_value);
-
         // Save Data
         mdb_data.mv_size = data_value.size();
         mdb_data.mv_data = reinterpret_cast<void*>(&data_value[0]);
@@ -283,8 +280,8 @@ void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_la
         labels[2] = (char)data.z;
         datuml.set_data((char*)labels, NUM_CLASSES);
         datuml.SerializeToString(&label_value);
-
-        // Save Data
+        free(labels);
+        // Save Labels
         mdb_datal.mv_size = label_value.size();
         mdb_datal.mv_data = reinterpret_cast<void*>(&label_value[0]);
         mdb_keyl.mv_size = key_str.size();
@@ -301,8 +298,6 @@ void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_la
             mdb_txn_begin(mdb_envl, NULL, 0, &mdb_txnl);
             cout << "Processed " << count << "\r" << flush;
         }
-        free(data_label);
-        free(labels);
     }
     // Last batch
     if (count % 1000 != 0) {
@@ -334,7 +329,7 @@ DataBlob process_images(ImgPair p)
 
     final_data.img1 = im1(r);
     final_data.img2 = im2(r);
-    
+
     float x,y,z;
     int bin_x = 0, bin_y = 0, bin_z = 0;
     // Translations
@@ -371,14 +366,12 @@ DataBlob process_images(ImgPair p)
     final_data.y = bin_y;
     final_data.z = bin_z;
 
-    /*
     // Debugging
-    namedWindow("im1");
-    namedWindow("im2");
-    imshow("im1", crop1);
-    imshow("im2", crop2);
-    waitKey(100);
-    */
+    //namedWindow("im1");
+    //namedWindow("im2");
+    //imshow("im1", final_data.img1);
+    //imshow("im2", final_data.img2);
+    //waitKey(0);
     return final_data;
 }
 
@@ -401,15 +394,6 @@ RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2){
         res[i][j] = cvr[j];
       }
     }
-    //memset((void*)&res, 0, sizeof(RotMatrix));
-    //unsigned int rot_size = t1.size();
-    //for (unsigned int k=0; k<rot_size; ++k) {
-    //    for (unsigned int i=0; i<rot_size; ++i){
-    //        for (unsigned int j = 0; j<rot_size; ++j){
-    //            res[i][k] += t1[i][j] * t2[j][k];
-    //        }
-    //    }
-    //}
     return res;
 }
 
@@ -448,4 +432,36 @@ int main(int argc, char** argv)
     cout << "Creating val LMDB's\n";
     create_lmdbs(IMAGES, LMDB_VAL, LMDB_LABEL_VAL, VAL_SPLITS);
     return 0;
+}
+
+void CVMatsToDatum(const Mat& img1, const Mat& img2, Datum* datum) {
+    // Modified from CVMatToDatum from Caffe
+    CHECK(img1.depth() == CV_8U) << "Image data type must be unsigned byte";
+    CHECK(img2.depth() == CV_8U) << "Image data type must be unsigned byte";
+    datum->set_channels(img1.channels() + img2.channels());
+    datum->set_height(img1.rows);
+    datum->set_width(img1.cols);
+    datum->clear_data();
+    datum->clear_float_data();
+    datum->set_encoded(false);
+    int datum_channels = datum->channels();
+    int datum_height = datum->height();
+    int datum_width = datum->width();
+    int datum_size = datum_channels * datum_height * datum_width;
+    string buffer(datum_size, ' ');
+
+    for (int h = 0; h < datum_height; ++h) {
+        const uchar* ptr1 = img1.ptr<uchar>(h);
+        const uchar* ptr2 = img2.ptr<uchar>(h);
+        int img_index = 0;
+        for (int w = 0; w < datum_width; ++w) {
+            for (int c = 0; c < datum_channels/2; ++c) {
+                int datum_index = (c * datum_height + h) * datum_width + w;
+                buffer[datum_index] = static_cast<char>(ptr1[img_index]);
+                datum_index = ((c+datum_channels/2) * datum_height + h) * datum_width + w;
+                buffer[datum_index] = static_cast<char>(ptr2[img_index++]);
+            }
+        }
+    }
+    datum->set_data(buffer);
 }
