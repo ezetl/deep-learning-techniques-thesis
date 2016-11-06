@@ -23,6 +23,7 @@ experiments/mnist/snapshots
 test_mnist.txt
 experiments/kitti/logs/
 experiments/kitti/snapshots/
+experiments/scene_recognition/snapshots/
 experiments/sf/logs/
 experiments/sf/snapshots/
 experiments/scene_recognition/data/paths

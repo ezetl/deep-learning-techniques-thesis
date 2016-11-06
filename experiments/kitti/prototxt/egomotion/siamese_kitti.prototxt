@@ -131,12 +131,12 @@ layer {
     }
 }
 
-layer {
-  name: "silence"
-  type: "Silence"
-  bottom: "labely"
-  bottom: "labelz"
-}
+#layer {
+#  name: "silence"
+#  type: "Silence"
+#  bottom: "labely"
+#  bottom: "labelz"
+#}
 
 #layer {
 #  name: "argmaxX"
@@ -197,21 +197,11 @@ layer {
   bottom: "conv1"
   top: "conv1"
 }
-layer {
-  name: "norm1"
-  type: "LRN"
-  bottom: "conv1"
-  top: "norm1"
-  lrn_param {
-    local_size: 5
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
+
 layer {
   name: "pool1"
   type: "Pooling"
-  bottom: "norm1"
+  bottom: "conv1"
   top: "pool1"
   pooling_param {
     pool: MAX
@@ -220,9 +210,20 @@ layer {
   }
 }
 layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "pool1"
+  top: "norm1"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
+layer {
   name: "conv2"
   type: "Convolution"
-  bottom: "pool1"
+  bottom: "norm1"
   top: "conv2"
   param {
     name: "conv2_w"
@@ -256,20 +257,9 @@ layer {
   top: "conv2"
 }
 layer {
-  name: "norm2"
-  type: "LRN"
-  bottom: "conv2"
-  top: "norm2"
-  lrn_param {
-    local_size: 5
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
-layer {
   name: "pool2"
   type: "Pooling"
-  bottom: "norm2"
+  bottom: "conv2"
   top: "pool2"
   pooling_param {
     pool: MAX
@@ -278,9 +268,20 @@ layer {
   }
 }
 layer {
+  name: "norm2"
+  type: "LRN"
+  bottom: "pool2"
+  top: "norm2"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
+layer {
   name: "conv3"
   type: "Convolution"
-  bottom: "pool2"
+  bottom: "norm2"
   top: "conv3"
   param {
     name: "conv3_w"
@@ -433,20 +434,9 @@ layer {
   top: "conv1_p"
 }
 layer {
-  name: "norm1_p"
-  type: "LRN"
-  bottom: "conv1_p"
-  top: "norm1_p"
-  lrn_param {
-    local_size: 5
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
-layer {
   name: "pool1_p"
   type: "Pooling"
-  bottom: "norm1_p"
+  bottom: "conv1_p"
   top: "pool1_p"
   pooling_param {
     pool: MAX
@@ -454,11 +444,23 @@ layer {
     stride: 2
   }
 }
+layer {
+  name: "norm1_p"
+  type: "LRN"
+  bottom: "pool1_p"
+  top: "norm1_p"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
+
 
 layer {
   name: "conv2_p"
   type: "Convolution"
-  bottom: "pool1_p"
+  bottom: "norm1_p"
   top: "conv2_p"
   param {
     name: "conv2_w"
@@ -491,21 +493,11 @@ layer {
   bottom: "conv2_p"
   top: "conv2_p"
 }
-layer {
-  name: "norm2_p"
-  type: "LRN"
-  bottom: "conv2_p"
-  top: "norm2_p"
-  lrn_param {
-    local_size: 5
-    alpha: 0.0001
-    beta: 0.75
-  }
-}
+
 layer {
   name: "pool2_p"
   type: "Pooling"
-  bottom: "norm2_p"
+  bottom: "conv2_p"
   top: "pool2_p"
   pooling_param {
     pool: MAX
@@ -513,11 +505,22 @@ layer {
     stride: 2
   }
 }
+layer {
+  name: "norm2_p"
+  type: "LRN"
+  bottom: "pool2_p"
+  top: "norm2_p"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 layer {
   name: "conv3_p"
   type: "Convolution"
-  bottom: "pool2_p"
+  bottom: "norm2_p"
   top: "conv3_p"
   param {
     name: "conv3_w"
@@ -789,57 +792,57 @@ layer {
   }
 }
 
-#layer {
-#  bottom: "fc500"
-#  top: "fcy"
-#  name: "fcy"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 20 
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
-#
-#layer {
-#  bottom: "fc500"
-#  top: "fcz"
-#  name: "fcz"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  type: "InnerProduct"
-#  inner_product_param {
-#    num_output: 20
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
+layer {
+  bottom: "fc500"
+  top: "fcy"
+  name: "fcy"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 20 
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  bottom: "fc500"
+  top: "fcz"
+  name: "fcz"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  type: "InnerProduct"
+  inner_product_param {
+    num_output: 20
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
 
 layer {
   name: "loss_x"
@@ -853,29 +856,29 @@ layer {
     }
 }
 
-#layer {
-#  name: "loss_y"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcy"
-#  bottom: "labely"
-#  top: "loss_y"
-#  loss_weight:1
-#  include {
-#      phase: TRAIN
-#    }
-#}
-#
-#layer {
-#  name: "loss_z"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcz"
-#  bottom: "labelz"
-#  top: "loss_z"
-#  loss_weight:1
-#  include {
-#      phase: TRAIN
-#    }
-#}
+layer {
+  name: "loss_y"
+  type: "SoftmaxWithLoss"
+  bottom: "fcy"
+  bottom: "labely"
+  top: "loss_y"
+  loss_weight:1
+  include {
+      phase: TRAIN
+    }
+}
+
+layer {
+  name: "loss_z"
+  type: "SoftmaxWithLoss"
+  bottom: "fcz"
+  bottom: "labelz"
+  top: "loss_z"
+  loss_weight:1
+  include {
+      phase: TRAIN
+    }
+}
 
 
 ### TEST NETWORK ON TRAIN SET
@@ -892,31 +895,31 @@ layer {
   }
 }
 
-#layer {
-#  name: "test_loss_train_y"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcy"
-#  bottom: "labely"
-#  top: "test_loss_train_y"
-#  loss_weight:1
-#  include {
-#    phase: TEST
-#    stage: "test-on-train"
-#  }
-#}
-#
-#layer {
-#  name: "test_loss_train_z"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcz"
-#  bottom: "labelz"
-#  top: "test_loss_train_z"
-#  loss_weight:1
-#  include {
-#    phase: TEST
-#    stage: "test-on-train"
-#  }
-#}
+layer {
+  name: "test_loss_train_y"
+  type: "SoftmaxWithLoss"
+  bottom: "fcy"
+  bottom: "labely"
+  top: "test_loss_train_y"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
+
+layer {
+  name: "test_loss_train_z"
+  type: "SoftmaxWithLoss"
+  bottom: "fcz"
+  bottom: "labelz"
+  top: "test_loss_train_z"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
 
 layer {
   name: "accuracy_train_X"
@@ -930,29 +933,29 @@ layer {
   }
 }
 
-#layer {
-#  name: "accuracy_train_Y"
-#  type: "Accuracy"
-#  bottom: "fcy"
-#  bottom: "labely"
-#  top: "accuracy_train_Y"
-#  include {
-#    phase: TEST
-#    stage: "test-on-train"
-#  }
-#}
-#
-#layer {
-#  name: "accuracy_train_Z"
-#  type: "Accuracy"
-#  bottom: "fcz"
-#  bottom: "labelz"
-#  top: "accuracy_train_Z"
-#  include {
-#    phase: TEST
-#    stage: "test-on-train"
-#  }
-#}
+layer {
+  name: "accuracy_train_Y"
+  type: "Accuracy"
+  bottom: "fcy"
+  bottom: "labely"
+  top: "accuracy_train_Y"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
+
+layer {
+  name: "accuracy_train_Z"
+  type: "Accuracy"
+  bottom: "fcz"
+  bottom: "labelz"
+  top: "accuracy_train_Z"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+}
 
 
 ### TEST NETWORK ON VALIDATION SET
@@ -969,31 +972,31 @@ layer {
   }
 }
 
-#layer {
-#  name: "test_loss_y"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcy"
-#  bottom: "labely"
-#  top: "test_loss_y"
-#  loss_weight:1
-#  include {
-#    phase: TEST
-#    stage: "test-on-test"
-#  }
-#}
-#
-#layer {
-#  name: "test_loss_z"
-#  type: "SoftmaxWithLoss"
-#  bottom: "fcz"
-#  bottom: "labelz"
-#  top: "test_loss_z"
-#  loss_weight:1
-#  include {
-#    phase: TEST
-#    stage: "test-on-test"
-#  }
-#}
+layer {
+  name: "test_loss_y"
+  type: "SoftmaxWithLoss"
+  bottom: "fcy"
+  bottom: "labely"
+  top: "test_loss_y"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+}
+
+layer {
+  name: "test_loss_z"
+  type: "SoftmaxWithLoss"
+  bottom: "fcz"
+  bottom: "labelz"
+  top: "test_loss_z"
+  loss_weight:1
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+}
 
 layer {
   name: "accuracy_test_X"
@@ -1007,26 +1010,26 @@ layer {
   }
 }
 
-#layer {
-#  name: "accuracy_test_Y"
-#  type: "Accuracy"
-#  bottom: "fcy"
-#  bottom: "labely"
-#  top: "accuracy_test_Y"
-#  include {
-#    phase: TEST
-#    stage: "test-on-test"
-#  }
-#}
-#
-#layer {
-#  name: "accuracy_test_Z"
-#  type: "Accuracy"
-#  bottom: "fcz"
-#  bottom: "labelz"
-#  top: "accuracy_test_Z"
-#  include {
-#    phase: TEST
-#    stage: "test-on-test"
-#  }
-#}
+layer {
+  name: "accuracy_test_Y"
+  type: "Accuracy"
+  bottom: "fcy"
+  bottom: "labely"
+  top: "accuracy_test_Y"
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+}
+
+layer {
+  name: "accuracy_test_Z"
+  type: "Accuracy"
+  bottom: "fcz"
+  bottom: "labelz"
+  top: "accuracy_test_Z"
+  include {
+    phase: TEST
+    stage: "test-on-test"
+  }
+}
