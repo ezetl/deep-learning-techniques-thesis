@@ -2343,7 +2343,7 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
 **** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
-**** TODO [#B] Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original)
+**** DONE [#B] Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original) (RESULTADOS: lo mismo)
 **** DONE Crear dos lmdbs: una para las imagenes y otra para los labels (guardados como data y luego spliteados).
      De esa forma va a ser mas facil restar la media. Centrar los
      datos mediante mean substraction podria aumentar la performance.

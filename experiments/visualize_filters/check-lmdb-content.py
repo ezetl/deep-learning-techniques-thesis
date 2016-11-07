@@ -1,4 +1,12 @@
 #!/usr/bin/env python2.7
+"""
+If you try to run this script an receive an error like:
+
+Gtk-ERROR **: GTK+ 2.x symbols detected. Using GTK+ 2.x and GTK+ 3 in the same process is not supported
+
+Then uncomment the import gtk line
+"""
+import gtk
 import caffe
 import lmdb
 import numpy as np
