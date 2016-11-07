@@ -76,10 +76,10 @@ using namespace cv;
 
 #define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
-#define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
-#define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"
+#define IMAGES       "/media/eze/Datasets/KITTI/dataset/sequences/"
+#define POSES        "/media/eze/Datasets/KITTI/dataset/poses/"
 
-#define LMDB_ROOT       "/media/eze/0F4A13791A35DD40/KITTI/" 
+#define LMDB_ROOT       "/media/eze/Datasets/KITTI/" 
 #define LMDB_TRAIN      (LMDB_ROOT"kitti_train_egomotion_lmdb/")
 #define LMDB_LABEL_TRAIN (LMDB_ROOT"kitti_train_label_egomotion_lmdb")
 #define LMDB_VAL        (LMDB_ROOT"kitti_val_egomotion_lmdb/")
