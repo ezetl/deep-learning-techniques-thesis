@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.7
 import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import sys
 import caffe
