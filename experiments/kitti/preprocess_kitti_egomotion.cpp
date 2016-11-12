@@ -61,7 +61,7 @@ using namespace cv;
 #define NUM_CLASSES 3
 #define LABEL_WIDTH NUM_BINS
 #define NUM_CHANNELS 3
-#define PAIRS_PER_SPLIT 20000 
+#define PAIRS_PER_SPLIT 2300 // approx. ~20K pairs of images
 // Translation bins
 // Maximum and minimum distances between pair of frames (rounded):
 // maxx: 18 minx: -18
@@ -348,11 +348,22 @@ DataBlob process_images(ImgPair p)
     }
 
     // Euler angle
+    //cout << "Transform matrix 1" << endl;
+    //cout <<  "[[ " <<p.t1[0][0] << ", " <<  p.t1[0][1] << ", " <<  p.t1[0][2] << ", " <<  p.t1[0][3] << "]," << 
+    //         "[ " <<p.t1[1][0] << ", " <<  p.t1[1][1] << ", " <<  p.t1[1][2] << ", " <<  p.t1[1][3] << "], " <<  
+    //         "[ " <<p.t1[2][0] << ", " <<  p.t1[2][1] << ", " <<  p.t1[2][2] << ", " <<  p.t1[2][3] << "]]"<< endl;
+    //cout << "Transform matrix 2" << endl;
+    //cout <<  "[[ " <<p.t2[0][0] << ", " <<  p.t2[0][1] << ", " <<  p.t2[0][2] << ", " <<  p.t2[0][3] << "]," << 
+    //         "[ " <<p.t2[1][0] << ", " <<  p.t2[1][1] << ", " <<  p.t2[1][2] << ", " <<  p.t2[1][3] << "]," <<  
+    //         "[ " <<p.t2[2][0] << ", " <<  p.t2[2][1] << ", " <<  p.t2[2][2] << ", " <<  p.t2[2][3] << "]]" << endl;
+
     RotMatrix r1 = get_rot_matrix(p.t1);
     RotMatrix r2 = get_rot_matrix(p.t2);
     RotMatrix rot = multiply_rot_matrix(r1, r2);
     EulerAngles eu = mat2euler(rot);
     y = eu.y;
+    //cout << "Final results:" << endl;
+    //cout << "x trans: " << x << " Y euler: " << y << " Z trans: " << z << endl;
     //maxy = (y>maxy) ? y : maxy;
     //miny = (y<miny) ? y : miny;
     //std::cout << "maxy: " << maxy << " miny: " << miny << std::endl;
@@ -420,6 +431,12 @@ EulerAngles mat2euler(RotMatrix& m){
         y = atan2(m[0][2], cy);
         x = 0.0;
     }
+    //cout << "Rotmat" << endl;
+    //cout <<  "[[ " <<m[0][0] << ", " <<  m[0][1] << ", " <<  m[0][2] << "]," << 
+    //         "[ " <<m[1][0] << ", " <<  m[1][1] << ", " <<  m[1][2]  << "]," <<  
+    //         "[ " <<m[2][0] << ", " <<  m[2][1] << ", " <<  m[2][2]  << "]]" << endl;
+    //cout << "Euler:" << endl;
+    //cout << "x: " << x << " y: " << y << " z: " << z << endl;
     return (EulerAngles){x,y,z};
 }
 
