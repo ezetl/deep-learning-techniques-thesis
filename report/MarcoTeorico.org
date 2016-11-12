@@ -2312,7 +2312,6 @@ Error rate: 0.0249
 ****************************************************************************************************
 ** Experimentos con KITTI
 *** Preprocesamiento
-
 **** KITTI
 Tiene 20501 imágenes. Se calculan las transformaciones entre las
 imágenes cercanas utilizando los datos odométricos del dataset.
@@ -2342,6 +2341,7 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
+**** TODO Probar con modelo preentrenado de ellos
 **** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
 **** TODO [#B] Leer scripts de lsm para ver como preprocesaron las imagenes ellos
 **** DONE [60%] Comparar como calculo los tags
