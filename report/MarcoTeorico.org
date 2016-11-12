@@ -2343,6 +2343,13 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
 **** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
+**** TODO [#B] Leer scripts de lsm para ver como preprocesaron las imagenes ellos
+**** DONE [60%] Comparar como calculo los tags
+***** DONE Chequear que se obtengan bien las matrices de los archivos
+***** DONE Comparar como calculo la matriz de rotacion en base a las dos imagenes. RESULTADO:  esta bien esa parte (get_pose_label)
+***** DONE Comparar como calculo Euler Angles. RESULTADO: esta bien esa parte (mat2euler)
+***** TODO [#C] Agregar normalizacion de valores euler/trans??
+***** TODO [#B] Chequear como se sacan labels de los datos obtenidos (traslaciones y rotaciones)
 **** DONE [#B] Entrenar egomotion con swap entre LRN y pooling (como estan en AlexNet original) (RESULTADOS: lo mismo)
 **** DONE Crear dos lmdbs: una para las imagenes y otra para los labels (guardados como data y luego spliteados).
      De esa forma va a ser mas facil restar la media. Centrar los
