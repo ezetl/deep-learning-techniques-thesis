@@ -16,7 +16,7 @@ gamma: 0.5
 
 # Display every 100 iterations
 display: 100
-max_iter: 40000
+max_iter: 20000
 
 snapshot: 1000
 snapshot_prefix: "../../snapshots/egomotion/snapshot_mnist_egomotion_lr0.001"

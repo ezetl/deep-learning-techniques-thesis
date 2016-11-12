@@ -12,7 +12,7 @@ layer {
   #  mean_file: "../../../kitti/data/kitti_egomotion_227_3channels.binaryproto"
   #}
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/SUN397/lmdbs/SUN_Training_01_20perclass_lmdb"
+    source: "/media/eze/Datasets/SUN397/lmdbs/SUN_Training_01_5perclass_lmdb"
     batch_size: 125 
     backend: LMDB
   }
@@ -32,7 +32,7 @@ layer {
   #  mean_file: "../../../kitti/data/kitti_egomotion_227_3channels.binaryproto"
   #}
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/SUN397/lmdbs/SUN_Testing_01_20perclass_lmdb"
+    source: "/media/eze/Datasets/SUN397/lmdbs/SUN_Testing_01_5perclass_lmdb"
     batch_size: 50 
     backend: LMDB
   }

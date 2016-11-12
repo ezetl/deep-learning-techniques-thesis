@@ -10,8 +10,8 @@ layer {
   #  mean_file: "../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_train_egomotion_lmdb"
-    batch_size: 125
+    source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
+    batch_size: 512 
     backend: LMDB
   }
 }
@@ -25,8 +25,8 @@ layer {
     stage: "test-on-train"
   }
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_train_egomotion_lmdb"
-    batch_size: 125 
+    source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
+    batch_size: 512 
     backend: LMDB
   }
 }
