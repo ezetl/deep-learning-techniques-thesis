@@ -2341,7 +2341,10 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
 
 **** DONE Crear dataset para egomotion
 **** DONE Entrenar egomotion
-**** TODO Probar con modelo preentrenado de ellos
+**** DONE Probar con modelo preentrenado de ellos
+    Anda bien con su modelo, a pesar de que los filtros no parecen ser
+    tan buenos. Acc. 5.2 en scene recognition con 5 imagenes per class
+    (el mio 3.2).
 **** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
 **** TODO [#B] Leer scripts de lsm para ver como preprocesaron las imagenes ellos
 **** DONE [60%] Comparar como calculo los tags
