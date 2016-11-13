@@ -10,7 +10,7 @@ caffe.set_device(0);
 
 classes = [str(i) for i in range(0,10)]
 
-ROOT_IMAGES = '/media/eze/0F4A13791A35DD40/MNIST/mnist_test_standar'
+ROOT_IMAGES = '/media/eze/Datasets/MNIST/mnist_test_standar'
 IMGS_LIST = './test.txt'
 DEPLOY_FILE = './deploy/deploy_finetuning_mnist.prototxt'
 MEAN_PATH = '../data/mean_mnist.binaryproto'

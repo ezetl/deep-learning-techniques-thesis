@@ -11,7 +11,7 @@ layer {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_finetuning_standar10000_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
     batch_size: 125 
     backend: LMDB
   }
@@ -30,7 +30,7 @@ layer {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
   data_param {
-    source: "/media/eze/0F4A13791A35DD40/MNIST/mnist_finetuning_standar10000_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
     batch_size: 125 
     backend: LMDB
   }
@@ -142,20 +142,20 @@ layer {
 }
 
 
-layer {
-  name: "pool2"
-  type: "Pooling"
-  bottom: "conv2"
-  top: "pool2"
-  pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 2
-  }
-}
+#layer {
+#  name: "pool2"
+#  type: "Pooling"
+#  bottom: "conv2"
+#  top: "pool2"
+#  pooling_param {
+#    pool: MAX
+#    kernel_size: 3
+#    stride: 2
+#  }
+#}
 
 layer {
-  bottom: "pool2"
+  bottom: "conv2"
   top: "fc"
   name: "fc"
   param {

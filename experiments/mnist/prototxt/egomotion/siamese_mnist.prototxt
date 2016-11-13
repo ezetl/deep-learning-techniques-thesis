@@ -162,17 +162,17 @@ layer {
 }
 
 
-layer {
-  name: "pool2"
-  type: "Pooling"
-  bottom: "conv2"
-  top: "pool2"
-  pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 2
-  }
-}
+#layer {
+#  name: "pool2"
+#  type: "Pooling"
+#  bottom: "conv2"
+#  top: "pool2"
+#  pooling_param {
+#    pool: MAX
+#    kernel_size: 3
+#    stride: 2
+#  }
+#}
 
 
 # Second component of siamese network
@@ -264,24 +264,24 @@ layer {
 }
 
 
-layer {
-  name: "pool2_p"
-  type: "Pooling"
-  bottom: "conv2_p"
-  top: "pool2_p"
-  pooling_param {
-    pool: MAX
-    kernel_size: 3 
-    stride: 2
-  }
-}
+#layer {
+#  name: "pool2_p"
+#  type: "Pooling"
+#  bottom: "conv2_p"
+#  top: "pool2_p"
+#  pooling_param {
+#    pool: MAX
+#    kernel_size: 3 
+#    stride: 2
+#  }
+#}
 
 
 
 layer {
   name: "concat"
-  bottom: "pool2"
-  bottom: "pool2_p"
+  bottom: "conv2"
+  bottom: "conv2_p"
   top: "concat"
   type: "Concat"
   concat_param {

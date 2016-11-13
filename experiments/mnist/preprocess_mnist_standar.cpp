@@ -63,7 +63,7 @@ using namespace cv;
 #define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
 
 #define LMDB_SIZE 10000 
-#define LMDB_ROOT         "/media/eze/0F4A13791A35DD40/MNIST/"
+#define LMDB_ROOT         "/media/eze/Datasets/MNIST/"
 #define LMDB_TRAIN      (LMDB_ROOT"mnist_finetuning_standar10000_lmdb/")
 #define LMDB_TEST       (LMDB_ROOT"mnist_test_standar_lmdb/")
 
