@@ -1,13 +1,13 @@
 net: "scene.prototxt"
 type: "SGD"
 
-test_interval: 1000
+#test_interval: 1000
 #test_state: { stage: 'test-on-train' }
-test_iter: 500
+#test_iter: 500
 #test_state: { stage: 'test-on-test' }
 #test_iter: 500
 
-base_lr: 0.001
+base_lr: 0.0001
 momentum: 0.9
 weight_decay: 0.0005
 
@@ -18,10 +18,10 @@ gamma: 0.5
 
 # Display every 100 iterations
 display: 100
-max_iter: 60000
+max_iter: 20000
 
 snapshot: 1000
-snapshot_prefix: "../../snapshots/L5/snapshot_scene_5perclass_lr0.001"
+snapshot_prefix: "../../snapshots/L5/asdfsnapshot_scene_5perclass_lr0.0001"
 
 
 # solver mode: CPU or GPU

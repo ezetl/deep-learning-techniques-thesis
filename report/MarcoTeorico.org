@@ -2374,8 +2374,9 @@ KITTI-Net y AlexNet-20K). El paper no aporta informacion sobre la
 cantidad de iteraciones ni el learning rate usado.  Referirse al paper
 para comparar resultados obtenidos.
 
-***** TODO [#B] Descargar ILSVRC'12
+***** DONE Descargar ILSVRC'12
 ***** DONE Conseguir AlexNet prototxt
+***** TODO Preparar LMDBS de ILSVRC
 ***** TODO Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
 ***** DONE Preprocesar SUN: crop por el centro con dimension mas chica
 ***** DONE Crear LMDBS SUN. Utilizar solo 3 splits, como en el paper. Crea un LMDB para cada split
