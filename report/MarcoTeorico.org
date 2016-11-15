@@ -2380,6 +2380,8 @@ para comparar resultados obtenidos.
 ***** TODO Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
 ***** DONE Preprocesar SUN: crop por el centro con dimension mas chica
 ***** DONE Crear LMDBS SUN. Utilizar solo 3 splits, como en el paper. Crea un LMDB para cada split
+***** TODO Volver a probar su model contra el mio. Probar con y sin pooling en la ultima capa a la hora de finetuning. Quedarse con el mejor.
+***** TODO Probar con su deploy identico (finetuneando el de ellos con SUN y el mio con SUN)
 ***** TODO Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
 ***** TODO Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
 ***** TODO Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
