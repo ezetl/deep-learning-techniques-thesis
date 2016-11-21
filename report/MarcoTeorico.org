@@ -2258,7 +2258,6 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 **** DONE Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
 **** TODO Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
 **** DONE Probar el codigo de Agrawal, la parte de mnist. Resultado: el codigo es horrible, no pude entender bien nada, logre correr un entrenamiento de MNIST pero los resultados fueron los mismos
-
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
@@ -2267,6 +2266,11 @@ set de MNIST (sin transformaciones).  El test set que viene con MNIST
 se utiliza para testing.
 
 *** Resultados
+Los mejores resultados para egomotion se obtienen con lr0.01 en ambas
+etapas (egomotion y finetuning). Con capas LRN despues de pooling. Con
+normalizacion de los valores (de 255 a 0-1).
+
+Con lr de 0.1 en egomotion y finetuning no llega a mas del 75%
 **** Finetuning sobre egomotion
 ****************************************************************************************************
 Final Results
