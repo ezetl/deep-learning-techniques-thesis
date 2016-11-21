@@ -35,6 +35,9 @@ def print_lmdb_data(lmdb_path):
             cv2.imshow('im1', data[0])
             cv2.imshow('im2', data[1])
             cv2.waitKey(0)
+        elif dims == 1:
+            cv2.imshow('im1', data[0])
+            cv2.waitKey(0)
         elif dims == 6:
             im = data.astype(np.uint8)
             im1 = im[0:3]
