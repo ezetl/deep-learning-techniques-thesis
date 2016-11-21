@@ -1,9 +1,9 @@
 net: "siamese_mnist.prototxt"
 type: "SGD"
 
-#test_state: { stage: 'test-on-train' }
-#test_iter: 500
-#test_interval: 1000
+test_state: { stage: 'test-on-train' }
+test_iter: 500
+test_interval: 1000
 
 base_lr: 0.01
 momentum: 0.9
@@ -16,7 +16,7 @@ gamma: 0.5
 
 # Display every 100 iterations
 display: 100
-max_iter: 20000
+max_iter: 40000
 
 snapshot: 1000
 snapshot_prefix: "../../snapshots/egomotion/snapshot_mnist_egomotion_lr0.01"

@@ -1,4 +1,5 @@
 name: "MNIST"
+#### DATA
 layer {
   name: "data_train"
   type: "Data" 
@@ -10,6 +11,9 @@ layer {
   #transform_param {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
     source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
     batch_size: 125 
@@ -17,24 +21,27 @@ layer {
   }
 }
 
-layer {
-  name: "data_test_train"
-  type: "Data" 
-  top: "data"
-  top: "label"
-  include {
-    phase: TEST
-    stage: "test-on-train"
-  }
-  #transform_param {
-  #  mean_file: "../../data/mean_mnist.binaryproto"
-  #}
-  data_param {
-    source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
-    batch_size: 125 
-    backend: LMDB
-  }
-}
+#layer {
+#  name: "data_test_train"
+#  type: "Data" 
+#  top: "data"
+#  top: "label"
+#  include {
+#    phase: TEST
+#    stage: "test-on-train"
+#  }
+#  #transform_param {
+#  #  mean_file: "../../data/mean_mnist.binaryproto"
+#  #}
+#  transform_param {
+#    scale: 0.00390625
+#  }
+#  data_param {
+#    source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
+#    batch_size: 125 
+#    backend: LMDB
+#  }
+#}
 
 layer {
   name: "data_test"
@@ -43,14 +50,17 @@ layer {
   top: "label"
   include {
     phase: TEST
-    stage: "test-on-test"
+    #stage: "test-on-test"
   }
   #transform_param {
   #  mean_file: "../../data/mean_mnist.binaryproto"
   #}
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
-    source: "../../data/mnist_test_lmdb"
-    batch_size: 20 
+    source: "/media/eze/Datasets/MNIST/mnist_test_standar_lmdb"
+    batch_size: 125 
     backend: LMDB
   }
 }
@@ -104,11 +114,22 @@ layer {
     stride: 2
   }
 }
+layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "pool1"
+  top: "norm1"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 layer {
   name: "conv2"
   type: "Convolution"
-  bottom: "pool1"
+  bottom: "norm1"
   top: "conv2"
   param {
     name: "conv2_w"
@@ -142,20 +163,33 @@ layer {
 }
 
 
-#layer {
-#  name: "pool2"
-#  type: "Pooling"
-#  bottom: "conv2"
-#  top: "pool2"
-#  pooling_param {
-#    pool: MAX
-#    kernel_size: 3
-#    stride: 2
-#  }
-#}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
 
 layer {
-  bottom: "conv2"
+  name: "norm2"
+  type: "LRN"
+  bottom: "pool2"
+  top: "norm2"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
+
+
+layer {
+  bottom: "norm2"
   top: "fc"
   name: "fc"
   param {
@@ -260,7 +294,7 @@ layer {
   top: "test_accuracy"
   include {
     phase: TEST
-    stage: "test-on-test"
+    #stage: "test-on-test"
   }
 }
 
@@ -286,6 +320,6 @@ layer {
   loss_weight:1
   include {
     phase: TEST
-    stage: "test-on-test"
+    #stage: "test-on-test"
   }
 }

@@ -1,6 +1,7 @@
 name: "MNIST"
+#### TRAIN DATA
 layer {
-  name: "data"
+  name: "data_train"
   type: "Data" 
   top: "data"
   include {
@@ -9,24 +10,30 @@ layer {
   #transform_param {
   #  mean_file: "../data/mean_mnist.binaryproto"
   #}
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
     source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
-    batch_size: 512 
+    batch_size: 125 
     backend: LMDB
   }
 }
 
 layer {
-  name: "data"
+  name: "data_test"
   type: "Data" 
   top: "data"
   include {
     phase: TEST
     stage: "test-on-train"
   }
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
     source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
-    batch_size: 512 
+    batch_size: 125 
     backend: LMDB
   }
 }
@@ -121,11 +128,22 @@ layer {
     stride: 2
   }
 }
+layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "pool1"
+  top: "norm1"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 layer {
   name: "conv2"
   type: "Convolution"
-  bottom: "pool1"
+  bottom: "norm1"
   top: "conv2"
   param {
     name: "conv2_w"
@@ -162,17 +180,28 @@ layer {
 }
 
 
-#layer {
-#  name: "pool2"
-#  type: "Pooling"
-#  bottom: "conv2"
-#  top: "pool2"
-#  pooling_param {
-#    pool: MAX
-#    kernel_size: 3
-#    stride: 2
-#  }
-#}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "norm2"
+  type: "LRN"
+  bottom: "pool2"
+  top: "norm2"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 
 # Second component of siamese network
@@ -224,11 +253,22 @@ layer {
     stride: 2
   }
 }
+layer {
+  name: "norm1_p"
+  type: "LRN"
+  bottom: "pool1_p"
+  top: "norm1_p"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 layer {
   name: "conv2_p"
   type: "Convolution"
-  bottom: "pool1_p"
+  bottom: "norm1_p"
   top: "conv2_p"
   param {
     name: "conv2_w"
@@ -264,24 +304,35 @@ layer {
 }
 
 
-#layer {
-#  name: "pool2_p"
-#  type: "Pooling"
-#  bottom: "conv2_p"
-#  top: "pool2_p"
-#  pooling_param {
-#    pool: MAX
-#    kernel_size: 3 
-#    stride: 2
-#  }
-#}
+layer {
+  name: "pool2_p"
+  type: "Pooling"
+  bottom: "conv2_p"
+  top: "pool2_p"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3 
+    stride: 2
+  }
+}
+layer {
+  name: "norm2_p"
+  type: "LRN"
+  bottom: "pool2_p"
+  top: "norm2_p"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
 
 
 
 layer {
   name: "concat"
-  bottom: "conv2"
-  bottom: "conv2_p"
+  bottom: "norm2"
+  bottom: "norm2_p"
   top: "concat"
   type: "Concat"
   concat_param {
