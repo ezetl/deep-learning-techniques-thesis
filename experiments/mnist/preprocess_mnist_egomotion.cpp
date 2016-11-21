@@ -68,7 +68,7 @@ using namespace cv;
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
 
-#define LMDB_ROOT         "/media/eze/0F4A13791A35DD40/MNIST/"
+#define LMDB_ROOT         "/media/eze/Datasets/MNIST/"
 #define LMDB_TRAIN        (LMDB_ROOT"mnist_train_egomotion_lmdb/")
 
 typedef char Byte;
@@ -177,6 +177,7 @@ void create_lmdbs(const char* images, const char* labels, const char* lmdb_path)
         vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
         cout << "Batch images: " << batch_imgs.size() << endl;
         cout << "Batch pairs: " << batch_data.size() << endl;
+        random_shuffle(std::begin(batch_data), std::end(batch_data));
         for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
             // Dont use item_id as key here since we have 83/85 images per original image,
             // meaning that we will overwrite the same image 83/85 times instead of creating 
