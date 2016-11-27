@@ -2083,7 +2083,9 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 * Plan de Trabajo                                :noexport:
 ** Backlog
 *** DONE Hacer visualizador de lmdbs para chequear que esten bien guardados los datos (basarse en el que ya hice para mnist)
-*** TODO Abstraer creacion de lmdb en una clase en codigos de preprocessing (C++).
+*** TODO [#B] Abstraer creacion de lmdb en una clase. agregar label como parametro al insert_db para poder unificar SFA y egomotion
+*** TODO Integrar SFA y egomotion en una sola base de datos en cada script de preprocessing
+*** TODO Agregar path de lmdb como argumentdo command line
 *** TODO Hacer gif con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
