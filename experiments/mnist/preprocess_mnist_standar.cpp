@@ -1,9 +1,6 @@
 /*
  * This code parses the MNIST dataset files (images and labels).
  *
- * It was done for my low-endian machine, but you can set the LOW_ENDIAN
- * flag off and it will run in high endian mode (TODO)
- *
  * The main idea is to create a database with 5 million images to 
  * reproduce the results obtained in "Learning to See by Moving" by 
  * Agrawal el al.
@@ -53,10 +50,8 @@ using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define LOW_ENDIAN true
 #define TB 1099511627776
 
-#define DATA_ROOT    "../data/"
 #define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
 #define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
 #define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")

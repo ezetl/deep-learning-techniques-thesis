@@ -1,9 +1,6 @@
 /*
  * This code parses the MNIST dataset files (images and labels).
  *
- * It was done for my little-endian machine, but you can set the LITTLE_ENDIAN
- * flag off and it will run in high endian mode (TODO)
- *
  * The main idea is to create a database with million of images to
  * reproduce the results obtained in "Learning to See by Moving" by
  * Agrawal el al.
@@ -38,23 +35,14 @@
 #include <string>
 #include <sys/stat.h>
 #include <vector>
-
-#include <leveldb/db.h>
-#include <leveldb/write_batch.h>
-#include <lmdb.h>
-
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "lmdb_creator.hpp"
 
-#include "caffe/proto/caffe.pb.h"
-
-using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define L_ENDIAN true // LITTLE ENDIAN
-#define TB 1099511627776
 #define NUM_TRASLATIONS 7
 #define NUM_ROTATIONS 60
 #define NUM_BIN_ROTATIONS 20
@@ -64,12 +52,11 @@ using namespace cv;
 #define LOWER_TRASLATION -3
 #define BATCHES 6
 
-#define DATA_ROOT "../data/"
-#define TRAIN_IMAGES (DATA_ROOT "train-images-idx3-ubyte")
-#define TRAIN_LABELS (DATA_ROOT "train-labels-idx1-ubyte")
+#define TRAIN_IMAGES (DATA_ROOT"/train-images-idx3-ubyte")
+#define TRAIN_LABELS (DATA_ROOT"/train-labels-idx1-ubyte")
 
 #define LMDB_ROOT "/media/eze/Datasets/MNIST/"
-#define LMDB_TRAIN (LMDB_ROOT "mnist_train_egomotion_lmdb/")
+#define LMDB_TRAIN (LMDB_ROOT "mnist_train_egomotion_lmdb")
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -89,8 +76,7 @@ typedef struct {
   Label z;
 } DataBlob;
 
-void create_lmdbs(const char *images, const char *labels,
-                  const char *lmdb_path);
+void create_lmdb(const char *images, const char *lmdb_path);
 uint32_t get_uint32_t(ifstream &f, streampos offset);
 vector<uByte> read_block(ifstream &f, unsigned int size, streampos offset);
 MNIST_metadata parse_images_header(ifstream &f);
@@ -100,66 +86,25 @@ void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<Label> *labels);
 Mat transform_image(Mat &img, float tx, float ty, float rot);
 vector<Mat> load_images(string path);
 vector<Label> load_labels(string path);
-vector<DataBlob> process_images(vector<Mat> &list_imgs,
-                                unsigned int amount_pairs);
+vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs);
 unsigned int generate_rand(int range_limit);
 
 int main(int argc, char **argv) {
   cout << "Creating train LMDB\n";
-  create_lmdbs(TRAIN_IMAGES, TRAIN_LABELS, LMDB_TRAIN);
+  create_lmdb(TRAIN_IMAGES, LMDB_TRAIN);
   return 0;
 }
 
-void create_lmdbs(const char *images, const char *labels,
-                  const char *lmdb_path) {
-  /* LMDB related code was adapted from Caffe script convert_mnist_data.cpp */
-  /* We dont use labels in this case */
-
-  // lmdb data
-  MDB_env *mdb_env;
-  MDB_dbi mdb_dbi;
-  MDB_val mdb_key, mdb_data;
-  MDB_txn *mdb_txn;
-
-  // Set database environment
-  mkdir(lmdb_path, 0744);
-
-  // Create Data LMDB
-  mdb_env_create(&mdb_env);
-  mdb_env_set_mapsize(mdb_env, TB);
-  mdb_env_open(mdb_env, lmdb_path, 0, 0664);
-  mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
-  mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
-
+void create_lmdb(const char *images, const char *lmdb_path) {
   // Load images/labels
   vector<Mat> list_imgs = load_images(images);
   random_shuffle(std::begin(list_imgs), std::end(list_imgs));
 
-  // Dimensions of Data LMDB
-  unsigned int rows = list_imgs[0].rows;
-  unsigned int cols = list_imgs[0].cols;
-
-  int count = 0;
-  string data_value, label_value;
-
-  // Data datum
-  // This datum has 2 + NUM_CLASSES dimensions.
-  // 2 dimensiones because we are merging 2 one channel images into one,
-  // plus NUM_CLASSES (3) because we are also merging the labels into the data.
-  // This allow us to slice the data later on training phase and retrieve the
-  // labels.
-  // Basically I am adding 3 "images" with all zeros in it except the index
-  // where the class
-  // is active. Then with the Argmax Layer of Caffe I retrieve these labels
-  // index again and pass them
-  // to the loss function.
-  // Chek the loop below to see how it is done.
-  Datum datum;
-  datum.set_channels(2 + NUM_CLASSES);
-  datum.set_height(rows);
-  datum.set_width(cols);
-
-  std::ostringstream s;
+  // Create databases frontends
+  string labels_path(lmdb_path);
+  labels_path = labels_path + "_labels";
+  LMDataBase *labels_lmdb = new LMDataBase((const char *)labels_path.c_str(), (size_t)NUM_CLASSES, 1);
+  LMDataBase *data_lmdb = new LMDataBase(lmdb_path, (size_t)2, (size_t)list_imgs[0].rows);
 
   // Processing and generating million of images at once will consume too much
   // RAM (>7GB)
@@ -170,74 +115,23 @@ void create_lmdbs(const char *images, const char *labels,
   for (unsigned int i = 0; i < BATCHES; i++) {
     unsigned int begin = i * len_batch;
     unsigned int end = begin + len_batch;
-    vector<Mat> batch_imgs =
-        vector<Mat>(list_imgs.begin() + begin, list_imgs.begin() + end);
+    vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin() + begin, list_imgs.begin() + end);
     unsigned int amount_pairs = 83;
     if (i == 0) {
       amount_pairs = 85;
     }
     vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
-    cout << "Batch images: " << batch_imgs.size() << endl;
-    cout << "Batch pairs: " << batch_data.size() << endl;
+    cout << "Batch images: " << batch_imgs.size() << " Batch pairs: " << batch_data.size() << endl;
     random_shuffle(std::begin(batch_data), std::end(batch_data));
     for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
-      // Dont use item_id as key here since we have 83/85 images per original
-      // image,
-      // meaning that we will overwrite the same image 83/85 times instead of
-      // creating
-      // a new entry
-      s << std::setw(8) << std::setfill('0') << count;
-      string key_str = s.str();
-      s.str(std::string());
-
-      // Set Data
-      // Create a char pointer and copy the images first, the labels at the end
-      char *data_label;
-      data_label = (char *)calloc(rows * cols * 5, sizeof(uByte));
-      memcpy(data_label, (void *)batch_data[item_id].img1.data, rows * cols);
-      memcpy(data_label + (rows * cols), (void *)batch_data[item_id].img2.data,
-             rows * cols);
-
-      char *labels;
-      unsigned int labelx = (unsigned int)batch_data[item_id].x;
-      unsigned int labely = (unsigned int)batch_data[item_id].y;
-      unsigned int labelz = (unsigned int)batch_data[item_id].z;
-      labels = (char *)calloc(rows * cols * 3, sizeof(uByte));
-      labels[labelx] = 1;
-      labels[cols * rows + labely] = 1;
-      labels[cols * rows * 2 + labelz] = 1;
-      memcpy(data_label + (cols * rows * 2), (void *)labels, 3 * rows * cols);
-
-      datum.set_data((char *)data_label, 5 * rows * cols);
-      datum.SerializeToString(&data_value);
-
-      // Save Data
-      mdb_data.mv_size = data_value.size();
-      mdb_data.mv_data = reinterpret_cast<void *>(&data_value[0]);
-      mdb_key.mv_size = key_str.size();
-      mdb_key.mv_data = reinterpret_cast<void *>(&key_str[0]);
-      mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
-
-      if (++count % 1000 == 0) {
-        // Commit txn Data
-        mdb_txn_commit(mdb_txn);
-        mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
-      }
-      if (count % 50000 == 0) {
-        cout << "Processed " << count << "\r" << flush;
-      }
-      free(data_label);
-      free(labels);
+      data_lmdb->insert2db(batch_data[item_id].img1, batch_data[item_id].img2);
+      vector<Label> labels = {(Label)batch_data[item_id].x, (Label)batch_data[item_id].y,
+                              (Label)batch_data[item_id].z};
+      labels_lmdb->insert2db(labels);
     }
   }
-  // Last batch
-  if (count % 1000 != 0) {
-    mdb_txn_commit(mdb_txn);
-    mdb_close(mdb_env, mdb_dbi);
-    mdb_env_close(mdb_env);
-  }
-
-  cout << "\nFinished creation of LMDB with " << count << " pairs of images.\n";
+  delete labels_lmdb;
+  delete data_lmdb;
   return;
 }
 
@@ -302,8 +196,7 @@ MNIST_metadata parse_labels_header(ifstream &f) {
   return meta;
 }
 
-void parse_labels_data(ifstream &f, MNIST_metadata meta,
-                       vector<Label> *labels) {
+void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<Label> *labels) {
   // 4 integers in the header of the images file
   streampos offset = sizeof(uint32_t) * 2;
   for (unsigned int i = 0; i < meta.num_elems; i++) {
@@ -370,13 +263,12 @@ Mat transform_image(Mat &img, float tx, float ty, float rot) {
   Mat transMat = (Mat_<double>(2, 3) << 0, 0, tx, 0, 0, ty);
   rotMat = rotMat + transMat;
   // Set constant value for border to be white
-  warpAffine(img, res, rotMat, Size(img.cols, img.rows), INTER_LINEAR,
-             BORDER_CONSTANT, Scalar(0, 0, 0));
+  warpAffine(img, res, rotMat, Size(img.cols, img.rows), INTER_LINEAR, BORDER_CONSTANT,
+             Scalar(0, 0, 0));
   return res;
 }
 
-vector<DataBlob> process_images(vector<Mat> &list_imgs,
-                                unsigned int amount_pairs) {
+vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs) {
   vector<DataBlob> final_data;
   srand(0);
   unsigned int rand_index = 0;

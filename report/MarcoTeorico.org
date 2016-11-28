@@ -2083,9 +2083,12 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 * Plan de Trabajo                                :noexport:
 ** Backlog
 *** DONE Hacer visualizador de lmdbs para chequear que esten bien guardados los datos (basarse en el que ya hice para mnist)
-*** TODO [#B] Abstraer creacion de lmdb en una clase. agregar label como parametro al insert_db para poder unificar SFA y egomotion
+*** DONE Abstraer creacion de lmdb en una clase.
+*** TODO agregar label como parametro al insert_db para poder unificar SFA y egomotion
 *** TODO Integrar SFA y egomotion en una sola base de datos en cada script de preprocessing
 *** TODO Agregar path de lmdb como argumentdo command line
+*** TODO Remover Caffe de los "preprocess_mnist..etc". Ahora se linkea desde lmdb_creator
+*** TODO Agregar LMDB_ROOT como parametro obligatorio para pasar al cmake.
 *** TODO Hacer gif con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
@@ -2155,7 +2158,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [90%] Entrenamiento
+*** [83%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2260,6 +2263,7 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 **** DONE Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
 **** TODO Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
 **** DONE Probar el codigo de Agrawal, la parte de mnist. Resultado: el codigo es horrible, no pude entender bien nada, logre correr un entrenamiento de MNIST pero los resultados fueron los mismos
+**** TODO Probar con menos pares (<85)
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan

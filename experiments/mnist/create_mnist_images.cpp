@@ -35,14 +35,12 @@ using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define LOW_ENDIAN true
 #define TB 1099511627776
 
-#define DATA_ROOT    "../data/"
-#define TRAIN_IMAGES (DATA_ROOT"train-images-idx3-ubyte")
-#define TRAIN_LABELS (DATA_ROOT"train-labels-idx1-ubyte")
-#define TEST_IMAGES  (DATA_ROOT"t10k-images-idx3-ubyte")
-#define TEST_LABELS  (DATA_ROOT"t10k-labels-idx1-ubyte")
+#define TRAIN_IMAGES (DATA_ROOT"/train-images-idx3-ubyte")
+#define TRAIN_LABELS (DATA_ROOT"/train-labels-idx1-ubyte")
+#define TEST_IMAGES  (DATA_ROOT"/t10k-images-idx3-ubyte")
+#define TEST_LABELS  (DATA_ROOT"/t10k-labels-idx1-ubyte")
 
 #define LMDB_SIZE 10000
 #define LMDB_ROOT         "/media/eze/Datasets/MNIST/"

@@ -2,7 +2,7 @@
 
 LMDataBase::LMDataBase(const char *lmdb_path, size_t dat_channels,
                        size_t dat_size)
-    : datum_channels(num_channels), datum_size(dsize), num_inserts(0) {
+    : datum_channels(dat_channels), datum_size(dat_size), num_inserts(0) {
   // Set database environment
   mkdir(lmdb_path, 0744);
   // Create LMDB
@@ -11,10 +11,6 @@ LMDataBase::LMDataBase(const char *lmdb_path, size_t dat_channels,
   mdb_env_open(mdb_env, lmdb_path, 0, 0664);
   mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
   mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
-
-  datum.set_channels(datum_channels);
-  datum.set_height(datum_size);
-  datum.set_width(datum__size);
 }
 
 void LMDataBase::insert2db(Mat &img) {
@@ -28,9 +24,7 @@ void LMDataBase::insert2db(Mat &img) {
   datum.SerializeToString(&data_value);
 
   save_data_to_lmdb(data_value);
-  cout << "Processed " << count << "\r" << flush;
-
-  num_inserts++;
+  cout << "Processed " << ++num_inserts << "\r" << flush;
 }
 
 void LMDataBase::insert2db(Mat &img1, Mat &img2) {
@@ -47,9 +41,7 @@ void LMDataBase::insert2db(Mat &img1, Mat &img2) {
   datum.SerializeToString(&data_value);
 
   save_data_to_lmdb(data_value);
-  cout << "Processed " << count << "\r" << flush;
-
-  num_inserts++;
+  cout << "Processed " << ++num_inserts << "\r" << flush;
 }
 
 void LMDataBase::insert2db(vector<Label> &labels) {
@@ -62,7 +54,7 @@ void LMDataBase::insert2db(vector<Label> &labels) {
 
   save_data_to_lmdb(label_value);
 
-  num_inserts++;
+  ++num_inserts;
 }
 
 void LMDataBase::save_data_to_lmdb(string &data_value) {
@@ -73,8 +65,8 @@ void LMDataBase::save_data_to_lmdb(string &data_value) {
 
   mdb_data.mv_size = data_value.size();
   mdb_data.mv_data = reinterpret_cast<void *>(&data_value[0]);
-  mdb_key.mv_size = key_str.size();
-  mdb_key.mv_data = reinterpret_cast<void *>(&key_str[0]);
+  mdb_key.mv_size = key.size();
+  mdb_key.mv_data = reinterpret_cast<void *>(&key[0]);
   mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
   if (num_inserts % 1000 == 0) {
     commit_data_to_lmdb();
@@ -94,8 +86,8 @@ void LMDataBase::close_env_lmdb(){
 
 void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum) {
   // Modified from CVMatToDatum from Caffe
-  CHECK(img1.depth() == CV_8U) << "Image data type must be unsigned byte";
-  CHECK(img2.depth() == CV_8U) << "Image data type must be unsigned byte";
+  assert(img1.depth() == CV_8U);
+  assert(img2.depth() == CV_8U);
   datum->set_channels(img1.channels() + img2.channels());
   datum->set_height(img1.rows);
   datum->set_width(img1.cols);
@@ -125,7 +117,7 @@ void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum) {
 }
 
 void Mat2Datum(const Mat &img, Datum *datum) {
-  CHECK(img.depth() == CV_8U) << "Image data type must be unsigned byte";
+  assert(img.depth() == CV_8U);
   datum->set_channels(img.channels());
   datum->set_height(img.rows);
   datum->set_width(img.cols);
