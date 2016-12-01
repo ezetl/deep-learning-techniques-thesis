@@ -98,18 +98,15 @@ int main(int argc, char **argv) {
 void create_lmdb(const char *images, const char *lmdb_path) {
   // Load images/labels
   vector<Mat> list_imgs = load_images(images);
-  random_shuffle(std::begin(list_imgs), std::end(list_imgs));
 
-  // Create databases frontends
+  // Create databases objects
   string labels_path(lmdb_path);
   labels_path = labels_path + "_labels";
   LMDataBase *labels_lmdb = new LMDataBase((const char *)labels_path.c_str(), (size_t)NUM_CLASSES, 1);
   LMDataBase *data_lmdb = new LMDataBase(lmdb_path, (size_t)2, (size_t)list_imgs[0].rows);
 
-  // Processing and generating million of images at once will consume too much
-  // RAM (>7GB)
-  // and it will (probably) throw a std::bad_alloc exception.
-  // Lets split the processing in several batches instead.
+  // Processing and generating million of images at once will consume too much RAM (>7GB) and it will
+  // (probably) throw a std::bad_alloc exception. Lets split the processing in several batches instead.
   // list_imgs.size() has to be multiple of BATCHES (to simplify things)
   int len_batch = list_imgs.size() / BATCHES;
   for (unsigned int i = 0; i < BATCHES; i++) {
