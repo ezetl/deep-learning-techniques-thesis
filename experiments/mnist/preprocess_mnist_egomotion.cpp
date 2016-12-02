@@ -86,7 +86,7 @@ void parse_labels_data(ifstream &f, MNIST_metadata meta, vector<Label> *labels);
 Mat transform_image(Mat &img, float tx, float ty, float rot);
 vector<Mat> load_images(string path);
 vector<Label> load_labels(string path);
-vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs);
+vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int pairs_per_img);
 unsigned int generate_rand(int range_limit);
 
 int main(int argc, char **argv) {
@@ -113,15 +113,15 @@ void create_lmdb(const char *images, const char *lmdb_path) {
     unsigned int begin = i * len_batch;
     unsigned int end = begin + len_batch;
     vector<Mat> batch_imgs = vector<Mat>(list_imgs.begin() + begin, list_imgs.begin() + end);
-    unsigned int amount_pairs = 83;
-    if (i == 0) {
-      amount_pairs = 85;
-    }
-    vector<DataBlob> batch_data = process_images(batch_imgs, amount_pairs);
+    unsigned int pairs_per_img = 83 * (i != 0) + 85 * (i == 0); // for a total of 5million imgs
+    vector<DataBlob> batch_data = process_images(batch_imgs, pairs_per_img);
     cout << "Batch images: " << batch_imgs.size() << " Batch pairs: " << batch_data.size() << endl;
     random_shuffle(std::begin(batch_data), std::end(batch_data));
     for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
-      data_lmdb->insert2db(batch_data[item_id].img1, batch_data[item_id].img2);
+      int sfa_label = (Label) (batch_data[item_id].x >= 2 && batch_data[item_id].x <= 4 &&
+                               batch_data[item_id].y >= 2 && batch_data[item_id].y <= 4 &&
+                               (batch_data[item_id].z == 9 || batch_data[item_id].z == 10));
+      data_lmdb->insert2db(batch_data[item_id].img1, batch_data[item_id].img2, sfa_label);
       vector<Label> labels = {(Label)batch_data[item_id].x, (Label)batch_data[item_id].y,
                               (Label)batch_data[item_id].z};
       labels_lmdb->insert2db(labels);
@@ -265,7 +265,7 @@ Mat transform_image(Mat &img, float tx, float ty, float rot) {
   return res;
 }
 
-vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pairs) {
+vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int pairs_per_img) {
   vector<DataBlob> final_data;
   srand(0);
   unsigned int rand_index = 0;
@@ -288,7 +288,7 @@ vector<DataBlob> process_images(vector<Mat> &list_imgs, unsigned int amount_pair
     // Use white background
     // bitwise_not(list_imgs[i], list_imgs[i]);
 
-    for (unsigned int j = 0; j < amount_pairs; j++) {
+    for (unsigned int j = 0; j < pairs_per_img; j++) {
       DataBlob d;
       // Generate random X translation
       rand_index = generate_rand(NUM_TRASLATIONS);

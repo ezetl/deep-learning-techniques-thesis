@@ -13,7 +13,7 @@ LMDataBase::LMDataBase(const char *lmdb_path, size_t dat_channels,
   mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
 }
 
-void LMDataBase::insert2db(Mat &img) {
+void LMDataBase::insert2db(Mat &img, int label = -10) {
   assert((size_t)img.cols == datum_size);
   assert((size_t)img.rows == datum_size);
   assert((size_t)img.channels() == datum_channels);
@@ -21,13 +21,16 @@ void LMDataBase::insert2db(Mat &img) {
   string data_value;
   Datum datum;
   Mat2Datum(img, &datum);
+  if (label != -10) {
+    datum.set_label(label);
+  }
   datum.SerializeToString(&data_value);
 
   save_data_to_lmdb(data_value);
   cout << "Processed " << ++num_inserts << "\r" << flush;
 }
 
-void LMDataBase::insert2db(Mat &img1, Mat &img2) {
+void LMDataBase::insert2db(Mat &img1, Mat &img2, int label = -10) {
   assert((size_t)img1.cols == datum_size);
   assert((size_t)img1.rows == datum_size);
   assert((size_t)img2.cols == datum_size);
@@ -38,6 +41,9 @@ void LMDataBase::insert2db(Mat &img1, Mat &img2) {
   string data_value;
   Datum datum;
   Mats2Datum(img1, img2, &datum);
+  if (label != -10) {
+    datum.set_label(label);
+  }
   datum.SerializeToString(&data_value);
 
   save_data_to_lmdb(data_value);
@@ -86,6 +92,7 @@ void LMDataBase::close_env_lmdb(){
 
 void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum) {
   // Modified from CVMatToDatum from Caffe
+  // TODO: merge these two methods somehow
   assert(img1.depth() == CV_8U);
   assert(img2.depth() == CV_8U);
   datum->set_channels(img1.channels() + img2.channels());
