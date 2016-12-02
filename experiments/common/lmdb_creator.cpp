@@ -1,14 +1,13 @@
 #include "lmdb_creator.hpp"
 
-LMDataBase::LMDataBase(const char *lmdb_path, size_t dat_channels,
-                       size_t dat_size)
+LMDataBase::LMDataBase(string lmdb_path, size_t dat_channels, size_t dat_size)
     : datum_channels(dat_channels), datum_size(dat_size), num_inserts(0) {
   // Set database environment
-  mkdir(lmdb_path, 0744);
+  mkdir(static_cast<const char *>(lmdb_path.c_str()), 0744);
   // Create LMDB
   mdb_env_create(&mdb_env);
   mdb_env_set_mapsize(mdb_env, TB);
-  mdb_env_open(mdb_env, lmdb_path, 0, 0664);
+  mdb_env_open(mdb_env, static_cast<const char *>(lmdb_path.c_str()), 0, 0664);
   mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
   mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
 }

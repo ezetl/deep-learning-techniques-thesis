@@ -20,8 +20,7 @@ using namespace cv;
 using namespace caffe;
 
 typedef char Byte;
-typedef unsigned char uByte;
-typedef uByte Label;
+typedef unsigned char Label;
 
 void Mat2Datum(const Mat &img, Datum *datum);
 void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum);
@@ -55,7 +54,7 @@ public:
    * LMDataBase(path, 6, 224) for 3 channels images of 224x224 *
    * LMDataBase(path, 2, 28)  for 1 channel images of 28x28    *
    *************************************************************/
-  LMDataBase(const char *lmdb_path, size_t dat_channels, size_t dat_size);
+  LMDataBase(string lmdb_path, size_t dat_channels, size_t dat_size);
   ~LMDataBase() {
     close_env_lmdb();
     cout << "\nFinished creation of LMDB with " << num_inserts << " pairs of images.\n";
