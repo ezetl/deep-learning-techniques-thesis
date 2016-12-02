@@ -1,4 +1,5 @@
-set(FILES "preprocess_mnist_siamese.cpp" "preprocess_mnist_standar.cpp")
+set(SRC "./src")
+set(FILES "${SRC}/preprocess_mnist_siamese.cpp" "${SRC}/preprocess_mnist_standar.cpp")
 
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3 -std=c++11")
 
@@ -18,6 +19,6 @@ add_definitions(-DDATA_ROOT="${DATA_ROOT}")
 
 foreach(infile ${FILES})
     get_filename_component(outname ${infile} NAME_WE)
-    add_executable(${outname} ${infile} mnist_utils.hpp mnist_utils.cpp)
+    add_executable(${outname} ${infile} ${SRC}/mnist_utils.hpp ${SRC}/mnist_utils.cpp)
     target_link_libraries(${outname} ${Caffe_LIBRARIES} ${OpenCV_LIBS} lmdb_creator)
 endforeach(infile)
