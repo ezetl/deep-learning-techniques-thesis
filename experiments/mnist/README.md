@@ -32,10 +32,8 @@ Steps to reproduce results:
 
 5. Train the CNN by stepping in the folder of the experiment you've chosen (`./prototxt/egomotion`, `./prototxt/contrastive`, `./prototxt/finetuning` or `./prototxt/standar`) and running the following command:
    ```
-   caffe train --gpu=all --solver=solver.prototxt
+   caffe train --gpu=all --solver=solver.prototxt  # in my case, "caffe" is an alias to the tool located in `/home/eze/.Software/caffe/build/tools/caffe`.
    ```
-   
-   In my case, "caffe" is an alias to the tool located in `/home/eze/.Software/caffe/build/tools/caffe`.
 
 6. Once you trained your network you can finetune the model in `./prototxt/finetuning`. Please also change the LMDB's paths to one of your LMDBs created using `../build/mnist/preprocess_mnist_standar`.
 
