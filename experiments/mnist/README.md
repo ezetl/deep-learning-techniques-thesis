@@ -31,17 +31,14 @@ Steps to reproduce results:
 4. Once you have created the proper LMDBs you have to modify the .prototxt files in `./prototxt/` to point the input layers to your LMDBs. Please do read those files and change the `data_param.source` param of the `Data` layer to your recently created LMDB 
 
 5. Train the CNN by stepping in the folder of the experiment you've chosen (`./prototxt/egomotion`, `./prototxt/contrastive`, `./prototxt/finetuning` or `./prototxt/standar`) and running the following command:
-
    ```
    caffe train --gpu=all --solver=solver.prototxt
    ```
-
    In my case, "caffe" is an alias to the tool located in `/home/eze/.Software/caffe/build/tools/caffe`.
 
 6. Once you trained your network you can finetune the model in `./prototxt/finetuning`. Please also change the LMDB's paths to one of your LMDBs created using `../build/mnist/preprocess_mnist_standar`.
 
 7. Evaluate the final model by running (also inside `./prototxt/finetuning`):
-
    ```
    caffe test --gpu=all --model=finetuning_mnist.prototxt --weights=../../snapshots/some.caffemodel --iterations 500
    ```
