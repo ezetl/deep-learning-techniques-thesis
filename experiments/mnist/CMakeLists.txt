@@ -1,4 +1,4 @@
-set(FILES "preprocess_mnist_egomotion.cpp" "preprocess_mnist_standar.cpp")
+set(FILES "preprocess_mnist_siamese.cpp" "preprocess_mnist_standar.cpp")
 
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3 -std=c++11")
 

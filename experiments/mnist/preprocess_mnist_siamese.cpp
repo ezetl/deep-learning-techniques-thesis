@@ -54,13 +54,6 @@ using namespace cv;
 #define BATCHES 6
 
 typedef struct {
-  uint32_t magic;
-  uint32_t num_elems;
-  uint32_t cols;
-  uint32_t rows;
-} MNIST_metadata;
-
-typedef struct {
   Mat img1;
   Mat img2;
   Label x;
@@ -111,9 +104,8 @@ void create_lmdb(string images, string lmdb_path) {
     cout << "Batch images: " << batch_imgs.size() << " Batch pairs: " << batch_data.size() << endl;
     random_shuffle(std::begin(batch_data), std::end(batch_data));
     for (unsigned int item_id = 0; item_id < batch_data.size(); ++item_id) {
-      int sfa_label =
-          (Label)(batch_data[item_id].x >= 2 && batch_data[item_id].x <= 4 && batch_data[item_id].y >= 2 &&
-                  batch_data[item_id].y <= 4 && (batch_data[item_id].z == 9 || batch_data[item_id].z == 10));
+      int sfa_label = (Label)(batch_data[item_id].x >= 2 && batch_data[item_id].x <= 4 && batch_data[item_id].y >= 2 &&
+                              batch_data[item_id].y <= 4 && (batch_data[item_id].z == 9 || batch_data[item_id].z == 10));
       data_lmdb->insert2db(batch_data[item_id].img1, batch_data[item_id].img2, sfa_label);
       vector<Label> labels = {(Label)batch_data[item_id].x, (Label)batch_data[item_id].y,
                               (Label)batch_data[item_id].z};
