@@ -74,11 +74,13 @@ int main(int argc, char **argv) {
     cout << "Please use the script experiments/mnist/download_mnist.sh to get the "
          << "original version of the MNIST dataset\n\n";
   } else {
-    cout << "Creating LMDBs\n";
+    cout << "Creating LMDB\n";
     string orig_imgs_path(argv[1]);
     string lmdb_data_path = string(argv[2]) + "/mnist_train_siamese_lmdb";
     create_lmdb(orig_imgs_path, lmdb_data_path);
+    cout << "Created LMDB in " << lmdb_data_path << endl;
   }
+
   return 0;
 }
 

@@ -1,4 +1,5 @@
 #include "lmdb_creator.hpp"
+#include "caffe/util/io.hpp"
 
 LMDataBase::LMDataBase(string lmdb_path, size_t dat_channels, size_t dat_size)
     : datum_channels(dat_channels), datum_size(dat_size), num_inserts(0) {
@@ -12,13 +13,15 @@ LMDataBase::LMDataBase(string lmdb_path, size_t dat_channels, size_t dat_size)
   mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
 }
 
-void LMDataBase::insert2db(Mat &img, int label = -10) {
+void LMDataBase::insert2db(const Mat &img, int label = -10) {
   assert((size_t)img.cols == datum_size);
   assert((size_t)img.rows == datum_size);
   assert((size_t)img.channels() == datum_channels);
 
   string data_value;
   Datum datum;
+  // TODO: fix this linking error
+  //CVMatToDatum(img, &datum);
   Mat2Datum(img, &datum);
   if (label != -10) {
     datum.set_label(label);
@@ -29,7 +32,7 @@ void LMDataBase::insert2db(Mat &img, int label = -10) {
   cout << "Processed " << ++num_inserts << "\r" << flush;
 }
 
-void LMDataBase::insert2db(Mat &img1, Mat &img2, int label = -10) {
+void LMDataBase::insert2db(const Mat &img1, const Mat &img2, int label = -10) {
   assert((size_t)img1.cols == datum_size);
   assert((size_t)img1.rows == datum_size);
   assert((size_t)img2.cols == datum_size);
@@ -49,12 +52,18 @@ void LMDataBase::insert2db(Mat &img1, Mat &img2, int label = -10) {
   cout << "Processed " << ++num_inserts << "\r" << flush;
 }
 
-void LMDataBase::insert2db(vector<Label> &labels) {
+void LMDataBase::insert2db(const vector<Label> &labels) {
   assert(labels.size() == datum_channels);
 
   string label_value;
   Datum datum;
-  datum.set_data(reinterpret_cast<char*>(&labels[0]), datum_channels);
+  datum.set_channels(labels.size());
+  datum.set_height(1);
+  datum.set_width(1);
+  datum.clear_data();
+  datum.clear_float_data();
+  datum.set_encoded(false);
+  datum.set_data(reinterpret_cast<const char*>(&labels[0]), datum_channels);
   datum.SerializeToString(&label_value);
 
   save_data_to_lmdb(label_value);
@@ -91,7 +100,6 @@ void LMDataBase::close_env_lmdb(){
 
 void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum) {
   // Modified from CVMatToDatum from Caffe
-  // TODO: merge these two methods somehow
   assert(img1.depth() == CV_8U);
   assert(img2.depth() == CV_8U);
   datum->set_channels(img1.channels() + img2.channels());
@@ -142,7 +150,7 @@ void Mat2Datum(const Mat &img, Datum *datum) {
     for (int w = 0; w < datum_width; ++w) {
       for (int c = 0; c < datum_channels; ++c) {
         int datum_index = (c * datum_height + h) * datum_width + w;
-        buffer[datum_index] = static_cast<char>(ptr[img_index]);
+        buffer[datum_index] = static_cast<char>(ptr[img_index++]);
       }
     }
   }

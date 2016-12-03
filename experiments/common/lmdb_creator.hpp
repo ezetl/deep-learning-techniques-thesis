@@ -12,6 +12,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/util/io.hpp"
 
 #define TB 1099511627776
 
@@ -22,8 +23,8 @@ using namespace caffe;
 typedef char Byte;
 typedef unsigned char Label;
 
-void Mat2Datum(const Mat &img, Datum *datum);
 void Mats2Datum(const Mat &img1, const Mat &img2, Datum *datum);
+void Mat2Datum(const Mat &img, Datum *datum);
 
 class LMDataBase {
 public:
@@ -59,9 +60,9 @@ public:
     close_env_lmdb();
     cout << "\nFinished creation of LMDB with " << num_inserts << " pairs of images.\n";
   };
-  void insert2db(Mat &img, int label);
-  void insert2db(Mat &img1, Mat &img2, int label);
-  void insert2db(vector<Label> &labels);
+  void insert2db(const Mat &img, int label);
+  void insert2db(const Mat &img1, const Mat &img2, int label);
+  void insert2db(const vector<Label> &labels);
 
 private:
   MDB_env *mdb_env;
