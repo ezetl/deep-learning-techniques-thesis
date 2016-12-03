@@ -87,7 +87,7 @@ void create_lmdb(string images, string lmdb_path) {
   vector<Mat> list_imgs = load_images(images);
 
   // Create databases objects
-  string labels_path = labels_path + "_labels";
+  string labels_path = lmdb_path + "_labels";
   LMDataBase *labels_lmdb = new LMDataBase(labels_path, (size_t)NUM_CLASSES, 1);
   LMDataBase *data_lmdb = new LMDataBase(lmdb_path, (size_t)2, (size_t)list_imgs[0].rows);
 
