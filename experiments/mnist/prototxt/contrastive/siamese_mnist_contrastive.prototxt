@@ -1,4 +1,5 @@
 name: "MNIST"
+### SFA Learning
 layer {
   name: "data"
   type: "Data" 
@@ -7,13 +8,15 @@ layer {
   include {
     phase: TRAIN
   }
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
-    source: "../../data/mnist_train_contrastive_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb"
     batch_size: 125 
     backend: LMDB
   }
 }
-
 layer {
   name: "data"
   type: "Data" 
@@ -23,13 +26,15 @@ layer {
     phase: TEST
     stage: "test-on-train"
   }
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
-    source: "../../data/mnist_train_contrastive_lmdb"
-    batch_size: 50 
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb"
+    batch_size: 125 
     backend: LMDB
   }
 }
-
 
 layer {
     name: "slice_data"
