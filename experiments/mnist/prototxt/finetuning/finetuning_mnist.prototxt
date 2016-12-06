@@ -15,7 +15,7 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "/media/eze/Datasets/MNIST/mnist_finetuning_standar10000_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_standar_lmdb_10000"
     batch_size: 125 
     backend: LMDB
   }

@@ -1,27 +1,37 @@
 name: "MNIST"
 #### TRAIN DATA
 layer {
-  name: "data_train"
+  name: "data"
   type: "Data" 
   top: "data"
   include {
     phase: TRAIN
   }
-  #transform_param {
-  #  mean_file: "../data/mean_mnist.binaryproto"
-  #}
   transform_param {
     scale: 0.00390625
   }
   data_param {
-    source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb"
+    batch_size: 125 
+    backend: LMDB
+  }
+}
+layer {
+  name: "labels"
+  type: "Data" 
+  top: "labels"
+  include {
+    phase: TRAIN
+  }
+  data_param {
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb_labels"
     batch_size: 125 
     backend: LMDB
   }
 }
 
 layer {
-  name: "data_test"
+  name: "data"
   type: "Data" 
   top: "data"
   include {
@@ -32,12 +42,25 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "/media/eze/Datasets/MNIST/mnist_train_egomotion_lmdb"
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb"
     batch_size: 125 
     backend: LMDB
   }
 }
-
+layer {
+  name: "labels"
+  type: "Data" 
+  top: "labels"
+  include {
+    phase: TEST
+    stage: "test-on-train"
+  }
+  data_param {
+    source: "/media/eze/Datasets/MNIST/mnist_train_siamese_lmdb_labels"
+    batch_size: 125 
+    backend: LMDB
+  }
+}
 
 layer {
     name: "slice_data"
@@ -45,6 +68,16 @@ layer {
     bottom: "data"
     top: "data0"
     top: "data1"
+    slice_param {
+      axis: 1
+      slice_point: 1 
+    }
+}
+
+layer {
+    name: "slice_labels"
+    type: "Slice"
+    bottom: "labels"
     top: "labelx"
     top: "labely"
     top: "labelz"
@@ -52,30 +85,7 @@ layer {
       axis: 1
       slice_point: 1 
       slice_point: 2
-      slice_point: 3
-      slice_point: 4
     }
-}
-
-layer {
-  name: "argmaxX"
-  type: "ArgMax"
-  bottom: "labelx"
-  top: "argmxX"
-}
-
-layer {
-  name: "argmaxY"
-  type: "ArgMax"
-  bottom: "labely"
-  top: "argmxY"
-}
-
-layer {
-  name: "argmaxZ"
-  type: "ArgMax"
-  bottom: "labelz"
-  top: "argmxZ"
 }
 
 
@@ -469,7 +479,7 @@ layer {
   name: "loss_x"
   type: "SoftmaxWithLoss"
   bottom: "fcnx"
-  bottom: "argmxX"
+  bottom: "labelx"
   top: "loss_x"
   loss_weight:1
   include {
@@ -481,7 +491,7 @@ layer {
   name: "loss_y"
   type: "SoftmaxWithLoss"
   bottom: "fcny"
-  bottom: "argmxY"
+  bottom: "labely"
   top: "loss_y"
   loss_weight:1
   include {
@@ -493,7 +503,7 @@ layer {
   name: "loss_z"
   type: "SoftmaxWithLoss"
   bottom: "fcnz"
-  bottom: "argmxZ"
+  bottom: "labelz"
   top: "loss_z"
   loss_weight:1
   include {
@@ -507,7 +517,7 @@ layer {
   name: "test_loss_x"
   type: "SoftmaxWithLoss"
   bottom: "fcnx"
-  bottom: "argmxX"
+  bottom: "labelx"
   top: "test_loss_x"
   loss_weight:1
   include {
@@ -520,7 +530,7 @@ layer {
   name: "test_loss_y"
   type: "SoftmaxWithLoss"
   bottom: "fcny"
-  bottom: "argmxY"
+  bottom: "labely"
   top: "test_loss_y"
   loss_weight:1
   include {
@@ -533,7 +543,7 @@ layer {
   name: "test_loss_z"
   type: "SoftmaxWithLoss"
   bottom: "fcnz"
-  bottom: "argmxZ"
+  bottom: "labelz"
   top: "test_loss_z"
   loss_weight:1
   include {
@@ -546,7 +556,7 @@ layer {
   name: "accuracy_X"
   type: "Accuracy"
   bottom: "fcnx"
-  bottom: "argmxX"
+  bottom: "labelx"
   top: "accuracy_X"
   include {
     phase: TEST
@@ -558,7 +568,7 @@ layer {
   name: "accuracy_Y"
   type: "Accuracy"
   bottom: "fcny"
-  bottom: "argmxY"
+  bottom: "labely"
   top: "accuracy_Y"
   include {
     phase: TEST
@@ -570,7 +580,7 @@ layer {
   name: "accuracy_Z"
   type: "Accuracy"
   bottom: "fcnz"
-  bottom: "argmxZ"
+  bottom: "labelz"
   top: "accuracy_Z"
   include {
     phase: TEST
