@@ -8,18 +8,46 @@ caffe.set_device(0)
 caffe.set_mode_gpu()
 
 
-# lr and decay multipliers for conv and fc layers
-weight_param = dict(lr_mult=1, decay_mult=1)
-bias_param   = dict(lr_mult=2, decay_mult=0)
-# If you want to train the WHOLE net, then use learned_param, 
-# if you want to finetune some classifier on top of the learned 
-# weights, then use frozen_param
-learned_param = [weight_param, bias_param]
-frozen_param = [dict(lr_mult=0)] * 2
+def get_weight_param(name, train=True):
+    """
+    Creates a named param for weights of a conv/fc layer
+    Example of named param for weights:
+    param {
+      name: "conv1_w"
+      lr_mult: 1
+      decay_mult: 1
+    }
+
+    :param name: str
+    :param train: bool. If True, sets the weights of that layer to be modified by the training process
+    """
+    if train:
+        return dict(name=name, lr_mult=1, decay_mult=1)
+    else:
+        return dict(name=name, lr_mult=0, decay_mult=0)
+
+
+def get_bias_param(name, train=True):
+    """
+    Creates a named param for bias of a conv/fc layer
+    Example of named param for bias:
+    param {
+      name: "conv1_b"
+      lr_mult: 1
+      decay_mult: 1
+    }
+
+    :param name: str
+    :param train: bool. If True, sets the weights of that layer to be modified by the training process
+    """
+    if train:
+        return dict(name=name, lr_mult=2, decay_mult=0)
+    else:
+        return dict(name=name, lr_mult=0, decay_mult=0)
 
 
 def conv_relu(bottom, ks, num_out, stride=1, pad=0, group=1,
-        param=learned_param, weight_filler=dict(type='gaussian', std=0.01),
+        param={}, weight_filler=dict(type='gaussian', std=0.01),
         bias_filler=dict(type='constant', value=0.1)):
     """
     Creates conv+relu layers
@@ -41,7 +69,7 @@ def conv_relu(bottom, ks, num_out, stride=1, pad=0, group=1,
     return conv, L.ReLU(conv, in_place=True)
 
 
-def fc_relu(bottom, num_out, param=learned_param,
+def fc_relu(bottom, num_out, param={},
     weight_filler=dict(type='gaussian', std=0.005),
     bias_filler=dict(type='constant', value=0.1)):
     """
@@ -105,36 +133,40 @@ def alexnet(train_lmdb=None, train_labels_lmdb=None, test_lmdb=None, test_labels
     if not train_lmdb:   
         n.data = L.DummyData(shape=dict(dim=[1, 3, 227, 227]))
 
-    param = learned_param if learn_all else frozen_param
-    n.conv1, n.relu1 = conv_relu(n.data, 11, 96, stride=4, param=param)
+    n.conv1, n.relu1 = conv_relu(n.data, 11, 96, stride=4, param=[get_weight_param('conv1_w', train=train), get_bias_param('conv1_b', train=train)])
     n.pool1 = max_pool(n.relu1, 3, stride=2)
     n.norm1 = L.LRN(n.pool1, local_size=5, alpha=1e-4, beta=0.75)
-    n.conv2, n.relu2 = conv_relu(n.norm1, 5, 256, pad=2, group=2, param=param)
+    n.conv2, n.relu2 = conv_relu(n.norm1, 5, 256, pad=2, group=2,param=[get_weight_param('conv2_w', train=train), get_bias_param('conv2_b', train=train)])
     n.pool2 = max_pool(n.relu2, 3, stride=2)
     n.norm2 = L.LRN(n.pool2, local_size=5, alpha=1e-4, beta=0.75)
-    n.conv3, n.relu3 = conv_relu(n.norm2, 3, 384, pad=1, param=param)
-    n.conv4, n.relu4 = conv_relu(n.relu3, 3, 384, pad=1, group=2, param=param)
-    n.conv5, n.relu5 = conv_relu(n.relu4, 3, 256, pad=1, group=2, param=param)
+    n.conv3, n.relu3 = conv_relu(n.norm2, 3, 384, pad=1, param=[get_weight_param('conv3_w', train=train), get_bias_param('conv3_b', train=train)])
+    n.conv4, n.relu4 = conv_relu(n.relu3, 3, 384, pad=1, group=2, param=[get_weight_param('conv4_w', train=train), get_bias_param('conv4_b', train=train)])
+    n.conv5, n.relu5 = conv_relu(n.relu4, 3, 256, pad=1, group=2, param=[get_weight_param('conv5_w', train=train), get_bias_param('conv5_b', train=train)])
     n.pool5 = max_pool(n.relu5, 3, stride=2)
-    n.fc6, n.relu6 = fc_relu(n.pool5, 4096, param=param)
+    n.fc6, n.relu6 = fc_relu(n.pool5, 4096, param=[get_weight_param('fc6_w', train=train), get_bias_param('fc6_b', train=train)])
+
     if train:
         n.drop6 = fc7input = L.Dropout(n.relu6, in_place=True)
     else:
         fc7input = n.relu6
-    n.fc7, n.relu7 = fc_relu(fc7input, 4096, param=param)
+
+    n.fc7, n.relu7 = fc_relu(fc7input, 4096, param=[get_weight_param('fc7_w', train=train), get_bias_param('fc7_b', train=train)])
+
     if train:
         n.drop7 = fc8input = L.Dropout(n.relu7, in_place=True)
     else:
         fc8input = n.relu7
-    # always learn fc8 (param=learned_param)
-    fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=learned_param)
+
+    fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=[get_weight_param('fc8', train=train), get_bias_param('fc8', train=train)])
     # give fc8 the name specified by argument `classifier_name`
     n.__setattr__(classifier_name, fc8)
+
     if not train:
         n.probs = L.Softmax(fc8)
     elif n.label is not None:    
         n.loss = L.SoftmaxWithLoss(fc8, n.label)
         n.acc = L.Accuracy(fc8, n.label)
+
     return n
 
 
@@ -147,8 +179,8 @@ if __name__ == "__main__":
             help="If set, creates a CNN for training (i.e.: enables dropout and softmax+accuracy layers)")
     parser.add_option("-n", "--num-classes", dest="num_classes", type="int",
             default=1000, help="Number of classes of the top classifier", metavar="INT")
-    parser.add_option("-a", dest="no_train_all", action="store_false",
-            help="Set the multiplicative values of lr/decay to 0. Use when you don't want to finetune your pretrained weights")
+    parser.add_option("-a", dest="train_all", action="store_true",
+            help="Set the multiplicative values of lr/decay different from 0. Don't use if you don't want to finetune your pretrained weights")
     parser.add_option("-m", "--mean", dest="mean", 
        help="Mean file, usually .binaryprototxt or .npy", metavar="PATH")
     parser.add_option("-s", "--scale", dest="scale", type="float", default=1.0, 
@@ -177,7 +209,7 @@ if __name__ == "__main__":
             scale=options.scale,
             train=options.train,
             num_classes=options.num_classes,
-            learn_all=options.no_train_all) 
+            learn_all=options.train_all) 
 
     # write the net to file
     with open('alexnet.prototxt', 'w') as f:    
