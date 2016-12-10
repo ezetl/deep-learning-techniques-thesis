@@ -2264,6 +2264,11 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 **** TODO Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
 **** DONE Probar el codigo de Agrawal, la parte de mnist. Resultado: el codigo es horrible, no pude entender bien nada, logre correr un entrenamiento de MNIST pero los resultados fueron los mismos
 **** TODO Probar con menos pares (<85)
+**** TODO Seguir probando con la red que viene como ejemplo en caffe.
+**** DONE Probar con exageraciones en las traslaciones (multiplicar por 3) -> da lo mismo
+Sera que no todas las redes son buenos candidatos a siamesas? por
+ejemplo, si tiene muchisimos pesos para aprender tal vez sea mala
+candidata para una red siamesa.
 *** Evaluación
 Las features obtenidas de las BCNN preentrenadas se evaluan teniendo
 en cuenta el error en la clasificación de dígitos.  Se utilizan
