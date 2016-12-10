@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
+from optparse import OptionParser, OptionGroup
 import caffe
-from caffe import layers as L
-from caffe import params as P
+from caffe import (layers as L, params as P)
 import numpy as np
 
 caffe.set_device(0)
@@ -70,14 +70,18 @@ def max_pool(bottom, ks, stride=1):
     return L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)
 
 
-def alexnet(train_data, train_labels=None, test_data=None, test_labels=None,
-        label=None, train=True, num_classes=1000, classifier_name='fc', 
-        learn_all=False, output_proto='alexnet.prototxt'):
+def alexnet(train_lmdb=None, train_labels_lmdb=None, test_lmdb=None, test_labels_lmdb=None,
+        batch_size=125, scale=1.0, train=True, num_classes=1000, classifier_name='fc', 
+        learn_all=False):
     """
     Creates a protoxt for the AlexNet architecture
 
-    :param data: A list of Caffe Data layers with proper shape.
-    :param label:
+    :param train_lmdb: str. Path to train LMDB
+    :param train_labels_lmdb: str. Path to train LMDB labels
+    :param test_lmdb: str. Path to train LMDB
+    :param test_labels_lmdb: str. Path to test LMDB labels
+    :param batch_size: int. Batch size
+    :param scale: float. How to scale the images
     :param train: bool. Flag indicating if this is for deploy or training
     :param num_classes: int. number of classes for the top classifier
     :param classifier_name: str. name of the top classifier
@@ -85,13 +89,21 @@ def alexnet(train_data, train_labels=None, test_data=None, test_labels=None,
     :returns: Caffe NetSpec 
     """
     n = caffe.NetSpec()
-    n.data = train_data
-    if train_labels:
-        n.labels = train_labels
-    if test_data:
-        n.test_data = test_data
-    if test_labels:
-        n.test_labels = test_labels
+
+    if train_lmdb and train_labels_lmdb:
+        n.data = L.Data(name="data", top="data", include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=1)
+        n.label = L.Data(name="label", top="label", include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_labels_lmdb, ntop=1)
+    elif train_lmdb and not train_labels_lmdb:
+        n.data, n.label = L.Data(batch_size=batch_size, backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=2)
+
+    if test_lmdb and test_labels_lmdb:
+        n.test_data = L.Data(name="data", top="data", include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=1)
+        n.test_label = L.Data(name="label", top="label", include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_labels_lmdb, ntop=1)
+    elif test_lmdb and not test_labels_lmdb:
+        n.test_data, n.test_label = L.Data(batch_size=batch_size, backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=2)
+
+    if not train_lmdb:   
+        n.data = L.DummyData(shape=dict(dim=[1, 3, 227, 227]))
 
     param = learned_param if learn_all else frozen_param
     n.conv1, n.relu1 = conv_relu(n.data, 11, 96, stride=4, param=param)
@@ -120,16 +132,53 @@ def alexnet(train_data, train_labels=None, test_data=None, test_labels=None,
     n.__setattr__(classifier_name, fc8)
     if not train:
         n.probs = L.Softmax(fc8)
-    if label is not None:
-        n.label = label
+    elif n.label is not None:    
         n.loss = L.SoftmaxWithLoss(fc8, n.label)
         n.acc = L.Accuracy(fc8, n.label)
-    # write the net to file
-    with open(output_proto, 'w') as f:    
-        f.write(str(n.to_proto()))
-    return n    
+    return n
 
 
 if __name__ == "__main__":
-    dummy_data = L.DummyData(shape=dict(dim=[1, 3, 227, 227]))
-    alexnet(dummy_data, train=True, learn_all=True, output_proto='alexnet.prototxt')
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage=usage)
+    parser.add_option("-b", "--batch-size", dest="batch_size", type="int",
+            default=125, help="Batch size", metavar="INT")
+    parser.add_option("-r", "--do-train", dest="train", action="store_true",
+            help="If set, creates a CNN for training (i.e.: enables dropout and softmax+accuracy layers)")
+    parser.add_option("-n", "--num-classes", dest="num_classes", type="int",
+            default=1000, help="Number of classes of the top classifier", metavar="INT")
+    parser.add_option("-a", dest="no_train_all", action="store_false",
+            help="Set the multiplicative values of lr/decay to 0. Use when you don't want to finetune your pretrained weights")
+    parser.add_option("-m", "--mean", dest="mean", 
+       help="Mean file, usually .binaryprototxt or .npy", metavar="PATH")
+    parser.add_option("-s", "--scale", dest="scale", type="float", default=1.0, 
+            help="Scale param. For example, if you want to provide a way to transform your images from [0,255] to [0,1 range]", metavar="FLOAT")
+
+    group = OptionGroup(parser, "LMDB Options",
+            "How to provide the paths to your LMDB databases.")
+    group.add_option("-T", "--train-lmdb", dest="train_lmdb",
+            help="LMDB with train data", metavar="PATH")
+    group.add_option("-L", "--train-labels-lmdb", dest="train_labels_lmdb", 
+            help="LMDB with train labels", metavar="PATH")
+    group.add_option("-t", "--test-lmdb", dest="test_lmdb",
+            help="LMDB with test data", metavar="PATH")
+    group.add_option("-l", "--test-labels-lmdb", dest="test_labels_lmdb", 
+            help="LMDB with test labels", metavar="PATH")
+
+    parser.add_option_group(group)
+
+    (options, args) = parser.parse_args()
+
+    alex = alexnet(train_lmdb=options.train_lmdb,
+            train_labels_lmdb=options.train_labels_lmdb,
+            test_lmdb=options.test_lmdb,
+            test_labels_lmdb=options.test_labels_lmdb,
+            batch_size=options.batch_size,
+            scale=options.scale,
+            train=options.train,
+            num_classes=options.num_classes,
+            learn_all=options.no_train_all) 
+
+    # write the net to file
+    with open('alexnet.prototxt', 'w') as f:    
+        f.write(str(alex.to_proto()))
