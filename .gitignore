@@ -30,3 +30,4 @@ experiments/scene_recognition/data/paths
 .ipynb_checkpoints/
 experiments/mnist/test/test.txt
 *.binaryproto
+*.pyc

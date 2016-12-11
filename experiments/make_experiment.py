@@ -136,16 +136,17 @@ def siamese_alexnet_kitti(train_lmdb=None, train_labels_lmdb=None,
     n = caffe.NetSpec()
 
     if train_lmdb and train_labels_lmdb:
-        n.data = L.Data(name="data", top="data", include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=1)
-        n.label = L.Data(name="label", top="label", include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_labels_lmdb, ntop=1)
+        n.data = L.Data(include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=1)
+        n.label = L.Data(include=dict(phase=caffe.TRAIN), batch_size=batch_size, backend=P.Data.LMDB, source=train_labels_lmdb, ntop=1)
     elif train_lmdb and not train_labels_lmdb:
-        n.data, n.label = L.Data(batch_size=batch_size, backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=2)
+        n.data, n.label = L.Data(batch_size=batch_size, include=dict(phase=caffe.TRAIN), backend=P.Data.LMDB, source=train_lmdb, transform_param=dict(scale=scale), ntop=2)
 
-    if test_lmdb and test_labels_lmdb:
-        n.test_data = L.Data(name="data", top="data", include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=1)
-        n.test_label = L.Data(name="label", top="label", include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_labels_lmdb, ntop=1)
-    elif test_lmdb and not test_labels_lmdb:
-        n.test_data, n.test_label = L.Data(batch_size=batch_size, backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=2)
+    # TODO(eze): try to figure out a way to include train+test data in the same network by using the same blob names ('data', 'label') 
+    #if test_lmdb and test_labels_lmdb:
+    #    n.test_data = L.Data(include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=1)
+    #    n.test_label = L.Data(include=dict(phase=caffe.TEST), batch_size=batch_size, backend=P.Data.LMDB, source=test_labels_lmdb, ntop=1)
+    #elif test_lmdb and not test_labels_lmdb:
+    #    n.test_data, n.test_label = L.Data(batch_size=batch_size, include=dict(phase=caffe.TEST), backend=P.Data.LMDB, source=test_lmdb, transform_param=dict(scale=scale), ntop=2)
 
     if not train_lmdb:   
         n.data = L.DummyData(shape=dict(dim=[1, 3, 227, 227]))
