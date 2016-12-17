@@ -2089,7 +2089,17 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 *** DONE Agregar path de lmdb como argumentdo command line del preprocess_...
 *** DONE Remover Caffe de los "preprocess_mnist..etc". Ahora se linkea desde lmdb_creator
 *** TODO [#B] Hacer las redes programatically, para poder automatizar los entrenamientos
-*** TODO Hacer gif con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
+*** TODO [50%] Completar el pipeline de entrenamiento en Python:
+**** DONE crear nets
+**** DONE solver
+**** DONE entrenar
+**** TODO finetunear
+**** TODO testear
+**** TODO mostar resultados
+*** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
+*** TODO Hacer plots de loss al finalizar el entrenamiento. Guardar .pdf
+*** TODO Hacer test al finalizar entrenamiento, imprimir en pantalla log.
+*** TODO Guardar logs de cada entrenamiento
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
@@ -2158,7 +2168,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [83%] Entrenamiento
+*** [78%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
