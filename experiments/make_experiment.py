@@ -71,15 +71,6 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    siam_mnist = siamese_alexnet_mnist(
-            lmdb_path=options.lmdb_path,
-            labels_lmdb_path=options.labels_lmdb_path,
-            batch_size=options.batch_size,
-            scale=options.scale,
-            train=options.train,
-            learn_all=options.train_all
-            )
-
     # write the nets
     alex_file = 'alexnet.prototxt'
     with open(alex_file, 'w') as f:
@@ -95,5 +86,6 @@ if __name__ == "__main__":
 
     niter = 40000
     print 'Running solver for {} iterations...'.format(niter)
-    loss = run_solver(create_solver_settings(siammnist_file, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
+    #loss = run_solver(create_solver_settings(siammnist_file, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
+    loss = run_solver(create_solver_settings(siam_kitti, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
     print(loss)
