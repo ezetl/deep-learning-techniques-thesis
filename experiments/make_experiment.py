@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 from optparse import OptionParser, OptionGroup
-from utils.cnn_factory import *
-from utils.solver_factory import *
+from utils.nets.cnn_factory import MNISTNetFactory, KITTINetFactory 
+from utils.solver.solver import Solver, run_solver 
 
 
 if __name__ == "__main__":
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    alex = alexnet(
+    alex = KITTINetFactory.standar(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    siam_alex = siamese_alexnet_kitti(
+    siam_alex = KITTINetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    siam_mnist = siamese_alexnet_mnist(
+    siam_mnist = MNISTNetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -86,6 +86,5 @@ if __name__ == "__main__":
 
     niter = 40000
     print 'Running solver for {} iterations...'.format(niter)
-    #loss = run_solver(create_solver_settings(siammnist_file, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
-    loss = run_solver(create_solver_settings(siam_kitti, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
+    loss = run_solver(Solver.create(siammnist_file, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
     print(loss)
