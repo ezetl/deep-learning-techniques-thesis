@@ -48,7 +48,7 @@ if __name__ == "__main__":
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
             scale=options.scale,
-            train=options.train,
+            is_train=options.train,
             num_classes=options.num_classes,
             learn_all=options.train_all
             )
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
             scale=options.scale,
-            train=options.train,
+            is_train=options.train,
             learn_all=options.train_all
             )
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
             scale=options.scale,
-            train=options.train,
+            is_train=options.train,
             learn_all=options.train_all
             )
 

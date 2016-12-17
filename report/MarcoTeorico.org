@@ -2088,7 +2088,11 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 *** DONE Integrar SFA y egomotion en una sola base de datos en cada script de preprocessing
 *** DONE Agregar path de lmdb como argumentdo command line del preprocess_...
 *** DONE Remover Caffe de los "preprocess_mnist..etc". Ahora se linkea desde lmdb_creator
-*** TODO [#B] Hacer las redes programatically, para poder automatizar los entrenamientos
+*** TODO [25%] Hacer las redes programatically, para poder automatizar los entrenamientos
+**** DONE Egomotion para kitti y mnist, alexnet 
+**** TODO SFA para kitti y mnist
+**** TODO Standar para kitti
+**** TODO Standar para mnist
 *** TODO [50%] Completar el pipeline de entrenamiento en Python:
 **** DONE crear nets
 **** DONE solver
