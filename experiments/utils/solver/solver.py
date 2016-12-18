@@ -85,7 +85,7 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
     if pretrained_weights:
         solver.net.copy_from(pretrained_weights)
 
-    weights_list = []
+    snapshots_list = []
     if loss_blobs:
         loss = {loss_name: np.zeros(max_iter) for loss_name in loss_blobs}
     else:
@@ -96,7 +96,7 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
 
     if not exists(dirname(snapshot_prefix)):
         print("Path for snapshots does not exists. Creating dir {}".format(dirname(snapshot_prefix)))
-        os.makedirs(dirname(snapshot_prefix))
+        makedirs(dirname(snapshot_prefix))
     
     try:
         for it in range(max_iter):
@@ -107,8 +107,8 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
                 snapshot_name = snapshot_prefix + '_iter_{}.caffemodel'.format(it)
                 print("Saving snapshot in {}".format(snapshot_name))
                 solver.net.save(snapshot_name)
-                weights_list.append(snapshot_name)
+                snapshots_list.append(snapshot_name)
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
 
-    return loss, weights_list
+    return loss, snapshots_list

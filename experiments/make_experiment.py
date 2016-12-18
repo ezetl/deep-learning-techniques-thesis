@@ -71,6 +71,14 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
+    mnist, loss_blobs_f, acc_blobs_f = MNISTNetFactory.standar(
+            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_10000',
+            batch_size=options.batch_size,
+            scale=options.scale,
+            is_train=options.train,
+            learn_all=False
+            )
+
     # write the nets
     alex_file = 'alexnet.prototxt'
     with open(alex_file, 'w') as f:
@@ -84,7 +92,13 @@ if __name__ == "__main__":
     with open(siammnist_file, 'w') as f:
         f.write(str(siam_mnist.to_proto()))
 
-    niter = 40000
+    mnist_file = 'mnist.prototxt'
+    with open(mnist_file, 'w') as f:
+        f.write(str(mnist.to_proto()))
+
+    niter = 1100
     print 'Running solver for {} iterations...'.format(niter)
     loss, snapshots = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
-    print(loss)
+    print(snapshots)
+    loss_f, snapshots_f = train_net(mnist_file, max_iter=4000, stepsize=10000, loss_blobs=loss_blobs_f, pretrained_weights=snapshots[-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+
