@@ -102,15 +102,16 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
         makedirs(dirname(snapshot_prefix))
     
     try:
-        for it in range(max_iter+1):
+        for it in range(max_iter):
             solver.step(1)
-            for name in loss_blobs:
-                loss[name][it] = solver.net.blobs[name].data.copy()
-            if it != 0 and it % snapshot==0:
-                snapshot_name = snapshot_prefix + '_iter_{}.caffemodel'.format(it)
-                print("Saving snapshot in {}".format(snapshot_name))
-                solver.net.save(snapshot_name)
-                snapshots_list.append(snapshot_name)
+            if it!=0:
+                for name in loss_blobs:
+                    loss[name][it] = solver.net.blobs[name].data.copy()
+                if it % snapshot==0:
+                    snapshot_name = snapshot_prefix + '_iter_{}.caffemodel'.format(it)
+                    print("Saving snapshot in {}".format(snapshot_name))
+                    solver.net.save(snapshot_name)
+                    snapshots_list.append(snapshot_name)
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
 

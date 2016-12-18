@@ -37,7 +37,7 @@ class MNISTNetFactory:
         n.pool2 = L.Pooling(n.relu2, pool=P.Pooling.MAX, kernel_size=3, stride=2)
         n.norm2 = L.LRN(n.pool2, local_size=5, alpha=1e-4, beta=0.75)
 
-        n.fc500 = L.InnerProduct(n.norm2, num_output=500, param=[weight_param('fc500_w', learn_all=learn_all), bias_param('fc500_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc500 = L.InnerProduct(n.norm2, num_output=500, param=[weight_param('fc500_w', learn_all=learn_all), bias_param('fc500_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
         n.relu3 = L.ReLU(n.fc500, in_place=True)
 
         if is_train:
@@ -224,7 +224,7 @@ class KITTINetFactory:
         n.relu5 = L.ReLU(n.conv5, in_place=True)
         n.pool5 = L.Pooling(n.relu5, pool=P.Pooling.MAX, kernel_size=3, stride=2)
 
-        n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=learn_all), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
         n.relu6 = L.ReLU(n.fc6, in_place=True)
     
         if is_train:
@@ -232,7 +232,7 @@ class KITTINetFactory:
         else:
             fc7input = n.relu6
     
-        n.fc7 = L.InnerProduct(fc7input, num_output=4096, param=[weight_param('fc7_w', learn_all=learn_all), bias_param('fc7_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc7 = L.InnerProduct(fc7input, num_output=4096, param=[weight_param('fc7_w', learn_all=True), bias_param('fc7_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
         n.relu7 = L.ReLU(n.fc7, in_place=True)
     
         if is_train:
@@ -240,7 +240,7 @@ class KITTINetFactory:
         else:
             fc8input = n.relu7
     
-        fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=[weight_param('fc8', learn_all=learn_all), bias_param('fc8', learn_all=learn_all)])
+        fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=[weight_param('fc8', learn_all=True), bias_param('fc8', learn_all=learn_all)])
     
         if not is_train:
             n.probs = L.Softmax(fc8, include=dict(phase=phase))
