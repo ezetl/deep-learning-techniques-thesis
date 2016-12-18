@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 from optparse import OptionParser, OptionGroup
 from utils.nets.cnn_factory import MNISTNetFactory, KITTINetFactory 
-from utils.solver.solver import Solver, run_solver 
+from utils.solver.solver import train_net 
 
 
 if __name__ == "__main__":
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    alex = KITTINetFactory.standar(
+    alex, loss_blobs, acc_blobs = KITTINetFactory.standar(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -53,7 +53,7 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    siam_alex = KITTINetFactory.siamese_egomotion(
+    siam_alex, loss_blobs, acc_blobs = KITTINetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    siam_mnist = MNISTNetFactory.siamese_egomotion(
+    siam_mnist, loss_blobs, acc_blobs = MNISTNetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
             batch_size=options.batch_size,
@@ -86,5 +86,5 @@ if __name__ == "__main__":
 
     niter = 40000
     print 'Running solver for {} iterations...'.format(niter)
-    loss = run_solver(Solver.create(siammnist_file, max_iter=niter, stepsize=10000,  snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'), max_iters=niter)
+    loss, snapshots = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
     print(loss)

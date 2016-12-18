@@ -19,7 +19,7 @@ class MNISTNetFactory:
         :param batch_size: int. Batch size
         :param scale: float. How to scale the images
         :param is_train: bool. Flag indicating if this is for deploy/testing or training
-        :returns: Caffe NetSpec
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
         """
     
         n = caffe.NetSpec()
@@ -47,7 +47,10 @@ class MNISTNetFactory:
             n.loss = L.SoftmaxWithLoss(n.fc10, n.labelx)
             n.acc = L.Accuracy(n.fc10, n.label, include=dict(phase=caffe.TEST))
     
-        return n
+        # Returning the name of the loss/acc layers is useful because then we can 
+        # know which outputs of the net we can track to test the 'health' 
+        # of the training process
+        return n, ('loss',), ('acc',)
     
     
     @staticmethod
@@ -62,7 +65,7 @@ class MNISTNetFactory:
         :param scale: float. How to scale the images
         :param is_train: bool. Flag indicating if this is for deploy/testing or training
         :param learn_all: bool. Flag indicating if we should learn all the layers from scratch
-        :returns: Caffe NetSpec
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
         """
     
         n = caffe.NetSpec()
@@ -102,7 +105,7 @@ class MNISTNetFactory:
             n.acc_y = L.Accuracy(n.fcy, n.labely, include=dict(phase=caffe.TEST))
             n.acc_z = L.Accuracy(n.fcz, n.labelz, include=dict(phase=caffe.TEST))
     
-        return n
+        return n, ('loss_x', 'loss_y', 'loss_z'), ('acc_x', 'acc_y', 'acc_z')
 
 
 class KITTINetFactory:
@@ -121,7 +124,7 @@ class KITTINetFactory:
         :param scale: float. How to scale the images
         :param is_train: bool. Flag indicating if this is for deploy or training
         :param learn_all: bool. Flag indicating if we should learn all the layers from scratch
-        :returns: Caffe NetSpec
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
         """
         n = caffe.NetSpec()
     
@@ -162,7 +165,7 @@ class KITTINetFactory:
             n.acc_y = L.Accuracy(n.fcy, n.labely, include=dict(phase=caffe.TEST))
             n.acc_z = L.Accuracy(n.fcz, n.labelz, include=dict(phase=caffe.TEST))
     
-        return n
+        return n, ('loss_x', 'loss_y', 'loss_z'), ('acc_x', 'acc_y', 'acc_z')
     
     
     @staticmethod
@@ -181,7 +184,7 @@ class KITTINetFactory:
         :param num_classes: int. number of classes for the top classifier
         :param classifier_name: str. name of the top classifier
         :param learn_all: bool. Flag indicating if we should learn all the layers from scratch
-        :returns: Caffe NetSpec
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
         """
         n = caffe.NetSpec()
     
@@ -219,4 +222,4 @@ class KITTINetFactory:
             n.loss = L.SoftmaxWithLoss(fc8, n.label)
             n.acc = L.Accuracy(fc8, n.label, include=dict(phase=caffe.TEST))
     
-        return n
+        return n, ('loss',), ('acc',)
