@@ -102,7 +102,7 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
         makedirs(dirname(snapshot_prefix))
     
     try:
-        for it in range(max_iter):
+        for it in range(max_iter+1):
             solver.step(1)
             for name in loss_blobs:
                 loss[name][it] = solver.net.blobs[name].data.copy()
