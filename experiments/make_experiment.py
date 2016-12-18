@@ -81,32 +81,11 @@ if __name__ == "__main__":
             learn_all=False
             )
 
-    # write the nets
-    alex_file = 'alexnet.prototxt'
-    with open(alex_file, 'w') as f:
-        f.write(str(alex.to_proto()))
-
-    siam_kitti = 'siamese_alexnet.prototxt'
-    with open(siam_kitti, 'w') as f:
-        f.write(str(siam_alex.to_proto()))
-
-    siammnist_file = 'siamese_mnist.prototxt'
-    with open(siammnist_file, 'w') as f:
-        f.write(str(siam_mnist.to_proto()))
-
-    mnist_file = 'mnist.prototxt'
-    with open(mnist_file, 'w') as f:
-        f.write(str(mnist.to_proto()))
-
-    mnist_test_file = 'mnist_test.prototxt'
-    with open(mnist_test_file, 'w') as f:
-        f.write(str(mnist_test.to_proto()))
-
-    niter = 40000
+    niter = 1000
     print 'Running solver for {} iterations...'.format(niter)
-    results = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
+    results = train_net(siam_mnist, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
     print(results['snaps'])
     niter = 4000
-    results_f = train_net(mnist_file, test_net_path=mnist_test_file, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
     print(results_f)
 

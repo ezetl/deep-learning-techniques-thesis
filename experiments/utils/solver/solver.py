@@ -65,21 +65,22 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     # Train on the GPU.
     solver.solver_mode = caffe_pb2.SolverParameter.GPU
     
+    return solver
     # Write the solver to a temporary file and return its filename.
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(str(solver))
         return f.name
     
     
-def train_net(train_net_path, test_net_path=None, test_interv=1000, test_iter=100, base_lr=0.01,
+def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100, base_lr=0.01,
             max_iter=40000, stepsize=10000, loss_blobs=None, acc_blobs=None,
             pretrained_weights="", snapshot=1000, snapshot_prefix="/tmp/snap"):
     """
     Run solvers for solver.max_iter iterations,
     returning the loss and accuracy recorded each iteration.
 
-    :param train_net_path: str. Path to the train protoxt
-    :param test_net_path: str. Path to the test protoxt
+    :param train_netspec: Caffe NetSpec. The train network
+    :param test_netspec: Caffe NetSpec. The test network 
     :param test_interv: int. Test will be performed ever test_interv iterations. Only useful if test_net_path is passed.
     :param base_lr: float. Initial learning rate
     :param max_iter: int. Maximum amount of iterations for training
@@ -102,11 +103,30 @@ def train_net(train_net_path, test_net_path=None, test_interv=1000, test_iter=10
                         } 
               }
     """
-    solver_param_name = create_solver_params(train_net_path,
+
+    #with tempfile.NamedTemporaryFile(delete=False) as f:
+    #    f.write(str(solver))
+    #    solver_param = f.name
+
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(str(train_netspec.to_proto()))
+        train_net_path = f.name
+
+    test_net_path = None
+    if test_netspec:
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(str(test_netspec.to_proto()))
+            test_net_path = f.name
+
+    solver_param = create_solver_params(train_net_path,
             test_net_path=test_net_path, test_interv=test_interv, test_iter=test_iter,
             base_lr=base_lr, max_iter=max_iter, stepsize=stepsize)
 
-    solver = caffe.get_solver(solver_param_name)
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(str(solver_param))
+        solver_param = f.name
+
+    solver = caffe.get_solver(solver_param)
 
     if pretrained_weights and not exists(pretrained_weights):
         raise TrainException("Could not find pretrained weights with provided path: {}".format(pretrained_weights)) 
