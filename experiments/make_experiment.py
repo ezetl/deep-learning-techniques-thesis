@@ -96,7 +96,7 @@ if __name__ == "__main__":
     with open(mnist_file, 'w') as f:
         f.write(str(mnist.to_proto()))
 
-    niter = 1100
+    niter = 40000
     print 'Running solver for {} iterations...'.format(niter)
     loss, snapshots = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
     print(snapshots)

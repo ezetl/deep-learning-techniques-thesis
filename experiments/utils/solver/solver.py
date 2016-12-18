@@ -82,7 +82,10 @@ def train_net(train_net_path, test_net_path=None, base_lr=0.01,
 
     solver = caffe.get_solver(solver_param_name)
 
-    if pretrained_weights:
+    if pretrained_weights and not exists(pretrained_weights):
+        raise TrainException("Could not find pretrained weights with provided path: {}".format(pretrained_weights)) 
+    elif exists(pretrained_weights):
+        print("Loading weights from {}".format(pretrained_weights))
         solver.net.copy_from(pretrained_weights)
 
     snapshots_list = []
