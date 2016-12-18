@@ -26,16 +26,10 @@ if __name__ == "__main__":
             help="LMDB with train data", metavar="PATH")
     group.add_option("-L", "--train-labels-lmdb", dest="labels_lmdb_path",
             help="LMDB with train labels", metavar="PATH")
-    group.add_option("-t", "--test-lmdb", dest="test_lmdb",
-            help="LMDB with test data", metavar="PATH")
-    group.add_option("-l", "--test-labels-lmdb", dest="test_labels_lmdb",
-            help="LMDB with test labels", metavar="PATH")
     group_example = OptionGroup(parser, "Example:",
             ' '.join(['./make_experiment.py -b 125 -r -n 397\\',
                 '-T /media/eze/Datasets/MNIST/mnist_train_siamese_lmdb\\',
                 '-L /media/eze/Datasets/MNIST/mnist_train_siamese_lmdb_labels\\',
-                '-t /media/eze/Datasets/MNIST/mnist_test_siamese_lmdb\\',
-                '-l /media/eze/Datasets/MNIST/mnist_test_siamese_lmdb_labels\\',
                 '-s $(python -c"print(1/255.0)") -a']))
 
     parser.add_option_group(group)
@@ -71,6 +65,14 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
+    mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
+            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_test',
+            batch_size=options.batch_size,
+            scale=options.scale,
+            is_train=False,
+            learn_all=False
+            )
+
     mnist, loss_blobs_f, acc_blobs_f = MNISTNetFactory.standar(
             lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_10000',
             batch_size=options.batch_size,
@@ -96,9 +98,15 @@ if __name__ == "__main__":
     with open(mnist_file, 'w') as f:
         f.write(str(mnist.to_proto()))
 
+    mnist_test_file = 'mnist_test.prototxt'
+    with open(mnist_test_file, 'w') as f:
+        f.write(str(mnist_test.to_proto()))
+
     niter = 40000
     print 'Running solver for {} iterations...'.format(niter)
-    loss, snapshots = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
-    print(snapshots)
-    loss_f, snapshots_f = train_net(mnist_file, max_iter=4000, stepsize=10000, loss_blobs=loss_blobs_f, pretrained_weights=snapshots[-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    results = train_net(siammnist_file, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
+    print(results['snaps'])
+    niter = 4000
+    results_f = train_net(mnist_file, test_net_path=mnist_test_file, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    print(results_f)
 
