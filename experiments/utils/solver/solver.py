@@ -103,11 +103,6 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
                         } 
               }
     """
-
-    #with tempfile.NamedTemporaryFile(delete=False) as f:
-    #    f.write(str(solver))
-    #    solver_param = f.name
-
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(str(train_netspec.to_proto()))
         train_net_path = f.name
@@ -134,21 +129,20 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
         print("Loading weights from {}".format(pretrained_weights))
         solver.net.copy_from(pretrained_weights)
 
-    results = {} 
-    results['snaps'] = []
-    if test_net_path and acc_blobs:
-        results['acc'] = {} 
+    results = {'snaps': []} 
 
     if loss_blobs:
         results['loss'] = {loss_name: np.array([]) for loss_name in loss_blobs}
     else:
         results['loss'] = {'loss': np.array([])}
 
-    if pretrained_weights and not exists(pretrained_weights):
-        raise TrainException("Could not find pretrained weights with provided path: {}".format(pretrained_weights)) 
+    if not acc_blobs:
+        acc_blobs = []
+    if test_net_path and acc_blobs:
+        results['acc'] = {} 
 
     if not exists(dirname(snapshot_prefix)):
-        print("Path for snapshots does not exists. Creating dir {}".format(dirname(snapshot_prefix)))
+        print("Path for snapshots does not exist. Creating dir {}".format(dirname(snapshot_prefix)))
         makedirs(dirname(snapshot_prefix))
     
     try:
@@ -159,13 +153,8 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
                 results['loss'][name] = np.append(results['loss'][name], solver.net.blobs[name].data.item())
             # Retrieve accuracy of tests every 'test_interv' iterations                            
             if it!=0 and it % test_interv == 0:
-                if acc_blobs:
-                    for name in acc_blobs:     
-                        if name in solver.test_nets[0].blobs:
-                            if name in results['acc']:
-                                results['acc'][name] = np.append(results['acc'][name], solver.test_nets[0].blobs[name].data.item())
-                            else:
-                                results['acc'][name] = solver.test_nets[0].blobs[name].data.copy()
+                for name in acc_blobs:     
+                    results['acc'][name] = np.append(results['acc'].get(name, np.array([])), solver.test_nets[0].blobs[name].data.item())
             # Save snapshot every 'snapshot' iterations
             if it!=0 and it % snapshot == 0:
                 snapshot_name = snapshot_prefix + '_iter_{}.caffemodel'.format(it)

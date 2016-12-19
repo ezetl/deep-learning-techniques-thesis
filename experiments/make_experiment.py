@@ -65,14 +65,6 @@ if __name__ == "__main__":
             learn_all=options.train_all
             )
 
-    mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
-            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_test',
-            batch_size=options.batch_size,
-            scale=options.scale,
-            is_train=False,
-            learn_all=False
-            )
-
     mnist, loss_blobs_f, acc_blobs_f = MNISTNetFactory.standar(
             lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_10000',
             batch_size=options.batch_size,
@@ -81,11 +73,48 @@ if __name__ == "__main__":
             learn_all=False
             )
 
-    niter = 1000
-    print 'Running solver for {} iterations...'.format(niter)
-    results = train_net(siam_mnist, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
-    print(results['snaps'])
-    niter = 4000
-    results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
-    print(results_f)
+    mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
+            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_test',
+            batch_size=options.batch_size,
+            scale=options.scale,
+            is_train=False,
+            learn_all=False
+            )
 
+    #niter = 40000
+    #print 'Running solver for {} iterations...'.format(niter)
+    #results = train_net(siam_mnist, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
+    #print(results['snaps'])
+    #niter = 8000
+    #acc = 0
+    #results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    #acc += results_f['acc'][acc_blobs_test[0]][0]
+    #results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    #acc += results_f['acc'][acc_blobs_test[0]][0]
+    #results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+    #acc += results_f['acc'][acc_blobs_test[0]][0]
+    #print("Final accuracy Siamese+finetuning (avg. of 3 runs): {0:.2f}".format(acc/3.0))
+
+    niter=10000
+    mnist, loss_blobs_f, acc_blobs_f = MNISTNetFactory.standar(
+            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_1000',
+            batch_size=options.batch_size,
+            scale=options.scale,
+            is_train=True,
+            learn_all=True
+            )
+    mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
+            lmdb_path='/media/eze/Datasets/MNIST/mnist_standar_lmdb_test',
+            batch_size=options.batch_size,
+            scale=options.scale,
+            is_train=False,
+            learn_all=False
+            )
+    acc = 0
+    results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
+    acc += results_f['acc'][acc_blobs_test[0]][0]
+    results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
+    acc += results_f['acc'][acc_blobs_test[0]][0]
+    results_f = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
+    acc += results_f['acc'][acc_blobs_test[0]][0]
+    print("Final error in standar net (avg. of 3 runs): {0:.3f}. Acc: {1:.3f}".format(1 - acc/3.0, acc/3.0))
