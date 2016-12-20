@@ -136,12 +136,11 @@ if __name__ == "__main__":
                 is_train=True,
                 learn_all=True
                 )
-        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
-        print(results_standar)
+        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=sniter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st, snapshot_prefix='mnist/snapshots/standar/mnist')
         acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
-        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
+        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=sniter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st, snapshot_prefix='mnist/snapshots/standar/mnist')
         acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
-        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_test, snapshot_prefix='mnist/snapshots/standar/mnist')
+        results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=sniter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st, snapshot_prefix='mnist/snapshots/standar/mnist')
         acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
 
         # CONTRASTIVE m=10
