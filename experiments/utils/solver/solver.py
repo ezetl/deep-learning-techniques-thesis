@@ -23,7 +23,12 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     :returns: str. The name of the tmp file where the Solver was stored 
     """
     solver = caffe_pb2.SolverParameter()
-    
+
+    """
+    TODO: try this
+    test_compute_loss: true
+    test_initialization: true
+    """
     # Specify locations of the train and (maybe) test networks.
     solver.train_net = train_net_path
     if test_net_path is not None:
@@ -70,8 +75,8 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(str(solver))
         return f.name
-    
-    
+
+
 def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100, base_lr=0.01,
             max_iter=40000, stepsize=10000, loss_blobs=None, acc_blobs=None,
             pretrained_weights="", snapshot=1000, snapshot_prefix="/tmp/snap"):
@@ -82,6 +87,7 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
     :param train_netspec: Caffe NetSpec. The train network
     :param test_netspec: Caffe NetSpec. The test network 
     :param test_interv: int. Test will be performed ever test_interv iterations. Only useful if test_net_path is passed.
+    :param test_iter: int. Amount of iterations to run on each test
     :param base_lr: float. Initial learning rate
     :param max_iter: int. Maximum amount of iterations for training
     :param stepsize:  int. Amount of iterations between each lr update.
@@ -150,7 +156,7 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
             solver.step(1)
             # Retrieve loss of this step
             for name in loss_blobs:
-                results['loss'][name] = np.append(results['loss'][name], solver.net.blobs[name].data.item())
+                results['loss'][name] = np.append(results['loss'].get(name, np.array([])), solver.net.blobs[name].data.item())
             # Retrieve accuracy of tests every 'test_interv' iterations                            
             if it!=0 and it % test_interv == 0:
                 for name in acc_blobs:     

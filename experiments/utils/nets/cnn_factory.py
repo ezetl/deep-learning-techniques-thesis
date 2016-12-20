@@ -56,12 +56,12 @@ class MNISTNetFactory:
         # of the training process
         return n, ('loss',), ('acc',)
     
-    
     @staticmethod
     def siamese_egomotion(lmdb_path=None, labels_lmdb_path=None,
             batch_size=125, scale=1.0, is_train=True, learn_all=False, sfa=False):
         """
         Creates a protoxt for the AlexNet architecture for the MNIST experiment
+        Uses Egomotion as stated in the paper
     
         :param lmdb_path: str. Path to train LMDB
         :param labels_lmdb_path: str. Path to train LMDB labels
@@ -106,6 +106,48 @@ class MNISTNetFactory:
         n.acc_z = L.Accuracy(n.fcz, n.labelz, include=dict(phase=caffe.TEST))
     
         return n, ('loss_x', 'loss_y', 'loss_z'), ('acc_x', 'acc_y', 'acc_z')
+
+    @staticmethod
+    def siamese_contrastive(lmdb_path=None, labels_lmdb_path=None,
+            batch_size=125, scale=1.0, contrastive_margin=10, is_train=True, learn_all=False, sfa=False):
+        """
+        Creates a protoxt for the AlexNet architecture for the MNIST experiment
+        Uses Contrastive loss
+    
+        :param lmdb_path: str. Path to train LMDB
+        :param labels_lmdb_path: str. Path to train LMDB labels
+        :param batch_size: int. Batch size
+        :param scale: float. How to scale the images
+        :param contrastive_margin: int. Margin for the contrastive loss layer
+        :param is_train: bool. Flag indicating if this is for testing or training
+        :param learn_all: bool. Flag indicating if we should learn all the layers from scratch
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
+        """
+    
+        n = caffe.NetSpec()
+    
+        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, batch_size=batch_size, scale=scale, is_train=is_train)
+        
+        # Slice data/labels for MNIST
+        n.data0, n.data1 = L.Slice(n.data, slice_param=dict(axis=1, slice_point=1), ntop=2)
+    
+        # BCNN
+        n.norm2, n.norm2_p = bcnn(n.data0, n.data1, n, learn_all, True)
+    
+        # TCNNs
+        n.fc1 = L.InnerProduct(n.norm2, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.relu3 = L.ReLU(n.fc1, in_place=True)
+        n.dropout1 = L.Dropout(n.relu3, in_place=True)
+        n.fc2 = L.InnerProduct(n.relu3, num_output=2, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+    
+        n.fc1_p = L.InnerProduct(n.norm2_p, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.relu3_p = L.ReLU(n.fc1_p, in_place=True)
+        n.dropout1_p = L.Dropout(n.relu3_p, in_place=True)
+        n.fc2_p = L.InnerProduct(n.relu3_p, num_output=2, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+
+        n.contrastive = L.ContrastiveLoss(n.fc2, n.fc2_p, n.label, contrastive_loss_param=dict(margin=contrastive_margin))
+    
+        return n, ('contrastive',), None 
 
 
 class KITTINetFactory:
