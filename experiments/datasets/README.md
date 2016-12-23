@@ -1,10 +1,13 @@
 ## Datasets utils
+
 Here you can find all the tools used to download and preprocess the datasets for all the experiments.
 
 ### Downloading the original datasets
-To download the MNIST dataset: `./download_mnist.sh`
-To download the KITTI dataset follow this [link](http://www.cvlibs.net/download.php?file=data_odometry_color.zip). For more info about the dataset visit the official [website](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) 
-To download the SF dataset, use the script `./download_sf.py` 
+
+- To download the MNIST dataset: `./download_mnist.sh`
+
+- To download the KITTI dataset follow this [link](http://www.cvlibs.net/download.php?file=data_odometry_color.zip). For more info about the dataset visit the official [website](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) 
+- To download the SF dataset, use the script `./download_sf.py` 
 
 
 ## Preprocessing the datasets and creating the LMDBs to train
