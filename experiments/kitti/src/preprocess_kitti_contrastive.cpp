@@ -60,7 +60,6 @@ using namespace cv;
 #define PAIRS_PER_SPLIT 20000 
 
 
-#define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
 #define IMAGES       "/media/eze/0F4A13791A35DD40/KITTI/dataset/sequences/"
 #define POSES        "/media/eze/0F4A13791A35DD40/KITTI/dataset/poses/"

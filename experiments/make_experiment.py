@@ -68,7 +68,7 @@ if __name__ == "__main__":
             )
 
     ### EGOMOTION
-    niter = 60000
+    niter = 40000
     siam_mnist, loss_blobs, acc_blobs = MNISTNetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,

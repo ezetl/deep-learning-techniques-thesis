@@ -1,31 +1,24 @@
-project(mnist.demo)
-cmake_minimum_required(VERSION 2.8.9)
+set(SRC "./src")
+set(FILES "${SRC}/preprocess_kitti_egomotion.cpp"  "${SRC}/preprocess_kitti_contrastive.cpp")
 
-set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-add_definitions ("-Wall")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O3 -std=c++11")
 
-MACRO(add_code name)
-   set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# OpenCV
+find_package(OpenCV)
+if (OpenCV_FOUND)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+endif()
 
-   set(CMAKE_CXX_FLAGS "-O3 -std=c++11")
+# Caffe
+find_package(Caffe)
+include_directories(${Caffe_INCLUDE_DIRS})
+add_definitions(${Caffe_DEFINITIONS})
 
-   # OpenCV
-   find_package(OpenCV)
-   if (OpenCV_FOUND)
-       include_directories(${OpenCV_INCLUDE_DIRS})
-   endif()
+set(DATA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/data")
+add_definitions(-DDATA_ROOT="${DATA_ROOT}")
 
-   # Caffe
-   FIND_PACKAGE(Caffe)
-   INCLUDE_DIRECTORIES(${Caffe_INCLUDE_DIRS})
-   ADD_DEFINITIONS(${Caffe_DEFINITIONS})    # ex. -DCPU_ONLY
-
-   ADD_EXECUTABLE(${name} ${name}.cpp)
-
-   TARGET_LINK_LIBRARIES(${name}
-                         ${Caffe_LIBRARIES}
-                         ${OpenCV_LIBS})
-ENDMACRO()
-
-add_code(preprocess_kitti_egomotion)
-add_code(preprocess_kitti_contrastive)
+foreach(infile ${FILES})
+    get_filename_component(outname ${infile} NAME_WE)
+    add_executable(${outname} ${infile})
+    target_link_libraries(${outname} ${Caffe_LIBRARIES} ${OpenCV_LIBS} lmdb_creator)
+endforeach(infile)

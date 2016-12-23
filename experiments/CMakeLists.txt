@@ -16,8 +16,8 @@ include_directories(${COM})
 
 add_subdirectory(${COM})
 add_subdirectory(${MNI})
+add_subdirectory(${KIT})
 #TODO: make the other CMakeLists files 
 #add_subdirectory(${ALE})
-#add_subdirectory(${KIT})
 #add_subdirectory(${SCE})
 #add_subdirectory(${SF})

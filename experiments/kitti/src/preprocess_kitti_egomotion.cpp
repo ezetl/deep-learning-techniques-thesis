@@ -43,6 +43,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+// TODO(ezetl): use lmdb_creator here. wont compile otherwise
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
 
@@ -74,7 +75,6 @@ using namespace cv;
 #define Y_MIN -0.563987
 #define Y_STEP 0.0536 // approximate
 
-#define DATA_ROOT    "../data/"
 #define PATHS_FILES  (DATA_ROOT"paths/")
 #define IMAGES       "/media/eze/Datasets/KITTI/dataset/sequences/"
 #define POSES        "/media/eze/Datasets/KITTI/dataset/poses/"
