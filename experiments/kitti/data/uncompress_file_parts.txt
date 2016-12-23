@@ -1,7 +1,0 @@
-Taken from http://stackoverflow.com/questions/1120095/split-files-using-tar-gz-zip-or-bzip2
-
-
-# create archives
-tar cz my_large_file_1 my_large_file_2 | split -b 1024MiB - myfiles_split.tgz_
-# uncompress
-cat myfiles_split.tgz_* | tar xz

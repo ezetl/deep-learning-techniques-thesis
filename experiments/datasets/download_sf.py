@@ -6,10 +6,13 @@ from bs4 import BeautifulSoup
 import urllib
 
 URLSNUM = 267
-DST = './data/'
+DST = './data/sf'
 command = 'wget -O {} {}'
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("\nYou did not provide a path to download the dataset. Default path: {}\n".format(DST))
+
     r = urllib.urlopen('https://embed.stanford.edu/iframe/?url=https%3A%2F%2Fpurl.stanford.edu%2Fvn158kj2087')
     soup = BeautifulSoup(r, "lxml")
     a = soup.find_all('a')
