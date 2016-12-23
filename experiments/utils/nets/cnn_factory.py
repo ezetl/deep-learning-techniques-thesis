@@ -138,12 +138,12 @@ class MNISTNetFactory:
         n.fc1 = L.InnerProduct(n.norm2, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
         n.relu3 = L.ReLU(n.fc1, in_place=True)
         n.dropout1 = L.Dropout(n.relu3, in_place=True)
-        n.fc2 = L.InnerProduct(n.relu3, num_output=2, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc2 = L.InnerProduct(n.relu3, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
     
         n.fc1_p = L.InnerProduct(n.norm2_p, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
         n.relu3_p = L.ReLU(n.fc1_p, in_place=True)
         n.dropout1_p = L.Dropout(n.relu3_p, in_place=True)
-        n.fc2_p = L.InnerProduct(n.relu3_p, num_output=2, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc2_p = L.InnerProduct(n.relu3_p, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
 
         n.contrastive = L.ContrastiveLoss(n.fc2, n.fc2_p, n.label, contrastive_loss_param=dict(margin=contrastive_margin))
     

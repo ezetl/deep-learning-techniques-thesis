@@ -68,7 +68,7 @@ if __name__ == "__main__":
             )
 
     ### EGOMOTION
-    niter = 40000
+    niter = 60000
     siam_mnist, loss_blobs, acc_blobs = MNISTNetFactory.siamese_egomotion(
             lmdb_path=options.lmdb_path,
             labels_lmdb_path=options.labels_lmdb_path,
@@ -88,22 +88,22 @@ if __name__ == "__main__":
             is_train=options.train,
             learn_all=options.train_all
             )
-    results_contr10 = train_net(siam_cont_mnist, max_iter=niter, stepsize=10000, loss_blobs=loss_cont_blobs, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem10')
+    results_contr10 = train_net(siam_cont_mnist, max_iter=niter, stepsize=10000, base_lr=0.001, loss_blobs=loss_cont_blobs, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem10')
 
     ### CONTRASTIVE m=100
     siam_cont_mnist2, loss_cont_blobs2, acc_cont_blobs2 = MNISTNetFactory.siamese_contrastive(
             lmdb_path=options.lmdb_path,
-            batch_size=options.batch_size,
+            batch_size=500,
             scale=options.scale,
             contrastive_margin=100,
             is_train=options.train,
             learn_all=options.train_all
             )
-    results_contr100 = train_net(siam_cont_mnist2, max_iter=niter, stepsize=10000, loss_blobs=loss_cont_blobs2, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem100')
+    results_contr100 = train_net(siam_cont_mnist2, max_iter=niter, stepsize=10000, base_lr=0.001, loss_blobs=loss_cont_blobs2, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem100')
 
     
-    niter = 4000
-    sniter = 10000
+    niter = 5000
+    sniter = 40000
     sizes_lmdb = ['100', '300', '1000', '10000'] 
     for num in sizes_lmdb:
         acc['ego'][num] = 0
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         acc['ego'][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
         results_egomotion = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
         acc['ego'][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
-        acc['ego'][num] += acc['ego'][num] / 3.0
+        acc['ego'][num] = acc['ego'][num] / 3.0
 
         ### STANDAR. Train from scratch for every dataset
         mnist, loss_blobs_st, acc_blobs_st = MNISTNetFactory.standar(
@@ -142,6 +142,7 @@ if __name__ == "__main__":
         acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
         results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=sniter, test_iter=80, max_iter=sniter, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st, snapshot_prefix='mnist/snapshots/standar/mnist')
         acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
+        acc['stand'][num] = acc['stand'][num] / 3.0
 
         # CONTRASTIVE m=10
         results_contrastive10 = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
@@ -153,7 +154,7 @@ if __name__ == "__main__":
         results_contrastive10 = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
                 pretrained_weights=results_contr10['snaps'][-1], snapshot_prefix='mnist/snapshots/contrastive_finetune10/mnist')
         acc['cont_10'][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
-        acc['cont_10'][num] += acc['cont_10'][num] / 3.0
+        acc['cont_10'][num] = acc['cont_10'][num] / 3.0
 
         # Contrastive m=100
         results_contrastive100 = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
@@ -165,7 +166,7 @@ if __name__ == "__main__":
         results_contrastive100 = train_net(mnist, test_netspec=mnist_test, test_interv=niter, test_iter=80, max_iter=niter, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
                 pretrained_weights=results_contr100['snaps'][-1], snapshot_prefix='mnist/snapshots/contrastive_finetune100/mnist')
         acc['cont_100'][num] += results_contrastive100['acc'][acc_blobs_test[0]][0]
-        acc['cont_100'][num] += acc['cont_100'][num] / 3.0
+        acc['cont_100'][num] = acc['cont_100'][num] / 3.0
 
     print('Accuracies')
     for a in ['stand', 'cont_10', 'cont_100', 'ego']:
