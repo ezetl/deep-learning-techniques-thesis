@@ -51,7 +51,7 @@ def parse_options():
             help="Root dir where all the LMDBs were created.", metavar="PATH")
 
     group_example = OptionGroup(parser, "Example:", 
-            './make_experiment.py -b 125 -L /media/eze/Datasets/MNIST/ -s $(python -c"print(1/255.0)") -i 40000 -f 4000\\')
+            './experiment_mnist.py -b 125 -L /media/eze/Datasets/MNIST/ -s $(python -c"print(1/255.0)") -i 40000 -f 4000\\')
     parser.add_option_group(group_example)
 
     return parser.parse_args()
