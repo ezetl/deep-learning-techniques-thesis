@@ -2099,6 +2099,7 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 **** DONE entrenar
 **** DONE finetunear
 **** TODO testear. Esta hecho el test dentro del train. Hacer una funcion nueva solo para testear
+**** TODO guardar best snapshot, no usar siempre el ultimo
 **** TODO Armar todos los entrenamientos para MNIST. Crear clase Experiment que permita agregar: preentrenamiento, finetuning, testing
 **** TODO mostar resultados
 *** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.

@@ -2,7 +2,7 @@
 from os.path import join
 from optparse import OptionParser, OptionGroup
 from utils.nets.cnn_factory import MNISTNetFactory, KITTINetFactory 
-from utils.solver.solver import train_net 
+from utils.solver.solver import train_net, create_solver_params
 
 """
 Script to reproduce the MNIST results.
@@ -39,19 +39,11 @@ def parse_options():
     """
     usage = "usage: %prog [options]"
     parser = OptionParser(usage=usage)
-    parser.add_option("-b", "--batch-size", dest="batch_size", type="int",
-            default=125, help="Batch size", metavar="INT")
-    parser.add_option("-i", "--train-iters", dest="train_iters", type="int",
-            default=40000, help="Iterations for training", metavar="INT")
-    parser.add_option("-f", "--finetune-iters", dest="finetune_iters", type="int",
-            default=4000, help="Iterations for finetuning", metavar="INT")
-    parser.add_option("-s", "--scale", dest="scale", type="float", default=1.0,
-            help="Scale param. For example, if you want to provide a way to transform your images from [0,255] to [0,1] range", metavar="FLOAT")
     parser.add_option("-L", "--lmdb-root", dest="lmdb_root",
             help="Root dir where all the LMDBs were created.", metavar="PATH")
 
     group_example = OptionGroup(parser, "Example:", 
-            './experiment_mnist.py -b 125 -L /media/eze/Datasets/MNIST/ -s $(python -c"print(1/255.0)") -i 40000 -f 4000\\')
+            './experiment_mnist.py -L /media/eze/Datasets/MNIST/\\')
     parser.add_option_group(group_example)
 
     return parser.parse_args()
@@ -62,65 +54,76 @@ if __name__ == "__main__":
 
     acc = {'ego': {}, 'cont_10': {}, 'cont_100': {}, 'stand': {}}  
 
+    scale = 1/255.0
     # TEST NET
+    # Used to test accuracy in finetunig stages
     mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
             lmdb_path=join(opts.lmdb_root, 'mnist_standar_lmdb_test'),
-            batch_size=opts.batch_size,
-            scale=opts.scale,
+            batch_size=125,
+            scale=scale,
             is_train=False,
             learn_all=False
             )
 
     # EGOMOTION NET
+    # Used to train a siamese network from scratch following the method from the 
+    # paper
     siam_mnist, loss_blobs, acc_blobs = MNISTNetFactory.siamese_egomotion(
             lmdb_path=join(opts.lmdb_root, 'mnist_train_siamese_lmdb'),
             labels_lmdb_path=join(opts.lmdb_root, 'mnist_train_siamese_lmdb_labels'),
-            batch_size=opts.batch_size,
-            scale=opts.scale,
+            batch_size=125,
+            scale=scale,
             is_train=True,
             learn_all=True
             )
-    results_ego = train_net(siam_mnist, max_iter=opts.train_iters, stepsize=10000, loss_blobs=loss_blobs, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese')
+
+    # Create a SolverParameter instance with the predefined parameters for this experiment.
+    # Some paths and iterations numbers will change for nets with contrastive loss or 
+    # in finetuning stage 
+    iters=40000
+    # Train our first siamese net with Egomotion method
+    results_ego = train_net(create_solver_params(siam_mnist, max_iter=iters, snapshot_prefix='mnist/snapshots/egomotion/mnist_siamese'),
+                            loss_blobs=loss_blobs)
 
     # CONTRASTIVE NET, m=10
     # Using a small batch size while training with Contrastive Loss leads 
     # to high bias in the networks (i.e. they dont learn much)
     # A good ad-hoc value is 500
-    siam_cont_mnist, loss_cont_blobs, acc_cont_blobs = MNISTNetFactory.siamese_contrastive(
+    siam_cont10_mnist, loss_cont_blobs, acc_cont_blobs = MNISTNetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'mnist_train_siamese_lmdb'),
             batch_size=500,
-            scale=opts.scale,
+            scale=scale,
             contrastive_margin=10,
             is_train=True,
             learn_all=True
             )
-    # Also, using a big lr (i.e. 0.01) whule training with Contrastive Loss can lead to nan values while backpropagating the loss
-    results_contr10 = train_net(siam_cont_mnist, max_iter=opts.train_iters, stepsize=10000, base_lr=0.001, loss_blobs=loss_cont_blobs, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem10')
+    # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
+    results_contr10 = train_net(create_solver_params(siam_cont10_mnist, max_iter=iters, base_lr=0.001, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamese_m10'),
+                                loss_blobs=loss_cont_blobs)
 
     # CONTRASTIVE NET, m=100
-    siam_cont_mnist2, loss_cont_blobs2, acc_cont_blobs2 = MNISTNetFactory.siamese_contrastive(
+    siam_cont100_mnist, loss_cont_blobs2, acc_cont_blobs2 = MNISTNetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'mnist_train_siamese_lmdb'),
             batch_size=500,
-            scale=opts.scale,
+            scale=scale,
             contrastive_margin=100,
             is_train=True,
             learn_all=True
             )
-    results_contr100 = train_net(siam_cont_mnist2, max_iter=opts.train_iters, stepsize=10000, base_lr=0.001, loss_blobs=loss_cont_blobs2, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamesem100')
+    results_contr100 = train_net(create_solver_params(siam_cont100_mnist, max_iter=1000,  base_lr=0.001, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamese_m100'),
+                                 loss_blobs=loss_cont_blobs2)
     
     repeat = 3
     sizes_lmdb = ['100', '300', '1000', '10000'] 
+    iters = 4000 
     for num in sizes_lmdb:
-        acc['ego'][num] = 0
-        acc['stand'][num] = 0
-        acc['cont_10'][num] = 0
-        acc['cont_100'][num] = 0
+        acc['ego'][num] = acc['stand'][num] = acc['cont_10'][num] = acc['cont_100'][num] = 0
 
         # Finetune network
         mnist_finetune, loss_blobs_f, acc_blobs_f = MNISTNetFactory.standar(
                 lmdb_path=join(opts.lmdb_root, 'mnist_standar_lmdb_{}'.format(num)),
-                batch_size=opts.batch_size,
-                scale=opts.scale,
+                batch_size=125,
+                scale=scale,
                 is_train=True,
                 learn_all=False
                 )
@@ -128,30 +131,37 @@ if __name__ == "__main__":
         # Train from scratch network
         mnist, loss_blobs_st, acc_blobs_st = MNISTNetFactory.standar(
                 lmdb_path=join(opts.lmdb_root, 'mnist_standar_lmdb_{}'.format(num)),
-                batch_size=opts.batch_size,
-                scale=opts.scale,
+                batch_size=125,
+                scale=scale,
                 is_train=True,
                 learn_all=True
                 )
 
         for i in range(0, repeat):
             # EGOMOTION
-            results_egomotion = train_net(mnist_finetune, test_netspec=mnist_test, test_interv=opts.finetune_iters, test_iter=80, max_iter=opts.finetune_iters, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['snaps'][-1], snapshot_prefix='mnist/snapshots/finetuning/mnist')
+            snapshot_prefix = 'mnist/snapshots/egomotion_finetuning/mnist_repeat{}_lmdb{}'.format(i, num)
+            results_egomotion = train_net(create_solver_params(mnist_finetune, test_netspec=mnist_test, max_iter=iters, test_interv=iters,
+                                                               base_lr=0.01, snapshot_prefix=snapshot_prefix),
+                                          loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['snaps'][-1])
             acc['ego'][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
 
-            # STANDAR
-            results_standar = train_net(mnist, test_netspec=mnist_test, test_interv=opts.train_iters, test_iter=80, max_iter=opts.train_iters, stepsize=10000, loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st, snapshot_prefix='mnist/snapshots/standar/mnist')
-            acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
-
             # CONTRASTIVE m=10
-            results_contrastive10 = train_net(mnist_finetune, test_netspec=mnist_test, test_interv=opts.finetune_iters, test_iter=80, max_iter=opts.finetune_iters, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
-                    pretrained_weights=results_contr10['snaps'][-1], snapshot_prefix='mnist/snapshots/contrastive_finetune10/mnist')
+            snapshot_prefix = 'mnist/snapshots/contrastive_finetuning10/mnist_repeat{}_lmdb{}'.format(i, num)
+            results_contrastive10 = train_net(create_solver_params(mnist_finetune, test_netspec=mnist_test, max_iter=iters, test_interv=iters, base_lr=0.01, snapshot_prefix=snapshot_prefix), 
+                                              loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights=results_contr10['snaps'][-1])
             acc['cont_10'][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
 
             # Contrastive m=100
-            results_contrastive100 = train_net(mnist_finetune, test_netspec=mnist_test, test_interv=opts.finetune_iters, test_iter=80, max_iter=opts.finetune_iters, stepsize=10000, loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test,
-                pretrained_weights=results_contr100['snaps'][-1], snapshot_prefix='mnist/snapshots/contrastive_finetune100/mnist')
+            snapshot_prefix = 'mnist/snapshots/contrastive_finetuning100/mnist_repeat{}_lmdb{}'.format(i, num)
+            results_contrastive100 = train_net(create_solver_params(mnist_finetune, test_netspec=mnist_test, max_iter=iters, base_lr=0.01, snapshot_prefix=snapshot_prefix), 
+                                               loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights=results_contr100['snaps'][-1])
             acc['cont_100'][num] += results_contrastive100['acc'][acc_blobs_test[0]][0]
+
+            # STANDAR
+            snapshot_prefix = 'mnist/snapshots/standar/mnist_repeat{}_lmdb{}'.format(i, num)
+            results_standar = train_net(create_solver_params(mnist, test_net=mnist_test, base_lr=0.01, max_iter=40000, test_interv=40000, snapshot_prefix=snapshot_prefix),
+                                        loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st)
+            acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
 
         acc['cont_100'][num] = acc['cont_100'][num] / float(repeat) 
         acc['cont_10'][num] = acc['cont_10'][num] / float(repeat)

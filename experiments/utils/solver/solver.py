@@ -9,8 +9,8 @@ from caffe.proto import caffe_pb2
 class TrainException(Exception):
     pass
 
-def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, test_iter=100, base_lr=0.01,
-    max_iter=40000, stepsize=10000):
+def create_solver_params(train_netspec, test_netspec=None, test_interv=1000, test_iter=80, base_lr=0.01,
+    max_iter=40000, lr_policy='step', stepsize=10000, gamma=0.5, snapshot=1000, snapshot_prefix='/tmp/snapshot'):
     """
     Code to create a solver. Taken and modified from
     this Caffe tutorial: https://github.com/BVLC/caffe/blob/master/examples/02-fine-tuning.ipynb
@@ -30,12 +30,17 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     test_initialization: true
     """
     # Specify locations of the train and (maybe) test networks.
-    solver.train_net = train_net_path
-    if test_net_path is not None:
-        solver.test_net.append(test_net_path)
-        solver.test_interval = test_interv 
-        solver.test_iter.append(test_iter)
-    
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(str(train_netspec.to_proto()))
+        solver.train_net = f.name
+
+    if test_netspec:
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(str(test_netspec.to_proto()))
+            solver.test_net.append(f.name)
+            solver.test_interval = test_interv 
+            solver.test_iter.append(test_iter)
+
     # The number of iterations over which to average the gradient.
     # Effectively boosts the training batch size by the given factor, without
     # affecting memory utilization.
@@ -53,10 +58,13 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     # Set `lr_policy` to define how the learning rate changes during training.
     # Here, we 'step' the learning rate by multiplying it by a factor `gamma`
     # every `stepsize` iterations.
-    solver.lr_policy = 'step'
-    solver.gamma = 0.05
-    solver.stepsize = stepsize
+    solver.lr_policy = lr_policy 
+    if lr_policy == 'step':
+        solver.gamma = gamma 
+        solver.stepsize = stepsize
     
+    solver.snapshot = snapshot
+    solver.snapshot_prefix = snapshot_prefix
     # Set other SGD hyperparameters. Setting a non-zero `momentum` takes a
     # weighted average of the current gradient and previous gradients to make
     # learning more stable. L2 weight decay regularizes learning, to help prevent
@@ -71,36 +79,23 @@ def create_solver_params(train_net_path, test_net_path=None, test_interv=1000, t
     solver.solver_mode = caffe_pb2.SolverParameter.GPU
     
     return solver
-    # Write the solver to a temporary file and return its filename.
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(str(solver))
-        return f.name
 
 
-def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100, base_lr=0.01,
-            max_iter=40000, stepsize=10000, loss_blobs=None, acc_blobs=None,
-            pretrained_weights="", snapshot=1000, snapshot_prefix="/tmp/snap"):
+def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=""):
     """
-    Run solvers for solver.max_iter iterations,
-    returning the loss and accuracy recorded each iteration.
+    Run a solver instance from solver_params for solver_params.max_iter iterations,
+    returning the loss and accuracy recorded in each step.
 
-    :param train_netspec: Caffe NetSpec. The train network
-    :param test_netspec: Caffe NetSpec. The test network 
-    :param test_interv: int. Test will be performed ever test_interv iterations. Only useful if test_net_path is passed.
-    :param test_iter: int. Amount of iterations to run on each test
-    :param base_lr: float. Initial learning rate
-    :param max_iter: int. Maximum amount of iterations for training
-    :param stepsize:  int. Amount of iterations between each lr update.
+    :param solver_params: Caffe SolverParameter instance
     :param loss_blobs: tuple of str. The names of the loss layers used to gather the loss info during training. These losses will then be returned as a result
-    :param acc_blobs: tuple of str. Same as loss_blobs but with accuracies 
+    :param acc_blobs: tuple of str. Same as loss_blobs but related to accuracies 
     :param pretrained_weights: str. Path where the pretrained .caffemodel is. If not set, train from scratch is performed.
-    :param snapshot: int. Save snapshots (.solverstate and .caffemodel files) every 'snapshot' iterations.
-    :param snapshot_prefix: str. Where to save the snapshots.
-    :returns: str. A dict containing at most 3 keys:
+
+    :return: A dict containing at most 3 keys:
               {
                 'snaps': ['path/to/snapshot1', 'path/to/snapshot2', ... ],
                 'loss': {
-                           'loss_x': list containing the loss_x captured in every iteration,
+                           'loss_x': list containing the training 'loss_x' captured in every iteration,
                            'loss_y': list ...
                         },
                  'acc': {
@@ -109,25 +104,15 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
                         } 
               }
     """
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(str(train_netspec.to_proto()))
-        train_net_path = f.name
-
-    test_net_path = None
-    if test_netspec:
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            f.write(str(test_netspec.to_proto()))
-            test_net_path = f.name
-
-    solver_param = create_solver_params(train_net_path,
-            test_net_path=test_net_path, test_interv=test_interv, test_iter=test_iter,
-            base_lr=base_lr, max_iter=max_iter, stepsize=stepsize)
+    if not exists(dirname(solver_param.snapshot_prefix)):
+        print("Path for snapshots does not exist. Creating dir {}".format(dirname(solver_param.snapshot_prefix)))
+        makedirs(dirname(solver_param.snapshot_prefix))
 
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(str(solver_param))
-        solver_param = f.name
+        solver_param_fname = f.name
 
-    solver = caffe.get_solver(solver_param)
+    solver = caffe.get_solver(solver_param_fname)
 
     if pretrained_weights and not exists(pretrained_weights):
         raise TrainException("Could not find pretrained weights with provided path: {}".format(pretrained_weights)) 
@@ -142,30 +127,24 @@ def train_net(train_netspec, test_netspec=None, test_interv=1000, test_iter=100,
     else:
         results['loss'] = {'loss': np.array([])}
 
-    if not acc_blobs:
-        acc_blobs = []
-    if test_net_path and acc_blobs:
+    if acc_blobs is not None:
         results['acc'] = {} 
+    else:
+        acc_blobs = []
 
-    if not exists(dirname(snapshot_prefix)):
-        print("Path for snapshots does not exist. Creating dir {}".format(dirname(snapshot_prefix)))
-        makedirs(dirname(snapshot_prefix))
-    
     try:
-        for it in range(0, max_iter+1):
+        for it in range(0, solver_param.max_iter+1):
             solver.step(1)
             # Retrieve loss of this step
             for name in loss_blobs:
                 results['loss'][name] = np.append(results['loss'].get(name, np.array([])), solver.net.blobs[name].data.item())
-            # Retrieve accuracy of tests every 'test_interv' iterations                            
-            if it!=0 and it % test_interv == 0:
+            # Retrieve accuracy of tests every 'test_interval' iterations                            
+            if solver_param.test_interval and it!=0 and it % solver_param.test_interval == 0:
                 for name in acc_blobs:     
                     results['acc'][name] = np.append(results['acc'].get(name, np.array([])), solver.test_nets[0].blobs[name].data.item())
-            # Save snapshot every 'snapshot' iterations
-            if it!=0 and it % snapshot == 0:
-                snapshot_name = snapshot_prefix + '_iter_{}.caffemodel'.format(it)
-                print("Saving snapshot in {}".format(snapshot_name))
-                solver.net.save(snapshot_name)
+            # Save snapshots names
+            if it!=0 and it % solver_param.snapshot == 0:
+                snapshot_name = str(solver_param.snapshot_prefix + '_iter_{}.caffemodel'.format(it))
                 results['snaps'].append(snapshot_name)
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
