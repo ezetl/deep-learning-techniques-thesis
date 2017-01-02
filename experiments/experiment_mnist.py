@@ -110,7 +110,7 @@ if __name__ == "__main__":
             is_train=True,
             learn_all=True
             )
-    results_contr100 = train_net(create_solver_params(siam_cont100_mnist, max_iter=1000,  base_lr=0.001, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamese_m100'),
+    results_contr100 = train_net(create_solver_params(siam_cont100_mnist, max_iter=iters,  base_lr=0.001, snapshot_prefix='mnist/snapshots/contrastive/mnist_siamese_m100'),
                                  loss_blobs=loss_cont_blobs2)
     
     repeat = 3
@@ -159,7 +159,7 @@ if __name__ == "__main__":
 
             # STANDAR
             snapshot_prefix = 'mnist/snapshots/standar/mnist_repeat{}_lmdb{}'.format(i, num)
-            results_standar = train_net(create_solver_params(mnist, test_net=mnist_test, base_lr=0.01, max_iter=40000, test_interv=40000, snapshot_prefix=snapshot_prefix),
+            results_standar = train_net(create_solver_params(mnist, test_netspec=mnist_test, base_lr=0.01, max_iter=40000, test_interv=40000, snapshot_prefix=snapshot_prefix),
                                         loss_blobs=loss_blobs_st, acc_blobs=acc_blobs_st)
             acc['stand'][num] += results_standar['acc'][acc_blobs_test[0]][0]
 
@@ -170,4 +170,4 @@ if __name__ == "__main__":
 
     print('Accuracies')
     for a in ['stand', 'cont_10', 'cont_100', 'ego']:
-        print('{}\t{}'.format(a, '\t'.join([str(acc[a]['100']), str(acc[a]['300']), str(acc[a]['1000']), str(acc[a]['10000'])])))
+        print('{}   \t{}'.format(a, '\t'.join([str(acc[a]['100']), str(acc[a]['300']), str(acc[a]['1000']), str(acc[a]['10000'])])))
