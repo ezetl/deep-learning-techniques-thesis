@@ -21,38 +21,24 @@
  * Author: Ezequiel Torti Lopez
  */
 
-#include <iostream>
-#include <fstream>
-#include <string> 
-#include <string.h>
-#include <vector>
-#include <array>
-#include <cmath>
-#include <tuple>
-#include <cinttypes>
-#include <sys/stat.h>
-#include <stdlib.h> 
-#include <iomanip>
-#include <algorithm>
-
-#include <leveldb/db.h>
-#include <leveldb/write_batch.h>
-#include <lmdb.h>
-
+#include "lmdb_creator.hpp"
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include <algorithm>
+#include <cinttypes>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <sys/stat.h>
+#include <vector>
 
-// TODO(ezetl): use lmdb_creator here. wont compile otherwise
-#include "caffe/proto/caffe.pb.h"
-#include "caffe/util/io.hpp"
-
-
-using namespace caffe;
 using namespace std;
 using namespace cv;
 
-#define TB 1099511627776
 #define THRESHOLD 8.8817841970012523e-16
 #define NUM_BINS 20
 #define HEIGHT 227
@@ -76,14 +62,13 @@ using namespace cv;
 #define Y_STEP 0.0536 // approximate
 
 #define PATHS_FILES  (DATA_ROOT"paths/")
-#define IMAGES       "/media/eze/Datasets/KITTI/dataset/sequences/"
-#define POSES        "/media/eze/Datasets/KITTI/dataset/poses/"
+#define IMAGES       "/sequences/"
+#define POSES        "/poses/"
 
-#define LMDB_ROOT       "/media/eze/Datasets/KITTI/" 
-#define LMDB_TRAIN      (LMDB_ROOT"kitti_train_egomotion_lmdb/")
-#define LMDB_LABEL_TRAIN (LMDB_ROOT"kitti_train_label_egomotion_lmdb")
-#define LMDB_VAL        (LMDB_ROOT"kitti_val_egomotion_lmdb/")
-#define LMDB_LABEL_VAL (LMDB_ROOT"kitti_val_label_egomotion_lmdb")
+#define LMDB_TRAIN      "kitti_train_egomotion_lmdb/"
+#define LMDB_LABEL_TRAIN "kitti_train_label_egomotion_lmdb"
+#define LMDB_VAL        "kitti_val_egomotion_lmdb/"
+#define LMDB_LABEL_VAL "kitti_val_label_egomotion_lmdb"
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -109,6 +94,7 @@ typedef struct
 {
     Mat img1;
     Mat img2;
+    Label sfa;
     Label x;
     Label y;
     Label z;
@@ -122,12 +108,11 @@ unsigned int generate_rand(int range_limit);
 RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2);
 RotMatrix get_rot_matrix(TransformMatrix& t);
 EulerAngles mat2euler(RotMatrix& m);
-void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_label_path, const vector<string> split);
-vector<ImgPair> generate_pairs(const vector<string> split);
+void create_lmdbs(string images_root, string lmdb_path, const vector<string> split);
+vector<ImgPair> generate_pairs(const string images_root, const vector<string> split);
 DataBlob process_images(ImgPair p);
-void CVMatsToDatum(const Mat& img1, const Mat& img2, Datum* datum);
 
-vector<ImgPair> generate_pairs(const vector<string> split) {
+vector<ImgPair> generate_pairs(const string images_root, const vector<string> split) {
     vector<ImgPair> pairs_paths;
     for (unsigned int i=0; i<split.size(); ++i) {
         // Load original paths
@@ -136,12 +121,12 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
         string path;
         vector<string> split_paths;
         while (fsplit >> path) {
-            split_paths.push_back(IMAGES+path);
+            split_paths.push_back(images_root+path);
         }
         fsplit.close();
 
         // Load transform matrix 
-        fsplit.open(POSES+split[i]);
+        fsplit.open(images_root+POSES+split[i]);
         TransformMatrix m;
         vector<TransformMatrix> split_matrix;
         while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
@@ -174,143 +159,26 @@ vector<ImgPair> generate_pairs(const vector<string> split) {
     return pairs_paths;
 }
 
-void create_lmdbs(const char* images, const char* lmdb_path, const char* lmdb_label_path, const vector<string> split)
+void create_lmdbs(string images_root, string lmdb_path, const vector<string> split)
 {
-    /***********************************************/
-    // lmdb data 
-    MDB_env *mdb_env;
-    MDB_dbi mdb_dbi;
-    MDB_val mdb_key, mdb_data;
-    MDB_txn *mdb_txn;
-    // Set database environment
-    mkdir(lmdb_path, 0744);
-    // Create Data LMDBs
-    mdb_env_create(&mdb_env);
-    mdb_env_set_mapsize(mdb_env, TB);
-    mdb_env_open(mdb_env, lmdb_path, 0, 0664);
-    mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
-    mdb_open(mdb_txn, NULL, 0, &mdb_dbi);
-    /***********************************************/
-
-
-    /***********************************************/
-    // lmdb labels 
-    MDB_env *mdb_envl;
-    MDB_dbi mdb_dbil;
-    MDB_val mdb_keyl, mdb_datal;
-    MDB_txn *mdb_txnl;
-    // Set database environment
-    mkdir(lmdb_label_path, 0744);
-    // Create Data LMDBs
-    mdb_env_create(&mdb_envl);
-    mdb_env_set_mapsize(mdb_envl, TB);
-    mdb_env_open(mdb_envl, lmdb_label_path, 0, 0664);
-    mdb_txn_begin(mdb_envl, NULL, 0, &mdb_txnl);
-    mdb_open(mdb_txnl, NULL, 0, &mdb_dbil);
-    /***********************************************/
-
-
+    string labels_path = lmdb_path + "_labels";
+    LMDataBase *labels_lmdb = new LMDataBase(labels_path, (size_t)NUM_CLASSES, 1);
+    LMDataBase *data_lmdb = new LMDataBase(lmdb_path, (size_t)6, (size_t)HEIGHT);
 
     // Generate pairs of images for each sequence 
-    vector<ImgPair> pairs = generate_pairs(split);
+    vector<ImgPair> pairs = generate_pairs(images_root, split);
     random_shuffle(std::begin(pairs), std::end(pairs));
-
-    // Dimensions of Data LMDB 
-    unsigned int rows = HEIGHT;
-    unsigned int cols = WIDTH;
-
-    int count = 0;
-    string data_value, label_value;
-    
-    /***********************************************/
-    // Data datum
-    // TODO (ezetlopez): update this comment if the changes work.
-    // This datum has 3 + 3 + NUM_CLASSES dimensions.
-    // The first 3 dimensions correspond to the first image, the second 3 to the second image 
-    // respectively. NUM_CLASSES (3) because we are also merging the labels into the data.
-    // This allow us to slice the data later on training phase and retrieve the labels.
-    // Basically I am adding 3 "images" with all zeros in it except the index where the class 
-    // is active. Then with the Argmax Layer of Caffe I retrieve these labels index again and pass them 
-    // to the loss function.
-    // Chek the loop below to see how it is done.
-    Datum datum;
-    //datum.set_channels(6+NUM_CLASSES);
-    datum.set_channels(NUM_CHANNELS);
-    datum.set_height(rows);
-    datum.set_width(cols);
-    /***********************************************/
-
-    /***********************************************/
-    // Labels datum
-    Datum datuml;
-    datuml.set_channels(NUM_CLASSES);
-    datuml.set_height(1);
-    datuml.set_width(1);
-    /***********************************************/
-
-    std::ostringstream s;
 
     for (unsigned int i = 0; i<pairs.size(); i++)
     {
-        DataBlob data = process_images(pairs[i]);
-        s << std::setw(8) << std::setfill('0') << count; 
-        string key_str = s.str();
-        s.str(std::string());
-
-        /***********************************************/
-        // Set Data
-        assert (data.img1.isContinuous());
-        assert (data.img2.isContinuous());
-        CVMatsToDatum(data.img1, data.img2, &datum);
-        datum.SerializeToString(&data_value);
-        // Save Data
-        mdb_data.mv_size = data_value.size();
-        mdb_data.mv_data = reinterpret_cast<void*>(&data_value[0]);
-        mdb_key.mv_size = key_str.size();
-        mdb_key.mv_data = reinterpret_cast<void*>(&key_str[0]);
-        mdb_put(mdb_txn, mdb_dbi, &mdb_key, &mdb_data, 0);
-        /***********************************************/
-
-        /***********************************************/
-        // Set Labels 
-        // Create a char pointer and copy the images first, the labels at the end
-        char * labels = (char*) calloc(NUM_CLASSES, sizeof(uByte));
-        labels[0] = (char)data.x;
-        labels[1] = (char)data.y;
-        labels[2] = (char)data.z;
-        datuml.set_data((char*)labels, NUM_CLASSES);
-        datuml.SerializeToString(&label_value);
-        free(labels);
-        // Save Labels
-        mdb_datal.mv_size = label_value.size();
-        mdb_datal.mv_data = reinterpret_cast<void*>(&label_value[0]);
-        mdb_keyl.mv_size = key_str.size();
-        mdb_keyl.mv_data = reinterpret_cast<void*>(&key_str[0]);
-        mdb_put(mdb_txnl, mdb_dbil, &mdb_keyl, &mdb_datal, 0);
-        /***********************************************/
-
-        if (++count % 1000 == 0) {
-            // Commit txn Data
-            mdb_txn_commit(mdb_txn);
-            mdb_txn_begin(mdb_env, NULL, 0, &mdb_txn);
-            // Commit txn labels 
-            mdb_txn_commit(mdb_txnl);
-            mdb_txn_begin(mdb_envl, NULL, 0, &mdb_txnl);
-            cout << "Processed " << count << "\r" << flush;
-        }
-    }
-    // Last batch
-    if (count % 1000 != 0) {
-        mdb_txn_commit(mdb_txn);
-        mdb_close(mdb_env, mdb_dbi);
-        mdb_env_close(mdb_env);
-
-        mdb_txn_commit(mdb_txnl);
-        mdb_close(mdb_envl, mdb_dbil);
-        mdb_env_close(mdb_envl);
+      DataBlob data = process_images(pairs[i]);
+      data_lmdb->insert2db(data.img1, data.img2, data.sfa);
+      vector<Label> labels = {(Label)data.x, (Label)data.y, (Label)data.z};
+      labels_lmdb->insert2db(labels);
     }
 
-    cout << "\nFinished creation of LMDB. " << count << " images processed.\n";
+    delete labels_lmdb;
+    delete data_lmdb;
     return;
 }
 
@@ -376,6 +244,7 @@ DataBlob process_images(ImgPair p)
     final_data.x = bin_x;
     final_data.y = bin_y;
     final_data.z = bin_z;
+    final_data.sfa = abs(p.i1 - p.i2) <= 7;
 
     // Debugging
     //namedWindow("im1");
@@ -443,42 +312,20 @@ EulerAngles mat2euler(RotMatrix& m){
 
 int main(int argc, char** argv)
 {
+  if (argc < 3) {
+    cout << "You must provide the path where the KITTI original dataset\n"
+         << "lives ('sequences' and 'poses' folders downloaded from the official website)\n"
+         << "and the path were you want to save your generated LMDBs:\n\n"
+         << argv[0] << " path/to/sequences_and_poses path/where/to/save/LMDB\n\n";
+  } else {
     srand(0);
+    string lmdb_data_path = string(argv[2]) + LMDB_TRAIN;
+    string images_root(argv[2]);
     cout << "Creating train LMDB's\n";
-    create_lmdbs(IMAGES, LMDB_TRAIN, LMDB_LABEL_TRAIN, TRAIN_SPLITS);
+    create_lmdbs(images_root, lmdb_data_path, TRAIN_SPLITS);
     cout << "Creating val LMDB's\n";
-    create_lmdbs(IMAGES, LMDB_VAL, LMDB_LABEL_VAL, VAL_SPLITS);
-    return 0;
-}
-
-void CVMatsToDatum(const Mat& img1, const Mat& img2, Datum* datum) {
-    // Modified from CVMatToDatum from Caffe
-    CHECK(img1.depth() == CV_8U) << "Image data type must be unsigned byte";
-    CHECK(img2.depth() == CV_8U) << "Image data type must be unsigned byte";
-    datum->set_channels(img1.channels() + img2.channels());
-    datum->set_height(img1.rows);
-    datum->set_width(img1.cols);
-    datum->clear_data();
-    datum->clear_float_data();
-    datum->set_encoded(false);
-    int datum_channels = datum->channels();
-    int datum_height = datum->height();
-    int datum_width = datum->width();
-    int datum_size = datum_channels * datum_height * datum_width;
-    string buffer(datum_size, ' ');
-
-    for (int h = 0; h < datum_height; ++h) {
-        const uchar* ptr1 = img1.ptr<uchar>(h);
-        const uchar* ptr2 = img2.ptr<uchar>(h);
-        int img_index = 0;
-        for (int w = 0; w < datum_width; ++w) {
-            for (int c = 0; c < datum_channels/2; ++c) {
-                int datum_index = (c * datum_height + h) * datum_width + w;
-                buffer[datum_index] = static_cast<char>(ptr1[img_index]);
-                datum_index = ((c+datum_channels/2) * datum_height + h) * datum_width + w;
-                buffer[datum_index] = static_cast<char>(ptr2[img_index++]);
-            }
-        }
-    }
-    datum->set_data(buffer);
+    lmdb_data_path = string(argv[2]) + LMDB_VAL;
+    create_lmdbs(images_root, lmdb_data_path, VAL_SPLITS);
+  }
+  return 0;
 }

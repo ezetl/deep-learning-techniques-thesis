@@ -4,7 +4,7 @@ add_definitions ("-Wall")
 
 set(SRC ".")
 #file(GLOB files "." "*.cpp")
-set(files "${SRC}/preprocess_mnist_siamese.cpp" "${SRC}/preprocess_mnist_standar.cpp")
+set(files "${SRC}/preprocess_mnist_siamese.cpp" "${SRC}/preprocess_mnist_standar.cpp" "${SRC}/preprocess_kitti_siamese.cpp")
 
 include_directories("${SRC}/utils")
 include_directories("${SRC}/lmdb_creator")
