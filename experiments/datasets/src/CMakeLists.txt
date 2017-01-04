@@ -4,7 +4,7 @@ add_definitions ("-Wall")
 
 set(SRC ".")
 #file(GLOB files "." "*.cpp")
-set(files "${SRC}/preprocess_mnist_siamese.cpp" "${SRC}/preprocess_mnist_standar.cpp" "${SRC}/preprocess_kitti_siamese.cpp")
+set(files "${SRC}/preprocess_mnist_siamese.cpp" "${SRC}/preprocess_mnist_standar.cpp" )
 
 include_directories("${SRC}/utils")
 include_directories("${SRC}/lmdb_creator")
@@ -12,7 +12,7 @@ include_directories("${SRC}/lmdb_creator")
 add_subdirectory("${SRC}/lmdb_creator")
 
 # OpenCV
-find_package(OpenCV)
+find_package(OpenCV 3.1 REQUIRED)
 if (OpenCV_FOUND)
     include_directories(${OpenCV_INCLUDE_DIRS})
 endif()
@@ -30,3 +30,6 @@ foreach(infile ${files})
     add_executable(${outname} ${infile} ${SRC}/utils/mnist_utils.hpp ${SRC}/utils/mnist_utils.cpp)
     target_link_libraries(${outname} ${Caffe_LIBRARIES} ${OpenCV_LIBS} lmdb_creator)
 endforeach(infile)
+
+add_executable(preprocess_kitti_siamese "${SRC}/preprocess_kitti_siamese.cpp")
+target_link_libraries(preprocess_kitti_siamese ${Caffe_LIBRARIES} ${OpenCV_LIBS} lmdb_creator)
