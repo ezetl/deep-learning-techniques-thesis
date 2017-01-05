@@ -61,13 +61,13 @@ using namespace cv;
 #define Y_MIN -0.563987
 #define Y_STEP 0.0536 // approximate
 
-#define PATHS_FILES  (DATA_ROOT"paths/")
+#define PATHS_FILES  (DATA_ROOT"/kitti/paths/")
 #define IMAGES       "/sequences/"
 #define POSES        "/poses/"
 
-#define LMDB_TRAIN      "kitti_train_egomotion_lmdb/"
+#define LMDB_TRAIN      "kitti_train_egomotion_lmdb"
 #define LMDB_LABEL_TRAIN "kitti_train_label_egomotion_lmdb"
-#define LMDB_VAL        "kitti_val_egomotion_lmdb/"
+#define LMDB_VAL        "kitti_val_egomotion_lmdb"
 #define LMDB_LABEL_VAL "kitti_val_label_egomotion_lmdb"
 
 typedef char Byte;
@@ -121,12 +121,12 @@ vector<ImgPair> generate_pairs(const string images_root, const vector<string> sp
         string path;
         vector<string> split_paths;
         while (fsplit >> path) {
-            split_paths.push_back(images_root+path);
+            split_paths.push_back(images_root+"/"+IMAGES"/"+path);
         }
         fsplit.close();
 
         // Load transform matrix 
-        fsplit.open(images_root+POSES+split[i]);
+        fsplit.open(images_root+"/"+POSES+"/"+split[i]);
         TransformMatrix m;
         vector<TransformMatrix> split_matrix;
         while (fsplit >> m[0][0] >> m[0][1] >> m[0][2] >> m[0][3] >>
@@ -319,12 +319,12 @@ int main(int argc, char** argv)
          << argv[0] << " path/to/sequences_and_poses path/where/to/save/LMDB\n\n";
   } else {
     srand(0);
-    string lmdb_data_path = string(argv[2]) + LMDB_TRAIN;
-    string images_root(argv[2]);
+    string lmdb_data_path = string(argv[2]) + "/" + LMDB_TRAIN;
+    string images_root(argv[1]);
     cout << "Creating train LMDB's\n";
     create_lmdbs(images_root, lmdb_data_path, TRAIN_SPLITS);
     cout << "Creating val LMDB's\n";
-    lmdb_data_path = string(argv[2]) + LMDB_VAL;
+    lmdb_data_path = string(argv[2]) + "/" + LMDB_VAL;
     create_lmdbs(images_root, lmdb_data_path, VAL_SPLITS);
   }
   return 0;

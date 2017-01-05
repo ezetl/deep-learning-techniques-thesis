@@ -22,7 +22,7 @@ find_package(Caffe)
 include_directories(${Caffe_INCLUDE_DIRS})
 add_definitions(${Caffe_DEFINITIONS})
 
-set(DATA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/data")
+set(DATA_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../data")
 add_definitions(-DDATA_ROOT="${DATA_ROOT}")
 
 foreach(infile ${files})

@@ -37,8 +37,8 @@ void LMDataBase::insert2db(const Mat &img1, const Mat &img2, int label = -10) {
   assert((size_t)img1.rows == datum_size);
   assert((size_t)img2.cols == datum_size);
   assert((size_t)img2.rows == datum_size);
-  assert((size_t)img1.channels() == datum_channels);
-  assert((size_t)img2.channels() == datum_channels);
+  assert((size_t)img1.channels() == datum_channels/2);
+  assert((size_t)img2.channels() == datum_channels/2);
 
   string data_value;
   Datum datum;
