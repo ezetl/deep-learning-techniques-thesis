@@ -211,6 +211,46 @@ class KITTINetFactory:
     
         return n, ('loss_x', 'loss_y', 'loss_z'), ('acc_x', 'acc_y', 'acc_z')
     
+    @staticmethod
+    def siamese_contrastive(lmdb_path=None, labels_lmdb_path=None,
+            batch_size=125, scale=1.0, is_train=True, learn_all=True):
+        """
+        Creates a protoxt for siamese AlexNet architecture with a contrastive loss layer on top
+    
+        :param lmdb_path: str. Path to train LMDB
+        :param labels_lmdb_path: str. Path to train LMDB labels
+        :param test_lmdb: str. Path to train LMDB
+        :param test_labels_lmdb: str. Path to test LMDB labels
+        :param batch_size: int. Batch size
+        :param scale: float. How to scale the images
+        :param is_train: bool. Flag indicating if this is for testing or training
+        :param learn_all: bool. Flag indicating if we should learn all the layers from scratch
+        :returns: Caffe NetSpec, tuple with names of loss blobs, tuple with name of accuracy blobs
+        """
+        n = caffe.NetSpec()
+    
+        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, batch_size=batch_size, scale=scale, is_train=is_train)
+        
+        # Slice data/labels
+        n.data0, n.data1 = L.Slice(n.data, slice_param=dict(axis=1, slice_point=3), ntop=2)
+    
+        # BCNN
+        n.pool5, n.pool5_p = bcnn(n.data0, n.data1, n, learn_all, False)
+
+        # TCNNs
+        n.fc1 = L.InnerProduct(n.pool5, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.relu3 = L.ReLU(n.fc1, in_place=True)
+        n.dropout1 = L.Dropout(n.relu3, in_place=True)
+        n.fc2 = L.InnerProduct(n.relu3, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+    
+        n.fc1_p = L.InnerProduct(n.pool5_p, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.relu3_p = L.ReLU(n.fc1_p, in_place=True)
+        n.dropout1_p = L.Dropout(n.relu3_p, in_place=True)
+        n.fc2_p = L.InnerProduct(n.relu3_p, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+
+        n.contrastive = L.ContrastiveLoss(n.fc2, n.fc2_p, n.label, contrastive_loss_param=dict(margin=contrastive_margin))
+    
+        return n, ('contrastive',), None 
     
     @staticmethod
     def standar(lmdb_path=None, labels_lmdb_path=None, batch_size=125,
