@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-from os.path import join
+from os.path import join, exists
 from optparse import OptionParser, OptionGroup
 from utils.nets.cnn_factory import KITTINetFactory 
 from utils.solver.solver import train_net, create_solver_params
@@ -59,8 +59,13 @@ if __name__ == "__main__":
     # in finetuning stage 
     iters=60000
     ## Train our first siamese net with Egomotion method
-    results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/egomotion/kitti_siamese'),
-                            loss_blobs=loss_blobs)
+    results_path = './results/kitti/'
+    if exists(join(results_path, 'egomotion.npy')):
+        results_ego = np.load(join(results_path, 'egomotion.npy'))
+    else:
+        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/egomotion/kitti_siamese'),
+                loss_blobs=loss_blobs)
+        np.save(join(results_path, 'egomotion.npy'))
 
     # CONTRASTIVE NET, m=10
     # Using a small batch size while training with Contrastive Loss leads 
@@ -75,8 +80,12 @@ if __name__ == "__main__":
             learn_all=True
             )
     # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
-    results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m10'),
-                                loss_blobs=loss_cont_blobs)
+    if exists(join(results_path, 'contr_10.npy')):
+        results_contr10 = np.load(join(results_path, 'contr_10.npy'))
+    else:
+        results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m10'),
+                loss_blobs=loss_cont_blobs)
+        np.save(join(results_path, 'contr_10.npy'))
 
     ## CONTRASTIVE NET, m=100
     siam_cont100_kitti, loss_cont_blobs2, acc_cont_blobs2 = KITTINetFactory.siamese_contrastive(
@@ -87,8 +96,12 @@ if __name__ == "__main__":
             is_train=True,
             learn_all=True
             )
-    results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m100'),
-                                 loss_blobs=loss_cont_blobs2)
+    if exists(join(results_path, 'contr_100.npy')):
+        results_contr100 = np.load(join(results_path, 'contr_100.npy'))
+    else:
+        results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m100'),
+                loss_blobs=loss_cont_blobs2)
+        np.save(join(results_path, 'contr_100.npy'))
     
     sizes_lmdb = ['5', '20'] 
     splits = ['01', '02', '03']
