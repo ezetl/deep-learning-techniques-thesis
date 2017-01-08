@@ -39,6 +39,7 @@ if __name__ == "__main__":
     acc = {'ego': {}, 'cont_10': {}, 'cont_100': {}, 'stand': {}}  
 
     scale = 1.0
+    batch_size = 5
 
     ## EGOMOTION NET
     ## Used to train a siamese network from scratch following the method from the 
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     siam_kitti, loss_blobs, acc_blobs = KITTINetFactory.siamese_egomotion(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
             labels_lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb_labels'),
-            batch_size=125,
+            batch_size=batch_size,
             scale=scale,
             is_train=True,
             learn_all=True
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     # Create a SolverParameter instance with the predefined parameters for this experiment.
     # Some paths and iterations numbers will change for nets with contrastive loss or 
     # in finetuning stage 
-    iters=1000
+    iters=60000
     ## Train our first siamese net with Egomotion method
     results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, snapshot_prefix='kitti/snapshots/egomotion/kitti_siamese'),
                             loss_blobs=loss_blobs)
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     # A good ad-hoc value is 500
     siam_cont10_kitti, loss_cont_blobs, acc_cont_blobs = KITTINetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
-            batch_size=800,
+            batch_size=batch_size,
             scale=scale,
             contrastive_margin=10,
             is_train=True,
@@ -77,9 +78,9 @@ if __name__ == "__main__":
                                 loss_blobs=loss_cont_blobs)
 
     ## CONTRASTIVE NET, m=100
-    siam_cont100_kitti, loss_cont_blobs2, acc_cont_blobs2 = MNISTNetFactory.siamese_contrastive(
+    siam_cont100_kitti, loss_cont_blobs2, acc_cont_blobs2 = KITTINetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
-            batch_size=500,
+            batch_size=batch_size,
             scale=scale,
             contrastive_margin=100,
             is_train=True,
@@ -91,14 +92,14 @@ if __name__ == "__main__":
     repeat = 3
     sizes_lmdb = ['5', '20'] 
     splits = ['01', '02', '03']
-    iters = 1000 
+    iters = 10000 
     for num in sizes_lmdb:
         acc['ego'][num] = acc['stand'][num] = acc['cont_10'][num] = acc['cont_100'][num] = 0
         for split in splits:
             # Finetune network
             kitti_finetune, loss_blobs_f, acc_blobs_f = KITTINetFactory.standar(
                     lmdb_path=join(opts.lmdb_root, 'SUN397/lmdbs/SUN_Training_{}_{}perclass_lmdb'.format(split, num)),
-                    batch_size=125,
+                    batch_size=batch_size,
                     scale=scale,
                     is_train=True,
                     learn_all=False
@@ -107,7 +108,7 @@ if __name__ == "__main__":
             # Train from scratch network
             kitti, loss_blobs_st, acc_blobs_st = KITTINetFactory.standar(
                     lmdb_path=join(opts.lmdb_root, 'SUN397/lmdbs/SUN_Training_{}_{}perclass_lmdb'.format(split, num)),
-                    batch_size=125,
+                    batch_size=batch_size,
                     scale=scale,
                     is_train=True,
                     learn_all=True
@@ -117,14 +118,14 @@ if __name__ == "__main__":
             # Used to test accuracy in finetunig stages
             kitti_test, loss_blobs_test, acc_blobs_test = KITTINetFactory.standar(
                     lmdb_path=join(opts.lmdb_root, 'SUN397/lmdbs/SUN_Testing_{}_{}perclass_lmdb'.format(split, num)),
-                    batch_size=125,
+                    batch_size=batch_size,
                     scale=scale,
                     is_train=False,
                     learn_all=False
                     )
 
             for i in range(0, repeat):
-                # EGOMOTION
+                ## EGOMOTION
                 snapshot_prefix = 'kitti/snapshots/egomotion_finetuning/kitti_repeat{}_lmdb{}'.format(i, num)
                 results_egomotion = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters,
                                                                    base_lr=0.01, snapshot_prefix=snapshot_prefix),
@@ -156,4 +157,4 @@ if __name__ == "__main__":
 
     print('Accuracies')
     for a in ['stand', 'cont_10', 'cont_100', 'ego']:
-        print('{}   \t{}'.format(a, '\t'.join([str(acc[a]['5']), str(acc[a]['20'])])))
+        print('{0:.6f}   \t{1:.6f}'.format(a, '\t'.join([str(acc[a]['5']), str(acc[a]['20'])])))
