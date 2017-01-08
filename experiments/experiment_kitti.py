@@ -39,7 +39,7 @@ if __name__ == "__main__":
     acc = {'ego': {}, 'cont_10': {}, 'cont_100': {}, 'stand': {}}  
 
     scale = 1.0
-    batch_size = 5
+    batch_size = 125
 
     ## EGOMOTION NET
     ## Used to train a siamese network from scratch following the method from the 
