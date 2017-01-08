@@ -38,7 +38,7 @@ def create_solver_params(train_netspec, test_netspec=None, test_interv=1000, tes
         with tempfile.NamedTemporaryFile(delete=False) as f:
             f.write(str(test_netspec.to_proto()))
             solver.test_net.append(f.name)
-            solver.test_interval = test_interv 
+            solver.test_interval = min(test_interv, max_iter) 
             solver.test_iter.append(test_iter)
 
     # The number of iterations over which to average the gradient.
@@ -63,7 +63,7 @@ def create_solver_params(train_netspec, test_netspec=None, test_interv=1000, tes
         solver.gamma = gamma 
         solver.stepsize = stepsize
     
-    solver.snapshot = snapshot
+    solver.snapshot = min(snapshot, max_iter)
     solver.snapshot_prefix = snapshot_prefix
     # Set other SGD hyperparameters. Setting a non-zero `momentum` takes a
     # weighted average of the current gradient and previous gradients to make
