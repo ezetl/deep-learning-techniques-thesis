@@ -2093,6 +2093,7 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 **** DONE SFA para kitti y mnist
 **** DONE Standar para kitti
 **** DONE Standar para mnist
+*** TODO Agregar docs para lo que falta de preprocessing (sun, kitti) 
 *** TODO [85%] Completar el pipeline de entrenamiento en Python:
 **** DONE crear nets
 **** DONE solver
