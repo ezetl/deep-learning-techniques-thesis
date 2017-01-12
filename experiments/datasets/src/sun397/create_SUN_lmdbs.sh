@@ -9,7 +9,7 @@ data_root=/media/eze/0F4A13791A35DD40/SUN397/
 for i in $(seq 1 3); do
     for s in ${im_per_class[@]}; do 
         for t in ${files[@]}; do 
-            ../utils/create_lmdb.sh -r 227\
+            ./utils/create_lmdb.sh -r 227\
                 -l ${data_root}lmdbs/SUN_${t}_0${i}_${s}perclass_lmdb\
                 -d ${data_root}preprocessed\
                 -f data/paths/${t}_0${i}_${s}per_class.txt

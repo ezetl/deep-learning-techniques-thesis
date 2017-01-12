@@ -21,3 +21,4 @@ experiments/sf/snapshots/
 .ipynb_checkpoints/
 *.binaryproto
 *.pyc
+ILSVRC_*\.txt
