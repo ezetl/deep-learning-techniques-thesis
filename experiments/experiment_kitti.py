@@ -40,7 +40,34 @@ if __name__ == "__main__":
 
     scale = 1.0
     batch_size = 125
-    # TODO: add pre-training with imagenet on AlexNet with 20K and 1M images
+    # Train AlexNet on ILSVRC'12 dataset with 20 and 1000 imgs per class 
+    iters = 90000 # TODO: calculate epochs on each dataset
+    imagenet_imgs_per_class = [20, 1000]
+    for num in imagenet_imgs_per_class:
+        imagenet, loss_blobs_imagenet, acc_blobs_imagenet = KITTINetFactory.standar(
+                lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Training_{}perclass_lmdb'.format(num)),
+                batch_size=batch_size,
+                scale=scale,
+                num_classes=1000,
+                is_train=True,
+                learn_all=True,
+                )
+        imagenet_test, loss_blobs_test, acc_blobs_test = KITTINetFactory.standar(
+                lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Testing_{}perclass_lmdb'.format(num)),
+                batch_size=batch_size,
+                scale=scale,
+                num_classes=1000,
+                is_train=False,
+                learn_all=False,
+                )
+        if exists(join(results_path, 'imagenet_{}.npy'.format(num))):
+            results_ego = np.load(join(results_path, 'imagenet_{}.npy'.format(num)))
+        else:
+            snapshot_prefix = 'snapshots/imagenet/imagenet_lmdb{}'.format(num)
+            results_imagenet = train_net(create_solver_params(imagenet, test_netspec=imagenet_test, max_iter=iters, test_interv=iters,
+                                                               base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                                          loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['snaps'][-1])
+            np.save(join(results_path, 'imagenet_{}.npy'.format(num)))
 
     ## EGOMOTION NET
     ## Used to train a siamese network from scratch following the method from the 
@@ -63,7 +90,7 @@ if __name__ == "__main__":
     if exists(join(results_path, 'egomotion.npy')):
         results_ego = np.load(join(results_path, 'egomotion.npy'))
     else:
-        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/egomotion/kitti_siamese'),
+        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
                 loss_blobs=loss_blobs)
         np.save(join(results_path, 'egomotion.npy'))
 
@@ -83,7 +110,7 @@ if __name__ == "__main__":
     if exists(join(results_path, 'contr_10.npy')):
         results_contr10 = np.load(join(results_path, 'contr_10.npy'))
     else:
-        results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m10'),
+        results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='snapshots/kitti/contrastive/kitti_siamese_m10'),
                 loss_blobs=loss_cont_blobs)
         np.save(join(results_path, 'contr_10.npy'))
 
@@ -99,7 +126,7 @@ if __name__ == "__main__":
     if exists(join(results_path, 'contr_100.npy')):
         results_contr100 = np.load(join(results_path, 'contr_100.npy'))
     else:
-        results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=0.001, snapshot_prefix='kitti/snapshots/contrastive/kitti_siamese_m100'),
+        results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=0.001, snapshot_prefix='snapshots/kitti/contrastive/kitti_siamese_m100'),
                 loss_blobs=loss_cont_blobs2)
         np.save(join(results_path, 'contr_100.npy'))
     
@@ -137,20 +164,20 @@ if __name__ == "__main__":
                         )
 
                 # EGOMOTION
-                snapshot_prefix = 'kitti/snapshots/egomotion_finetuning/kitti_lmdb{}'.format(num)
+                snapshot_prefix = 'snapshots/kitti/egomotion_finetuning/kitti_lmdb{}'.format(num)
                 results_egomotion = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters,
                                                                    base_lr=0.001, snapshot_prefix=snapshot_prefix),
                                               loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['snaps'][-1])
                 acc['egomotion'][output][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
 
                 # CONTRASTIVE m=10
-                snapshot_prefix = 'kitti/snapshots/contrastive_finetuning10/kitti_lmdb{}'.format(num)
+                snapshot_prefix = 'snapshots/kitti/contrastive_finetuning10/kitti_lmdb{}'.format(num)
                 results_contrastive10 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix), 
                                                   loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights=results_contr10['snaps'][-1])
                 acc['cont_10'][output][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
 
                 # Contrastive m=100
-                snapshot_prefix = 'kitti/snapshots/contrastive_finetuning100/kitti_lmdb{}'.format(num)
+                snapshot_prefix = 'snapshots/kitti/contrastive_finetuning100/kitti_lmdb{}'.format(num)
                 results_contrastive100 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix), 
                                                    loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights=results_contr100['snaps'][-1])
                 acc['cont_100'][output][num] += results_contrastive100['acc'][acc_blobs_test[0]][0]
