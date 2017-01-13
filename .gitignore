@@ -22,3 +22,5 @@ experiments/sf/snapshots/
 *.binaryproto
 *.pyc
 ILSVRC_*\.txt
+results/
+snapshots/
