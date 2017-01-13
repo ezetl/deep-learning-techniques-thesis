@@ -79,6 +79,8 @@ if __name__ == "__main__":
                                       loss_blobs=loss_blobs_imagenet, acc_blobs=acc_blobs_imagenet)
         with open(join(results_path, 'imagenet_20.pickle'), 'wb') as handle:
             pickle.dump(results_imagenet20, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del imagenet20        
+    del imagenet_test20
 
     # Imagenet 1000 images per class
     imagenet1000, loss_blobs_imagenet, acc_blobs_imagenet = KITTINetFactory.standar(
@@ -110,6 +112,8 @@ if __name__ == "__main__":
         with open(join(results_path, 'imagenet_1000.pickle'), 'wb') as handle:
             pickle.dump(results_imagenet1000, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+    del imagenet1000
+    del imagenet_test1000
     ## EGOMOTION NET
     ## Used to train a siamese network from scratch following the method from the 
     ## paper
@@ -135,6 +139,7 @@ if __name__ == "__main__":
                 loss_blobs=loss_blobs)
         with open(join(results_path, 'egomotion.pickle'), 'wb') as handle:
             pickle.dump(results_ego, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_kitti        
 
 
     # CONTRASTIVE NET, m=10
@@ -158,6 +163,7 @@ if __name__ == "__main__":
                 loss_blobs=loss_cont_blobs)
         with open(join(results_path, 'contr_10.pickle'), 'wb') as handle:
             pickle.dump(results_contr10, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_cont10_kitti        
 
 
     ## CONTRASTIVE NET, m=100
@@ -177,9 +183,11 @@ if __name__ == "__main__":
                 loss_blobs=loss_cont_blobs2)
         with open(join(results_path, 'contr_100.pickle'), 'wb') as handle:
             pickle.dump(results_contr100, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_cont100_kitti        
 
     sizes_lmdb = ['5', '20'] 
-    splits = ['01', '02', '03']
+    #splits = ['01', '02', '03']
+    splits = ['01']
     outputs_to_test = ['1', '2', '3', '4', '5']
     iters = 10000
     for output in outputs_to_test:
