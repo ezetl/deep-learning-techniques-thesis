@@ -43,7 +43,7 @@ if __name__ == "__main__":
     scale = 1.0
     batch_size = 125
     # Train AlexNet on ILSVRC'12 dataset with 20 and 1000 imgs per class 
-    iters = 1 
+    iters = 60000 
     results_path = './results/kitti/'
     try:
         makedirs(results_path)
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     # Create a SolverParameter instance with the predefined parameters for this experiment.
     # Some paths and iterations numbers will change for nets with contrastive loss or 
     # in finetuning stage 
-    iters=1
+    iters = 60000
     ## Train our first siamese net with Egomotion method
     if exists(join(results_path, 'egomotion.pickle')):
        with open(join(results_path, 'egomotion.pickle'), 'rb') as handle:
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     sizes_lmdb = ['5', '20'] 
     splits = ['01', '02', '03']
     outputs_to_test = ['1', '2', '3', '4', '5']
-    iters = 1
+    iters = 10000
     for output in outputs_to_test:
         acc['egomotion'][output] = {}
         acc['cont_10'][output] = {}
