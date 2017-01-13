@@ -255,7 +255,7 @@ class KITTINetFactory:
     
     @staticmethod
     def standar(lmdb_path=None, labels_lmdb_path=None, batch_size=125,
-            scale=1.0, is_train=True, num_classes=397, learn_all=True, layers='5'):
+            scale=1.0, is_train=True, num_classes=397, learn_all=True, layers='5', is_imagenet=False):
         """
         Creates a protoxt for the AlexNet architecture
     
@@ -325,33 +325,63 @@ class KITTINetFactory:
         n.relu5 = L.ReLU(n.conv5, in_place=True)
         n.pool5 = L.Pooling(n.relu5, pool=P.Pooling.MAX, kernel_size=3, stride=2)
 
-        if layers == '5':
-            n.fc = L.InnerProduct(n.pool5, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        if not is_imagenet:
+            if layers == '5':
+                n.fc = L.InnerProduct(n.pool5, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+                if is_train:
+                    n.loss = L.SoftmaxWithLoss(n.fc, n.label)
+                n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                return n, ('loss',), ('acc',)
+
+            n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.relu6 = L.ReLU(n.fc6, in_place=True)
+
             if is_train:
-                n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-            n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
-            return n, ('loss',), ('acc',)
+                n.drop6 = fc7input = L.Dropout(n.relu6, in_place=True)
+            else:
+                fc7input = n.relu6
 
-        n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
-        n.relu6 = L.ReLU(n.fc6, in_place=True)
-
-        if is_train:
-            n.drop6 = fc7input = L.Dropout(n.relu6, in_place=True)
-        else:
-            fc7input = n.relu6
-
-        n.fc7 = L.InnerProduct(fc7input, num_output=4096, param=[weight_param('fc7_w', learn_all=True), bias_param('fc7_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
-        n.relu7 = L.ReLU(n.fc7, in_place=True)
+            n.fc7 = L.InnerProduct(fc7input, num_output=4096, param=[weight_param('fc7_w', learn_all=True), bias_param('fc7_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.relu7 = L.ReLU(n.fc7, in_place=True)
     
-        if is_train:
-            n.drop7 = fc8input = L.Dropout(n.relu7, in_place=True)
+            if is_train:
+                n.drop7 = fc8input = L.Dropout(n.relu7, in_place=True)
+            else:
+                fc8input = n.relu7
+
+            n.fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=[weight_param('fc8_w', learn_all=True), bias_param('fc8_b', learn_all=True)])
+
+            if is_train:
+                n.loss = L.SoftmaxWithLoss(n.fc8, n.label)
+            n.acc = L.Accuracy(n.fc8, n.label, include=dict(phase=caffe.TEST))
         else:
-            fc8input = n.relu7
+            if layers == '5':
+                n.fc_imgnet = L.InnerProduct(n.pool5, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+                if is_train:
+                    n.loss = L.SoftmaxWithLoss(n.fc_imgnet, n.label)
+                n.acc = L.Accuracy(n.fc_imgnet, n.label, include=dict(phase=caffe.TEST))
+                return n, ('loss',), ('acc',)
 
-        n.fc8 = L.InnerProduct(fc8input, num_output=num_classes, param=[weight_param('fc8_w', learn_all=True), bias_param('fc8_b', learn_all=True)])
+            n.fc6_imgnet = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.relu6 = L.ReLU(n.fc6_imgnet, in_place=True)
 
-        if is_train:
-            n.loss = L.SoftmaxWithLoss(n.fc8, n.label)
-        n.acc = L.Accuracy(n.fc8, n.label, include=dict(phase=caffe.TEST))
+            if is_train:
+                n.drop6 = fc7input = L.Dropout(n.relu6, in_place=True)
+            else:
+                fc7input = n.relu6
+
+            n.fc7_imgnet = L.InnerProduct(fc7input, num_output=4096, param=[weight_param('fc7_w', learn_all=True), bias_param('fc7_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.relu7 = L.ReLU(n.fc7_imgnet, in_place=True)
+    
+            if is_train:
+                n.drop7 = fc8input = L.Dropout(n.relu7, in_place=True)
+            else:
+                fc8input = n.relu7
+
+            n.fc8_imgnet = L.InnerProduct(fc8input_imgnet, num_output=num_classes, param=[weight_param('fc8_w', learn_all=True), bias_param('fc8_b', learn_all=True)])
+
+            if is_train:
+                n.loss = L.SoftmaxWithLoss(n.fc8_imgnet, n.label)
+            n.acc = L.Accuracy(n.fc8_imgnet, n.label, include=dict(phase=caffe.TEST))
 
         return n, ('loss',), ('acc',)
