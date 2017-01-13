@@ -2093,7 +2093,7 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 **** DONE SFA para kitti y mnist
 **** DONE Standar para kitti
 **** DONE Standar para mnist
-*** TODO Agregar docs para lo que falta de preprocessing (sun, kitti) 
+*** DONE Agregar docs para lo que falta de preprocessing (sun, kitti) 
 *** TODO [85%] Completar el pipeline de entrenamiento en Python:
 **** DONE crear nets
 **** DONE solver
@@ -2102,13 +2102,15 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 **** TODO guardar best snapshot, no usar siempre el ultimo
 **** DONE Armar todos los entrenamientos para MNIST
 **** DONE mostrar resultados
-*** TODO Guardar resultados con npy.save. Cargar los archivos si existen para evitar reentrenar todo si se corto un entrenamiento 
-*** TODO Agregar experimentos de AlexNet con 20k y 1m de imagenes de Imagenet para SUN397
+*** DONE Guardar resultados de los entrenamientos grandes (siamese, imagenet) con pickle. Cargar los archivos si existen para evitar reentrenar todo si se corto un entrenamiento 
+*** DONE Agregar experimentos de AlexNet con 20k y 1m de imagenes de Imagenet para SUN397
 *** DONE Agregar el finetuning con las 5 ultimas capas para SUN397
+*** TODO MNIST: cont_10 uso batch size de 800, hacer lo mismo para cont_100
+*** TODO Probar pandas para guardar y mostrar los datos y evitar usar tantos diccionarios
 *** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
 *** TODO Hacer plots de loss al finalizar el entrenamiento. Guardar .pdf
-*** TODO Hacer test al finalizar entrenamiento, imprimir en pantalla log.
-*** TODO Guardar logs de cada entrenamiento
+*** DONE Hacer test al finalizar entrenamiento, imprimir en pantalla log.
+*** TODO Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
@@ -2177,7 +2179,7 @@ que corresponde la imagen. A ese argmax obtenido lo mando a la capa de
 accuracy/softmax por ejemplo
 
 ***** Armar una sola DB para datos y labels y despues slicear los labels
-*** [78%] Entrenamiento
+*** [100%] Entrenamiento
 **** DONE Armar la red (.prototxt) teniendo en cuenta el Slice, los multiple Softmax y loss
 Slice de los labels:
 https://groups.google.com/forum/#!searchin/caffe-users/multilabel/caffe-users/RuT1TgwiRCo/hoUkZOeEDgAJ
@@ -2280,10 +2282,10 @@ iteraciones, con batches de 125 (5millones de imagenes.)
 **** DONE Probar con conv1: 96 x 13 x 13 y conv2: 256 x 7 x 7. lr0.001 para from scratch parece andar bien.
 **** DONE Probar con conv1: 96 x 7 x 7 y conv2: 256 x 5 x 5
 **** DONE Probar con los mismos settings que AlexNet(stride, group, etc). Ademas, la parte from scratch no usa preentrenamiento
-**** TODO Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
+**** DONE Probar sacando la fc100, poner el concat como bottom de las fc{x,y,z}
 **** DONE Probar el codigo de Agrawal, la parte de mnist. Resultado: el codigo es horrible, no pude entender bien nada, logre correr un entrenamiento de MNIST pero los resultados fueron los mismos
-**** TODO Probar con menos pares (<85)
-**** TODO Seguir probando con la red que viene como ejemplo en caffe.
+**** DONE Probar con menos pares (<85)
+**** DONE Seguir probando con la red que viene como ejemplo en caffe.
 **** DONE Probar con exageraciones en las traslaciones (multiplicar por 3) -> da lo mismo
 Sera que no todas las redes son buenos candidatos a siamesas? por
 ejemplo, si tiene muchisimos pesos para aprender tal vez sea mala
@@ -2298,52 +2300,17 @@ se utiliza para testing.
 *** Resultados
 Los mejores resultados para egomotion se obtienen con lr0.01 en ambas
 etapas (egomotion y finetuning). Con capas LRN despues de pooling. Con
-normalizacion de los valores (de 255 a 0-1).
+normalizacion de los valores (de 255 a 0-1). Para contrastive loss
+hubo que utilizar un lr de 0.001 y un batch size mas grande, sino las
+redes no convergen.
 
-Con lr de 0.1 en egomotion y finetuning no llega a mas del 75%
-**** Finetuning sobre egomotion
-****************************************************************************************************
-Final Results
+Accuracies
+| stand    | 0.426666667064 |  0.71199999253 | 0.837333321571 | 0.981333355109 |
+| cont_10  |  0.53066666921 | 0.722666680813 | 0.826666673024 | 0.879999995232 |
+| cont_100 | 0.333333333333 | 0.448000003894 | 0.503999988238 | 0.496000001828 |
+| ego      | 0.757333318392 | 0.896000027657 | 0.949333349864 | 0.986666679382 |
 
-Total cases: 10000 - Cases OK: 9602
-Accuracy: 0.96
-Confussion Matrix:
 
-98.7	0.0	0.1	0.0	0.1	0.2	0.4	0.1	0.4	0.0			967	0	1	0	1	2	4	1	4	0
-0.1	99.1	0.5	0.2	0.1	0.0	0.0	0.0	0.0	0.0			1	1125	6	2	1	0	0	0	0	0
-0.7	0.4	97.2	0.2	0.1	0.0	0.1	0.6	0.7	0.1			7	4	1003	2	1	0	1	6	7	1
-0.0	0.1	2.1	95.0	0.1	0.8	0.0	0.8	0.9	0.3			0	1	21	959	1	8	0	8	9	3
-0.0	0.2	0.2	0.0	95.9	0.0	0.6	0.1	0.8	2.1			0	2	2	0	942	0	6	1	8	21
-0.4	0.0	0.2	2.4	0.3	94.5	0.0	0.1	1.5	0.6			4	0	2	21	3	843	0	1	13	5
-1.1	0.2	0.4	0.0	0.2	1.3	95.9	0.0	0.6	0.2			11	2	4	0	2	12	919	0	6	2
-0.2	0.9	1.7	0.4	0.5	0.0	0.0	94.9	0.3	1.2			2	9	17	4	5	0	0	976	3	12
-0.9	0.0	0.7	0.9	0.4	0.7	0.2	0.2	94.9	1.0			9	0	7	9	4	7	2	2	924	10
-0.2	0.4	0.0	0.5	2.1	0.6	0.0	1.0	1.7	93.6			2	4	0	5	21	6	0	10	17	944
-Error rate: 0.0398
-
-****************************************************************************************************
-
-**** Entrenando desde cero, red standar
-****************************************************************************************************
-Final Results
-
-Total cases: 10000 - Cases OK: 9751
-Accuracy: 0.98
-Confussion Matrix:
-
-98.4	0.0	0.1	0.0	0.2	0.1	0.5	0.2	0.2	0.3			964	0	1	0	2	1	5	2	2	3
-0.0	99.4	0.3	0.0	0.0	0.0	0.2	0.1	0.1	0.0			0	1128	3	0	0	0	2	1	1	0
-0.2	0.0	98.0	0.4	0.0	0.0	0.2	1.0	0.3	0.0			2	0	1011	4	0	0	2	10	3	0
-0.1	0.0	1.2	97.5	0.0	0.9	0.0	0.2	0.1	0.0			1	0	12	985	0	9	0	2	1	0
-0.0	0.0	0.1	0.0	97.3	0.0	0.5	0.2	0.4	1.5			0	0	1	0	955	0	5	2	4	15
-0.2	0.0	0.1	1.1	0.1	97.4	0.3	0.1	0.2	0.3			2	0	1	10	1	869	3	1	2	3
-0.5	0.2	0.1	0.1	0.6	0.6	97.5	0.0	0.3	0.0			5	2	1	1	6	6	934	0	3	0
-0.0	0.5	1.1	0.3	0.0	0.0	0.0	97.6	0.0	0.6			0	5	11	3	0	0	0	1003	0	6
-0.4	0.0	0.3	0.5	0.1	0.8	0.2	0.3	96.4	0.9			4	0	3	5	1	8	2	3	939	9
-0.4	0.5	0.0	0.3	0.9	0.7	0.1	1.0	0.7	95.4			4	5	0	3	9	7	1	10	7	963
-Error rate: 0.0249
-
-****************************************************************************************************
 ** Experimentos con KITTI
 *** Preprocesamiento
 **** KITTI
