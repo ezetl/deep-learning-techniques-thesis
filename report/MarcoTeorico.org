@@ -1857,13 +1857,11 @@ asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \end{figure}
 #+END_LaTeX
 
-Una vez entrenadas las redes siamesas es común tomar una de sus redes
-(da lo mismo cual sea pues comparten los mismos parámetros) y
-utilizarla para aplicar transferencia de aprendizaje a un nuevo
-problema. De esta manera se aprovechan los parámetros aprendidos y es
-posible entrenar con menos datos.
+El propósito de entrenar redes siamesas es aprender buenas features relacionadas al problema en cuestion.
+Lo mas común es tomar los pesos aprendidos por la red siamesa y realizar una transferencia de aprendizaje 
+a un nuevo problema.
 
-Podemos concluir que es necesario definir qué función de similitud
+Es necesario definir qué función de similitud
 vamos a usar y cómo vamos a generar los pares de entrenamiento antes
 de entrenar redes siamesas. En la siguiente Sección nos vamos a
 adentrar en trabajo con redes siamesas de Agrawal et
@@ -1889,35 +1887,44 @@ de automovimiento se corresponde con los movimientos de la
 cámara. Establecen entonces el problema de relacionar los estímulos
 visuales con el movimiento como la tarea de predecir qué
 transformaciones sufren las imágenes a medida que el agente se mueve.
+
+
+Ese agente móvil es modelado con Redes Neurales Convolucionales que optimizan sus
+representaciones visuales minimizando el error entre la informacion de automovimiento provista 
+por el sistema y la informacion de eutomovimiento predecida utilizando las imágenes de 
+entrada solamente. Este procedimiento es, según Agrawal, equivalente a entrenar una 
+Red Convolucional con dos flujos de entrada (o sea, una Red Neural Convolucional Siamesa) en el que cada
+entrada toma una imagen y la red predice la transformacion que ocurrio entre ambas imágenes.
+
 Bajo la hipótesis de que esto forzaría al agente a aprender
 \textit{features} útiles en la identificación de elementos visuales
-que esten presentes en ambas imágenes, entrenaron varias redes
-siamesas con distintos conjuntos de datos y obtuvieron resultados que
-casi equiparan a los del estado del arte. La diferencia es que ellos
+que esten presentes en ambas imágenes, entrenaron diferentes versiones de redes
+siamesas con distintos conjuntos de datos y obtuvieron resultados comparables al estado del arte. La diferencia es que ellos
 no debieron utilizar tantas imágenes.
+
+En este trabajo final se tratará de validar la hipótesis propuesta por Agrawal et al. reproduciendo varios
+de los experimentos propuestos en su investigación. Para ello nos valdremos de técnicas similares a las mencionadas en la Sección XX 
+, de pre-entrenamiento de redes y finalmente de transferencia de aprendizaje para validar las redes entrenadas.
 
 En la Sección \ref{sec:agrawal} reproduciremos los resultados del
 paper previamente citado. Primero haremos una prueba de concepto
 utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
-experimentos con los conjuntos KITTI \cite{KITTI} y SF \cite{SF}.
+experimentos con el conjunto de datos KITTI \cite{KITTI}.
 
 *** Nomenclatura
 
-Vamos a seguir la misma nomenclatura que en el paper original, aunque
-con algunas variantes.
-
-Cada componente de la red siamesa se denotará con BCNN por sus siglas
+Vamos a seguir la misma nomenclatura que en el paper original. Cada componente de la red siamesa se denotará con BCNN por sus siglas
 en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
 redes serán concatenadas y pasadas a otra red llamada TCNN
 (\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
 de pérdida. Las BCNN son las redes sobre las que luego haremos
 transferencia de aprendizaje.
 
-Para definir las arquitecturas de cada red de manera sencilla vamos a
+Para dar una idea de las arquitecturas de cada red de manera sencilla vamos a
 usar las siguientes abreviaciones:
 
 \begin{itemize}
-\item \(N\)C\(k\) para una capa convolucional con \(k\) filtros cuadrados de tamaño \(N \times N\).
+\item C\(k\) para una capa convolucional con \(k\) filtros cuadrados.
 \item F\(k\) para una capa completamente conectada (FC) con salida de dimensión \(k\).
 \item P para una capa de \textit{Pooling}. A menos que se diga lo contrario, siempre usaremos \textit{MAX Pooling}.
 \item D para una capa \textit{Dropout}.
@@ -1959,20 +1966,33 @@ imagen.
 
 *** Reproducción de resultados
 #+LaTeX: \label{sec:agrawal}
+
+Todos los experimentos realizados se encuentran en Github [fn::https://github.com/ezetl/deep-learning-techniques-thesis]. 
+Dentro del repositorio se encuentra toda la documentación pertinente a la descarga de los
+conjuntos de datos y la reproducción de los experimentos. Parte del tiempo fue dedicado a tratar de que los 
+experimentos sean reproducibles por otras personas, por lo que se trató de seguir buenas prácticas a la hora de
+modularizar y organizar los distintos módulos.
+
+Los experimentos fueron desarrollados en su mayoría en el lenguaje Python, excepto por algunos scripts
+de preprocesamiento que originalmente fueron creados en C++.
+
 **** Prueba de concepto con MNIST
 ***** Conjunto de datos
 
-El conjunto de datos MNIST cuenta con 60000 imágenes de caracteres
+El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de caracteres
 numéricos manuscritos para entrenamiento, más 10000 imágenes para
-evaluación. La dimensión de cada imagen es \(1 \times 28 \times 28\),
-es decir son de un solo canal. Para el entrenamiento mediante
+evaluación. La dimensión de cada imagen es \(1 \times 28 \times 28\).
+Para el entrenamiento mediante
 \textit{automovimiento} se crearon pares de imágenes siguiendo los
-lineamientos del paper. Esto es, cada para esta compuesto de la imagen
-original más la imagen con transformaciones en los ejes X, y Z. Las
-transformaciones en X e Y varían entre los -3 y +3 píxeles, mientras
+lineamientos del paper. Esto significa que cada par está compuesto de la imagen
+original y la imagen con transformaciones en los ejes X, Y, Z. Las
+transformaciones en X e Y son traslaciones de 3 píxeles, mientras
 que la rotación en Z varía entre los -30° y los 30°. Tanto las
 rotaciones como las traslaciones son números enteros. Para cada par
-creado las transformaciones son aleatorias.
+creado las transformaciones se eligen de manera aleatoria uniforme.
+
+En la Figura XX se pueden observar varios pares de imágenes generadas durante la creación de 
+la base de datos que luego fue usada para entrenar la red siamesa.
 
 ***** Descripción de la red
 
@@ -1991,7 +2011,7 @@ Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
 tasa de aprendizaje de 0.01. Siguiendo los lineamientos del paper se
 utilizaron márgenes de 10 y 100 para SFA por ser los que mejores
 resultados lograron. En ambas redes la tasa de aprendizaje se reduce a
-la mitad cada 10000 iteraciones. El tamaño del \textit{batch} fue de
+la mitad cada 10000 iteraciones. El tamaño del \textit{mini batch} fue de
 125, lo cual equivale a procesar 5 millones de pares de imágenes
 durante las 40000 iteraciones del entrenamiento.
 
@@ -2008,18 +2028,20 @@ imágenes de los dos métodos utilizados y una comparación con el
 entrenamiento desde cero utilizando esa misma cantidad de imágenes.
 automovimiento y SFA.
 
-#+caption: Tasa de error de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
+#+caption: (TODO: en la tabla estan los accuracies) Tasa de error de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
 #+name: tab:one
 
-       |---+-----------------------------+------+------+------+-------|
-       |   | método\#datos entrenamiento |  100 |  300 | 1000 | 10000 |
-       | / | <>                          |    < |      |      |     > |
-       |---+-----------------------------+------+------+------+-------|
-       | # | Desde cero                  | 30.9 | 13.3 |  7.5 |   2.8 |
-       | # | SFA(m=10)                   | 22.1 | 12.1 |  5.6 |   2.0 |
-       | # | SFA(m=100)                  | 23.3 | 11.9 |  5.5 |   2.1 |
-       | # | Automovimiento              |      |      |      |       |
-       |---+-----------------------------+------+------+------+-------|
+|---+-----------------------------+----------------+----------------+----------------+----------------|
+|   | método\#datos entrenamiento |            100 |            300 |           1000 |           1000 |
+| / | <>                          |              < |                |                |              > |
+| # | Desde cero                  | 0.426666667064 |  0.71199999253 | 0.837333321571 | 0.981333355109 |
+| # | SFA(m=10)                   |  0.53066666921 | 0.722666680813 | 0.826666673024 | 0.879999995232 |
+| # | SFA(m=100)                  |           TODO |           TODO |           TODO |           TODO |
+| # | Automovimiento              | 0.757333318392 | 0.896000027657 | 0.949333349864 | 0.986666679382 |
+|---+-----------------------------+----------------+----------------+----------------+----------------|
+
+Se puede observar que entrenar mediante automovimiento presenta una performance claramente superior a entrenar una red desde cero con 
+la misma cantidad de imágenes en los casos en los que el conjunto de datos es relativamente pequeño.
 
 **** Pruebas con KITTI
 ***** Conjunto de datos
@@ -2068,7 +2090,33 @@ http://robotics.stackexchange.com/questions/7040/how-to-get-the-projection-matri
 http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
 ***** Descripción de la red
+
+La red utilizada como base de las BCNN está inspirada en las primeras 5 capas convolucionales de AlexNet /cite{alexnet}, es 
+decir, C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
+
 ***** Entrenamiento y evaluación
+
+Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño de \textit{mini batch} de 125 y una tasa de aprendizaje
+inicial de \(0.001\), reducida en un factor de 2 cada 20K iteraciones. La transferencia de aprendizaje se hizo durante 10K iteraciones a una tasa
+de aprendizaje constante de 0.001. Para diferenciar los distintos entrenamientos, al modelo entrenado con SFA lo vamos a llamar KITTI-SFA y al entrenado
+con automovimiento, KITTI-EGO.
+
+Para tener un baseline adecuado, se entrenó AlexNet con el conjunto de datos ILSVRC'12 desde cero utilizando 20 y 1000 imágenes por clase. 
+El conjunto de datos ILSVRC es el usado en la competencia anual de Imagenet y contiene mil clases de objetos distintas. Dichos modelos 
+seran llamados ALEX-20 y ALEX-1000 respectivamente.
+
+Para hacer una comparación justa con ALEX-20 y ALEX-1000, las redes siamesas fueron entrenadas solamente con aproximadamente 20K pares de imágenes.
+
+****** Evaluación utilizando el conjunto de datos SUN-397
+
+El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías de paisajes interiores y exteriores y 
+además provee 10 particiones del dataset para hacer \textit{cross-validation}, pero debido a lo costoso que es entrenar
+redes neuronales convolucionales solo se utilizó una partición.
+
+La evaluación se hizo midiendo la exactitud de clasificadores \textit{Softmax} utilizando las \textit{features} obtenidas de las
+salidas de las primeras 5 capas convolucionales.
+
+
 **** Pruebas con SF
 ***** Descripción del conjunto de datos y preprocesamiento
 ***** Descripción de la red
@@ -2311,6 +2359,7 @@ Accuracies
 | ego      | 0.757333318392 | 0.896000027657 | 0.949333349864 | 0.986666679382 |
 
 
+
 ** Experimentos con KITTI
 *** Preprocesamiento
 **** KITTI
@@ -2346,8 +2395,8 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
     Anda bien con su modelo, a pesar de que los filtros no parecen ser
     tan buenos. Acc. 5.2 en scene recognition con 5 imagenes per class
     (el mio 3.2).
-**** TODO Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
-**** TODO [#B] Leer scripts de lsm para ver como preprocesaron las imagenes ellos
+**** DONE Rever como se hacen los pares para SFA, solo los -+7 frames mas cercanos son similares. Y para egomotion?
+**** DONE [#B] Leer scripts de lsm para ver como preprocesaron las imagenes ellos
 **** DONE [60%] Comparar como calculo los tags
 ***** DONE Chequear que se obtengan bien las matrices de los archivos
 ***** DONE Comparar como calculo la matriz de rotacion en base a las dos imagenes. RESULTADO:  esta bien esa parte (get_pose_label)
@@ -2359,8 +2408,7 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
      De esa forma va a ser mas facil restar la media. Centrar los
      datos mediante mean substraction podria aumentar la performance.
 **** DONE Crear lmdb para SFA
-**** TODO Entrenar SFA
-
+**** DONE Entrenar SFA
 
 *** Evaluación
 Los modelos KITTI-Net y SF-Net deben ser entrenados utilizando
@@ -2377,15 +2425,15 @@ para comparar resultados obtenidos.
 
 ***** DONE Descargar ILSVRC'12
 ***** DONE Conseguir AlexNet prototxt
-***** TODO Preparar LMDBS de ILSVRC
-***** TODO Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
+***** DONE Preparar LMDBS de ILSVRC
+***** DONE Entrenar AlexNet para clasification con ILSVRC'12 con 20, 10 y 1000 imagenes por clase
 ***** DONE Preprocesar SUN: crop por el centro con dimension mas chica
 ***** DONE Crear LMDBS SUN. Utilizar solo 3 splits, como en el paper. Crea un LMDB para cada split
-***** TODO Volver a probar su model contra el mio. Probar con y sin pooling en la ultima capa a la hora de finetuning. Quedarse con el mejor.
-***** TODO Probar con su deploy identico (finetuneando el de ellos con SUN y el mio con SUN)
-***** TODO Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
-***** TODO Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
-***** TODO Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
+***** DONE Volver a probar su model contra el mio. Probar con y sin pooling en la ultima capa a la hora de finetuning. Quedarse con el mejor.
+***** DONE Probar con su deploy identico (finetuneando el de ellos con SUN y el mio con SUN)
+***** DONE Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
+***** DONE Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
+***** DONE Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
 
 **** Object Recognition
 Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
