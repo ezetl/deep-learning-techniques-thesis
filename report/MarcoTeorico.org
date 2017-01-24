@@ -2118,24 +2118,34 @@ decir, C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D
 
 ***** Entrenamiento y evaluación
 
-Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño de \textit{mini batch} de 125 y una tasa de aprendizaje
-inicial de \(0.001\), reducida en un factor de 2 cada 20K iteraciones. La transferencia de aprendizaje se hizo durante 10K iteraciones a una tasa
-de aprendizaje constante de 0.001. Para diferenciar los distintos entrenamientos, al modelo entrenado con SFA lo vamos a llamar KITTI-SFA y al entrenado
-con automovimiento, KITTI-EGO.
+Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño
+de \textit{mini batch} de 125 y una tasa de aprendizaje inicial de
+\(0.001\), reducida en un factor de 2 cada 20K iteraciones. La
+transferencia de aprendizaje se hizo durante 10K iteraciones a una
+tasa de aprendizaje constante de 0.001. Para diferenciar los distintos
+entrenamientos, al modelo entrenado con SFA lo vamos a llamar
+KITTI-SFA y al entrenado con automovimiento, KITTI-EGO.
 
-Para tener un baseline adecuado, se entrenó AlexNet con el conjunto de datos ILSVRC'12 desde cero utilizando 20 y 1000 imágenes por clase. 
-El conjunto de datos ILSVRC es el usado en la competencia anual de Imagenet y contiene mil clases de objetos distintas. Dichos modelos 
+Para tener un baseline adecuado, se entrenó AlexNet con el conjunto de
+datos ILSVRC'12 desde cero utilizando 20 y 1000 imágenes por clase.
+El conjunto de datos ILSVRC es el usado en la competencia anual de
+Imagenet y contiene mil clases de objetos distintas. Dichos modelos
 seran llamados ALEX-20 y ALEX-1000 respectivamente.
 
-Para hacer una comparación justa con ALEX-20 y ALEX-1000, las redes siamesas fueron entrenadas solamente con aproximadamente 20K pares de imágenes.
+Para hacer una comparación justa con ALEX-20 y ALEX-1000, las redes
+siamesas fueron entrenadas solamente con aproximadamente 20K pares de
+imágenes.
 
 ****** Evaluación utilizando el conjunto de datos SUN-397
 
-El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías de paisajes interiores y exteriores y 
-además provee 10 particiones del dataset para hacer \textit{cross-validation}, pero debido a lo costoso que es entrenar
-redes neuronales convolucionales solo se utilizó una partición.
+El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías
+de paisajes interiores y exteriores y además provee 10 particiones del
+dataset para hacer \textit{cross-validation}, pero debido a lo costoso
+que es entrenar redes neuronales convolucionales solo se utilizó una
+partición.
 
-La evaluación se hizo midiendo la exactitud de clasificadores \textit{Softmax} utilizando las \textit{features} obtenidas de las
+La evaluación se hizo midiendo la exactitud de clasificadores
+\textit{Softmax} utilizando las \textit{features} obtenidas de las
 salidas de las primeras 5 capas convolucionales.
 
 
