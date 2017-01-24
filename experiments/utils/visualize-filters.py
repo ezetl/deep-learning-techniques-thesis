@@ -26,17 +26,26 @@ def set_net(deploy, caffemodel, num_channels, im_size):
     net.blobs['data'].reshape(1,                 # batch size
                               num_channels,      # 3-channel (BGR) images
                               im_size, im_size)  # image size is 227x227
+    for layer_name, blob in net.blobs.iteritems():
+            print layer_name + '\t' + str(blob.data.shape)
     return (net, transformer)
 
 
 def get_conv_filters(net, conv_name):
     filters = net.params[conv_name][0].data
     s = filters.shape
-    if (s[1] == 3):
+    if s[1] == 3:
         filters = np.reshape(filters, (s[0], s[2], s[3], s[1]))
     else:
         filters = np.reshape(filters, (s[0], s[2], s[3]))
     return filters
+
+
+def get_conv_activations(net, transformer, test_im, conv_name):
+    img = transformer.preprocess('data', caffe.io.load_image(test_im))
+    net.blobs['data'].data[...] = img
+    out = net.forward()
+    return net.blobs[conv_name].data[0]
 
 
 def vis_square(data):
@@ -64,29 +73,30 @@ def vis_square(data):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
-        print("You have to provide the paths to the caffemodel, deploy\n\
-               \rprototxt and a flag telling which experiment you ran\n\
+    if len(sys.argv) < 3:
+        print("You have to provide the paths to the caffemodel and\n\
+               \ra flag telling which experiment you ran\n\
                \r('mnist', 'sf', 'kitti'):\n\
-               \r\n{} /path/to/caffemodel /path/to/deploy/prototxt 'mnist'\n".format(sys.argv[0]))
+               \r\n{} /path/to/caffemodel 'mnist'\n".format(sys.argv[0]))
         sys.exit(1)
 
     caffemodel = sys.argv[1]
-    deploy = sys.argv[2]
-    experiment_id = sys.argv[3]
+    experiment_id = sys.argv[2]
 
     if experiment_id == 'mnist':
         imsize = 28 # 28 for mnist, 227 for kitti
         imchannel = 1
         test_im = './images/mnist_4_5.bmp'
+        deploy = 'deploys/mnist.prototxt'
     else: # kitti or sf
         imsize = 227
         imchannel = 3
         test_im = './images/kitti_000889.png'
-
+        deploy = 'deploys/kitti.prototxt'
 
     net, transformer = set_net(deploy, caffemodel, imchannel, imsize)
     # the parameters are a list of [weights, biases]
-    filters = get_conv_filters(net, 'conv1')
+    #filters = get_conv_filters(net, 'conv1')
+    filters = get_conv_activations(net, transformer, test_im, 'conv1')
     vis_square(filters)
     sys.exit(0)

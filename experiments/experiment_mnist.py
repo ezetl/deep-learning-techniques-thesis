@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.7
-from os.path import join
+from os.path import join, exists
+from os import makedirs
+import pickle
 from optparse import OptionParser, OptionGroup
 from utils.nets.cnn_factory import MNISTNetFactory, KITTINetFactory 
 from utils.solver.solver import train_net, create_solver_params
@@ -55,6 +57,11 @@ if __name__ == "__main__":
     acc = {'ego': {}, 'cont_10': {}, 'cont_100': {}, 'stand': {}}  
 
     scale = 1/255.0
+    results_path = './results/mnist/'
+    try:
+        makedirs(results_path)
+    except:
+        pass
     # TEST NET
     # Used to test accuracy in finetunig stages
     mnist_test, loss_blobs_test, acc_blobs_test = MNISTNetFactory.standar(
@@ -82,8 +89,15 @@ if __name__ == "__main__":
     # in finetuning stage 
     iters=40000
     # Train our first siamese net with Egomotion method
-    results_ego = train_net(create_solver_params(siam_mnist, max_iter=iters, snapshot_prefix='snapshots/mnist/egomotion/mnist_siamese'),
+    if exists(join(results_path, 'egomotion.pickle')):
+        with open(join(results_path, 'egomotion.pickle'), 'rb') as handle:
+            results_ego = pickle.load(handle)
+    else:
+        results_ego = train_net(create_solver_params(siam_mnist, max_iter=iters, snapshot_prefix='snapshots/mnist/egomotion/mnist_siamese'),
                             loss_blobs=loss_blobs)
+        with open(join(results_path, 'egomotion.pickle'), 'wb') as handle:
+            pickle.dump(results_ego, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_mnist        
 
     # CONTRASTIVE NET, m=10
     # Using a small batch size while training with Contrastive Loss leads 
@@ -97,21 +111,35 @@ if __name__ == "__main__":
             is_train=True,
             learn_all=True
             )
-    # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
-    results_contr10 = train_net(create_solver_params(siam_cont10_mnist, max_iter=iters, base_lr=0.01, snapshot_prefix='snapshots/mnist/contrastive/mnist_siamese_m10'),
+    if exists(join(results_path, 'contr_10.pickle')):
+        with open(join(results_path, 'contr_10.pickle'), 'rb') as handle:
+            results_contr10 = pickle.load(handle)
+    else:
+        # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
+        results_contr10 = train_net(create_solver_params(siam_cont10_mnist, max_iter=iters, base_lr=0.01, snapshot_prefix='snapshots/mnist/contrastive/mnist_siamese_m10'),
                                 loss_blobs=loss_cont_blobs)
+        with open(join(results_path, 'contr_10.pickle'), 'wb') as handle:
+            pickle.dump(results_contr10, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_cont10_mnist        
 
     # CONTRASTIVE NET, m=100
     siam_cont100_mnist, loss_cont_blobs2, acc_cont_blobs2 = MNISTNetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'mnist_train_siamese_lmdb'),
-            batch_size=500,
+            batch_size=800,
             scale=scale,
             contrastive_margin=100,
             is_train=True,
             learn_all=True
             )
-    results_contr100 = train_net(create_solver_params(siam_cont100_mnist, max_iter=iters,  base_lr=0.001, snapshot_prefix='snapshots/mnist/contrastive/mnist_siamese_m100'),
+    if exists(join(results_path, 'contr_100.pickle')):
+        with open(join(results_path, 'contr_100.pickle'), 'rb') as handle:
+            results_contr100 = pickle.load(handle)
+    else:
+        results_contr100 = train_net(create_solver_params(siam_cont100_mnist, max_iter=iters,  base_lr=0.001, snapshot_prefix='snapshots/mnist/contrastive/mnist_siamese_m100'),
                                  loss_blobs=loss_cont_blobs2)
+        with open(join(results_path, 'contr_100.pickle'), 'wb') as handle:
+            pickle.dump(results_contr100, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    del siam_cont100_mnist        
     
     repeat = 3
     sizes_lmdb = ['100', '300', '1000', '10000'] 
