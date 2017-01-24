@@ -1857,16 +1857,17 @@ asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \end{figure}
 #+END_LaTeX
 
-El propósito de entrenar redes siamesas es aprender buenas features relacionadas al problema en cuestion.
-Lo mas común es tomar los pesos aprendidos por la red siamesa y realizar una transferencia de aprendizaje 
-a un nuevo problema.
+El propósito de entrenar redes siamesas es aprender buenas features
+relacionadas al problema en cuestion.  Lo mas común es tomar los pesos
+aprendidos por la red siamesa y realizar una transferencia de
+aprendizaje a un nuevo problema.
 
-Es necesario definir qué función de similitud
-vamos a usar y cómo vamos a generar los pares de entrenamiento antes
-de entrenar redes siamesas. En la siguiente Sección nos vamos a
-adentrar en trabajo con redes siamesas de Agrawal et
-al. \cite{LSM2015}, reproduciendo y analizando sus resultados en lo
-que conforma el eje principal de este trabajo final.
+Es necesario definir qué función de similitud vamos a usar y cómo
+vamos a generar los pares de entrenamiento antes de entrenar redes
+siamesas. En la siguiente Sección nos vamos a adentrar en trabajo con
+redes siamesas de Agrawal et al. \cite{LSM2015}, reproduciendo y
+analizando sus resultados en lo que conforma el eje principal de este
+trabajo final.
 
 ** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
 #+LaTeX: \label{sec:odometry}
@@ -1889,22 +1890,29 @@ visuales con el movimiento como la tarea de predecir qué
 transformaciones sufren las imágenes a medida que el agente se mueve.
 
 
-Ese agente móvil es modelado con Redes Neurales Convolucionales que optimizan sus
-representaciones visuales minimizando el error entre la informacion de automovimiento provista 
-por el sistema y la informacion de eutomovimiento predecida utilizando las imágenes de 
-entrada solamente. Este procedimiento es, según Agrawal, equivalente a entrenar una 
-Red Convolucional con dos flujos de entrada (o sea, una Red Neural Convolucional Siamesa) en el que cada
-entrada toma una imagen y la red predice la transformacion que ocurrio entre ambas imágenes.
+Ese agente móvil es modelado con Redes Neurales Convolucionales que
+optimizan sus representaciones visuales minimizando el error entre la
+informacion de automovimiento provista por el sistema y la informacion
+de eutomovimiento predecida utilizando las imágenes de entrada
+solamente. Este procedimiento es, según Agrawal, equivalente a
+entrenar una Red Convolucional con dos flujos de entrada (o sea, una
+Red Neural Convolucional Siamesa) en el que cada entrada toma una
+imagen y la red predice la transformacion que ocurrio entre ambas
+imágenes.
 
 Bajo la hipótesis de que esto forzaría al agente a aprender
 \textit{features} útiles en la identificación de elementos visuales
-que esten presentes en ambas imágenes, entrenaron diferentes versiones de redes
-siamesas con distintos conjuntos de datos y obtuvieron resultados comparables al estado del arte. La diferencia es que ellos
+que esten presentes en ambas imágenes, entrenaron diferentes versiones
+de redes siamesas con distintos conjuntos de datos y obtuvieron
+resultados comparables al estado del arte. La diferencia es que ellos
 no debieron utilizar tantas imágenes.
 
-En este trabajo final se tratará de validar la hipótesis propuesta por Agrawal et al. reproduciendo varios
-de los experimentos propuestos en su investigación. Para ello nos valdremos de técnicas similares a las mencionadas en la Sección XX 
-, de pre-entrenamiento de redes y finalmente de transferencia de aprendizaje para validar las redes entrenadas.
+En este trabajo final se tratará de validar la hipótesis propuesta por
+Agrawal et al. reproduciendo varios de los experimentos propuestos en
+su investigación. Para ello nos valdremos de técnicas similares a las
+mencionadas en la Sección XX , de pre-entrenamiento de redes y
+finalmente de transferencia de aprendizaje para validar las redes
+entrenadas.
 
 En la Sección \ref{sec:agrawal} reproduciremos los resultados del
 paper previamente citado. Primero haremos una prueba de concepto
@@ -1967,14 +1975,18 @@ imagen.
 *** Reproducción de resultados
 #+LaTeX: \label{sec:agrawal}
 
-Todos los experimentos realizados se encuentran en Github [fn::https://github.com/ezetl/deep-learning-techniques-thesis]. 
-Dentro del repositorio se encuentra toda la documentación pertinente a la descarga de los
-conjuntos de datos y la reproducción de los experimentos. Parte del tiempo fue dedicado a tratar de que los 
-experimentos sean reproducibles por otras personas, por lo que se trató de seguir buenas prácticas a la hora de
-modularizar y organizar los distintos módulos.
+Todos los experimentos realizados se encuentran en Github
+[fn::https://github.com/ezetl/deep-learning-techniques-thesis].
+Dentro del repositorio se encuentra toda la documentación pertinente a
+la descarga de los conjuntos de datos y la reproducción de los
+experimentos. Parte del tiempo fue dedicado a tratar de que los
+experimentos sean reproducibles por otras personas, por lo que se
+trató de seguir buenas prácticas a la hora de modularizar y organizar
+los distintos módulos.
 
-Los experimentos fueron desarrollados en su mayoría en el lenguaje Python, excepto por algunos scripts
-de preprocesamiento que originalmente fueron creados en C++.
+Los experimentos fueron desarrollados en su mayoría en el lenguaje
+Python, excepto por algunos scripts de preprocesamiento que
+originalmente fueron creados en C++.
 
 **** Prueba de concepto con MNIST
 ***** Conjunto de datos
@@ -2009,10 +2021,10 @@ BCNN.
 
 Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
 tasa de aprendizaje de 0.01. Siguiendo los lineamientos del paper se
-utilizaron márgenes de 10 y 100 para SFA por ser los que mejores
+utilizaron márgenes \(m\) de 10 y 100 para SFA por ser los que mejores
 resultados lograron. En ambas redes la tasa de aprendizaje se reduce a
-la mitad cada 10000 iteraciones. El tamaño del \textit{mini batch} fue de
-125, lo cual equivale a procesar 5 millones de pares de imágenes
+la mitad cada 10000 iteraciones. El tamaño del \textit{mini batch} fue
+de 125, lo cual equivale a procesar 5 millones de pares de imágenes
 durante las 40000 iteraciones del entrenamiento.
 
 La etapa de transferencia de aprendizaje se hizo con 4000 iteraciones
@@ -2022,26 +2034,36 @@ Para evaluar la calidad de las \textit{features} aprendidas por las
 redes siamesas se estableció la tasa de aprendizaje de las capas
 convolucionales a cero.
 
-En la Tabla \ref{tab:one} se puede observar la tasa de error obtenida
+En la Tabla \ref{tab:one} se puede observar la exactitud obtenida
 mediante la transferencia de aprendizaje con 100, 300, 1000 y 10000
-imágenes de los dos métodos utilizados y una comparación con el
-entrenamiento desde cero utilizando esa misma cantidad de imágenes.
-automovimiento y SFA.
+imágenes de los dos métodos utilizados (automovimiento y SFA) y una
+comparación con un entrenamiento desde cero utilizando esa misma
+cantidad de imágenes.
 
-#+caption: (TODO: en la tabla estan los accuracies) Tasa de error de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
+#+caption: Exactitud de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
 #+name: tab:one
 
-|---+-----------------------------+----------------+----------------+----------------+----------------|
-|   | método\#datos entrenamiento |            100 |            300 |           1000 |           1000 |
-| / | <>                          |              < |                |                |              > |
-| # | Desde cero                  | 0.426666667064 |  0.71199999253 | 0.837333321571 | 0.981333355109 |
-| # | SFA(m=10)                   |  0.53066666921 | 0.722666680813 | 0.826666673024 | 0.879999995232 |
-| # | SFA(m=100)                  |           TODO |           TODO |           TODO |           TODO |
-| # | Automovimiento              | 0.757333318392 | 0.896000027657 | 0.949333349864 | 0.986666679382 |
-|---+-----------------------------+----------------+----------------+----------------+----------------|
+|---+-----------------------------+------+------+------+------|
+|   | método\#datos entrenamiento |  100 |  300 | 1000 | 1000 |
+| / | <>                          |    < |      |      |    > |
+| # | Desde cero                  | 0.42 | 0.70 | 0.82 | 0.97 |
+| # | SFA(m=10)                   | 0.52 | 0.71 | 0.77 | 0.82 |
+| # | SFA(m=100)                  | 0.58 | 0.73 | 0.80 | 0.88 |
+| # | Automovimiento              | 0.75 | 0.90 | 0.92 | 0.99 |
+|---+-----------------------------+------+------+------+------|
 
-Se puede observar que entrenar mediante automovimiento presenta una performance claramente superior a entrenar una red desde cero con 
-la misma cantidad de imágenes en los casos en los que el conjunto de datos es relativamente pequeño.
+Se puede observar que entrenar mediante automovimiento presenta una
+performance claramente superior a entrenar una red desde cero con la
+misma cantidad de imágenes en los casos en los que el conjunto de
+datos es relativamente pequeño. Es también superior al entrenamiento
+utilizando \textit{Slow Feature Analysis}, y dado que no se
+modificaron las capas convolucionales aprendidas durante el
+pre-entrenamiento, podemos concluir que las \textit{features}
+aprendidas son buenas y logran captar las representaciones necesarias
+para el domino del problema en cuestión. El siguiente paso es
+verificar que efectivamente las \textit{features} aprendidas se puedan
+aplicar a diferentes dominios de problemas y sean lo suficientemente
+generalizables.
 
 **** Pruebas con KITTI
 ***** Conjunto de datos
