@@ -3,6 +3,7 @@ from sys import exit, argv
 from os import makedirs
 from os.path import isdir, isfile, join, dirname
 from multiprocessing import Pool
+import numpy as np
 import cv2
 
 
@@ -17,11 +18,14 @@ def preprocess_split(split):
             print("Couldn't load image {}".format(orig))
             continue
         rows, cols, _ = imorig.shape
-        start = abs(rows - cols) / 2
-        if rows > cols:
-            imorig = imorig[start:start+cols, 0:cols]
-        else:
-            imorig = imorig[0:rows, start:start+rows]
+        max_side = max(rows, cols)
+        rows_pad = abs(rows - max_side) / 2
+        cols_pad = abs(cols - max_side) / 2
+        print("")
+        print(imorig.shape)
+        imorig = np.pad(imorig, ((rows_pad, rows_pad), (cols_pad, cols_pad), (0,0)), 'constant', constant_values=0)
+        print(imorig.shape)
+        print("")
         cv2.imwrite(dst, imorig)
 
 
@@ -55,6 +59,7 @@ if __name__ == "__main__":
                 makedirs(dirname(dst))
             list.append((orig, dst))
 
+    #preprocess_split(list)
     # Split the list in 8 chunks, each one will be processed by a CPU core
     nchunks = 8
     schunk = (len(list) + nchunks) / nchunks
