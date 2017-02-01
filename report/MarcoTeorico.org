@@ -2119,7 +2119,7 @@ decir, C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D
 ***** Entrenamiento y evaluación
 
 Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño
-de \textit{mini batch} de 125 y una tasa de aprendizaje inicial de
+de \textit{mini batch} de 250 y una tasa de aprendizaje inicial de
 \(0.001\), reducida en un factor de 2 cada 20K iteraciones. La
 transferencia de aprendizaje se hizo durante 10K iteraciones a una
 tasa de aprendizaje constante de 0.001. Para diferenciar los distintos
@@ -2133,7 +2133,7 @@ Imagenet y contiene mil clases de objetos distintas. Dichos modelos
 seran llamados ALEX-20 y ALEX-1000 respectivamente.
 
 Para hacer una comparación justa con ALEX-20 y ALEX-1000, las redes
-siamesas fueron entrenadas solamente con aproximadamente 20K pares de
+siamesas fueron entrenadas con aproximadamente 20K pares de
 imágenes.
 
 ****** Evaluación utilizando el conjunto de datos SUN-397
@@ -2193,12 +2193,13 @@ salidas de las primeras 5 capas convolucionales.
 *** DONE Guardar resultados de los entrenamientos grandes (siamese, imagenet) con pickle. Cargar los archivos si existen para evitar reentrenar todo si se corto un entrenamiento 
 *** DONE Agregar experimentos de AlexNet con 20k y 1m de imagenes de Imagenet para SUN397
 *** DONE Agregar el finetuning con las 5 ultimas capas para SUN397
-*** TODO MNIST: cont_10 uso batch size de 800, hacer lo mismo para cont_100
+*** DONE MNIST: cont_10 uso batch size de 800, hacer lo mismo para cont_100
 *** TODO Probar pandas para guardar y mostrar los datos y evitar usar tantos diccionarios
-*** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc.
+*** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc. 
+Para esto tal vez sea mejor tener implementada la feature de guardar el mejor snapshot. De esa manera tenemos una marca de cuando llegamos a los mejores filtros
 *** TODO Hacer plots de loss al finalizar el entrenamiento. Guardar .pdf
 *** DONE Hacer test al finalizar entrenamiento, imprimir en pantalla log.
-*** TODO Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
+*** DONE Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
@@ -2397,7 +2398,6 @@ Accuracies
 | cont_10  |  0.53066666921 | 0.722666680813 | 0.826666673024 | 0.879999995232 |
 | cont_100 | 0.333333333333 | 0.448000003894 | 0.503999988238 | 0.496000001828 |
 | ego      | 0.757333318392 | 0.896000027657 | 0.949333349864 | 0.986666679382 |
-
 
 
 ** Experimentos con KITTI
