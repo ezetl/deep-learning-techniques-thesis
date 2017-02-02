@@ -50,14 +50,14 @@ def bias_param(name, learn_all=True):
 def input_layers(lmdb_path=None, labels_lmdb_path=None, batch_size=125,
         scale=1.0, is_train=True):
     """
-    Creates the Data and Slice layers needed for the experiments with siamese networks 
+    Creates the Data and Slice layers needed for the experiments with siamese networks
 
     :param lmdb_path: str. Path to train LMDB
     :param labels_lmdb_path: str. Path to train LMDB labels
     :param batch_size: int. Batch size
     :param scale: float. How to scale the images
     :param is_train: bool. Flag indicating if this is for deploy/testing or training
-    :returns: data and label Caffe layers 
+    :returns: data and label Caffe layers
     """
     phase = caffe.TRAIN if is_train else caffe.TEST
     if lmdb_path and labels_lmdb_path:
@@ -68,18 +68,18 @@ def input_layers(lmdb_path=None, labels_lmdb_path=None, batch_size=125,
     else:
         raise LayerWrapperException("You forgot to provide a path to a LMDB database")
 
-    return data, label 
+    return data, label
 
 
 def bcnn(data0, data1, n, learn_all, is_mnist):
     """
-    Creates the Base Convolutional Network from the paper 
+    Creates the Base Convolutional Network from the paper
     "Learning To See By Moving" by Agrawal et al.
 
     :param data{0,1}: L.Data layers from Caffe
     :param n: Caffe NetSpec. The BCNN will be appended to this NetSpec
-    :param learn_all: bool. Flag indicating if this bccn is to train from scratch or to finetune 
-    :param mnist: bool. Flag indicating if this bcnn is for mnist (just use 2 conv layers or if it is for kitti/sf/etc (use all conv layers) 
+    :param learn_all: bool. Flag indicating if this bccn is to train from scratch or to finetune
+    :param mnist: bool. Flag indicating if this bcnn is for mnist (just use 2 conv layers or if it is for kitti/sf/etc (use all conv layers)
     """
     n.conv1 = L.Convolution(n.data0, kernel_size=11, stride=4, num_output=96, param=[weight_param('conv1_w', learn_all=learn_all), bias_param('conv1_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
     n.relu1 = L.ReLU(n.conv1, in_place=True)
@@ -124,4 +124,4 @@ def bcnn(data0, data1, n, learn_all, is_mnist):
 
         return n.pool5, n.pool5_p
 
-    return n.norm2, n.norm2_p    
+    return n.norm2, n.norm2_p
