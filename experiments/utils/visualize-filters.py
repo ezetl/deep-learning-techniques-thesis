@@ -33,12 +33,7 @@ def set_net(deploy, caffemodel, num_channels, im_size):
 
 def get_conv_filters(net, conv_name):
     filters = net.params[conv_name][0].data
-    s = filters.shape
-    if s[1] == 3:
-        filters = np.reshape(filters, (s[0], s[2], s[3], s[1]))
-    else:
-        filters = np.reshape(filters, (s[0], s[2], s[3]))
-    return filters
+    return filters.transpose(0, 2, 3, 1)
 
 
 def get_conv_activations(net, transformer, test_im, conv_name):
@@ -96,7 +91,7 @@ if __name__ == "__main__":
 
     net, transformer = set_net(deploy, caffemodel, imchannel, imsize)
     # the parameters are a list of [weights, biases]
-    #filters = get_conv_filters(net, 'conv1')
-    filters = get_conv_activations(net, transformer, test_im, 'conv1')
+    filters = get_conv_filters(net, 'conv1')
+    #filters = get_conv_activations(net, transformer, test_im, 'conv3')
     vis_square(filters)
     sys.exit(0)
