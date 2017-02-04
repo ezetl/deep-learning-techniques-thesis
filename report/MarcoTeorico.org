@@ -2476,7 +2476,7 @@ para comparar resultados obtenidos.
 ***** DONE Modificar KITTI-Net, KITTI-SFA-Net agregando Softmax luego de cada capa convolucional
 ***** DONE Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
 ***** DONE Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
-***** TODO Probar con scale, mean substraction
+***** DONE Probar con scale, mean substraction
 **** Object Recognition
 Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
 clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
