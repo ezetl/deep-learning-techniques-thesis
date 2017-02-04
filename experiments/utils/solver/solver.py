@@ -6,6 +6,8 @@ import numpy as np
 import caffe
 from caffe.proto import caffe_pb2
 
+MIN_LOSS = 1000000
+
 class TrainException(Exception):
     pass
 
@@ -132,20 +134,32 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
     else:
         acc_blobs = []
 
+    min_loss = MIN_LOSS
+    min_loss_step = 0
     try:
         for it in range(0, solver_param.max_iter+1):
             solver.step(1)
             # Retrieve loss of this step
+            total_loss = 0
             for name in loss_blobs:
-                results['loss'][name] = np.append(results['loss'].get(name, np.array([])), solver.net.blobs[name].data.item())
+                partial_loss = solver.net.blobs[name].data.item()
+                results['loss'][name] = np.append(results['loss'].get(name, np.array([])), partial_loss)
+                total_loss += partial_loss
+
             # Retrieve accuracy of tests every 'test_interval' iterations                            
             if solver_param.test_interval and it!=0 and it % solver_param.test_interval == 0:
                 for name in acc_blobs:     
                     results['acc'][name] = np.append(results['acc'].get(name, np.array([])), solver.test_nets[0].blobs[name].data.item())
+
             # Save snapshots names
             if it!=0 and it % solver_param.snapshot == 0:
                 snapshot_name = str(solver_param.snapshot_prefix + '_iter_{}.caffemodel'.format(it))
                 results['snaps'].append(snapshot_name)
+                if min_loss > total_loss:
+                    min_loss = total_loss
+                    min_loss_step = it
+                    results['best_snap'] = snapshot_name
+
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
 
