@@ -282,10 +282,10 @@ class KITTINetFactory:
         n.norm1 = L.LRN(n.pool1, local_size=5, alpha=1e-4, beta=0.75)
 
         if layers == '1':
-            n.fc = L.InnerProduct(n.norm1, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_intermediate = L.InnerProduct(n.norm1, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             if is_train:
-                n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-            n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                n.loss = L.SoftmaxWithLoss(n.fc_intermediate, n.label)
+            n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
 
             return n, ('loss',), ('acc',)
 
@@ -296,34 +296,34 @@ class KITTINetFactory:
         n.norm2 = L.LRN(n.pool2, local_size=5, alpha=1e-4, beta=0.75)
 
         if layers == '2':
-            n.fc = L.InnerProduct(n.norm2, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_intermediate = L.InnerProduct(n.norm2, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             if is_train:
-                n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-            n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                n.loss = L.SoftmaxWithLoss(n.fc_intermediate, n.label)
+            n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
             return n, ('loss',), ('acc',)
 
         n.conv3 = L.Convolution(n.norm2, kernel_size=3, num_output=384, pad=1, param=[weight_param('conv3_w', learn_all=learn_all), bias_param('conv3_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
         n.relu3 = L.ReLU(n.conv3, in_place=True)
 
         if layers == '3':
-            n.fc_prev = L.InnerProduct(n.relu3, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_prev = L.InnerProduct(n.relu3, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             n.relu_prev = L.ReLU(n.fc_prev, in_place=True)
-            n.fc = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_intermediate = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             if is_train:
-                n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-            n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                n.loss = L.SoftmaxWithLoss(n.fc_intermediate, n.label)
+            n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
             return n, ('loss',), ('acc',)
 
         n.conv4 = L.Convolution(n.relu3, kernel_size=3, num_output=384, pad=1, group=2, param=[weight_param('conv4_w', learn_all=learn_all), bias_param('conv4_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
         n.relu4 = L.ReLU(n.conv4, in_place=True)
 
         if layers == '4':
-            n.fc_prev = L.InnerProduct(n.relu4, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_prev = L.InnerProduct(n.relu4, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             n.relu_prev = L.ReLU(n.fc_prev, in_place=True)
-            n.fc = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+            n.fc_intermediate = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
             if is_train:
-                n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-            n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                n.loss = L.SoftmaxWithLoss(n.fc_intermediate, n.label)
+            n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
             return n, ('loss',), ('acc',)
         n.conv5 = L.Convolution(n.relu4, kernel_size=3, num_output=256, pad=1, group=2, param=[weight_param('conv5_w', learn_all=learn_all), bias_param('conv5_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
         n.relu5 = L.ReLU(n.conv5, in_place=True)
@@ -331,12 +331,12 @@ class KITTINetFactory:
 
         if not is_imagenet:
             if layers == '5':
-                n.fc_prev = L.InnerProduct(n.pool5, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+                n.fc_prev = L.InnerProduct(n.pool5, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
                 n.relu_prev = L.ReLU(n.fc_prev, in_place=True)
-                n.fc = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+                n.fc_intermediate = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
                 if is_train:
-                    n.loss = L.SoftmaxWithLoss(n.fc, n.label)
-                n.acc = L.Accuracy(n.fc, n.label, include=dict(phase=caffe.TEST))
+                    n.loss = L.SoftmaxWithLoss(n.fc_intermediate, n.label)
+                n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
                 return n, ('loss',), ('acc',)
 
             n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
