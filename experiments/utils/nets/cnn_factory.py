@@ -153,7 +153,7 @@ class MNISTNetFactory:
 class KITTINetFactory:
 
     @staticmethod
-    def siamese_egomotion(lmdb_path=None, labels_lmdb_path=None,
+    def siamese_egomotion(lmdb_path=None, labels_lmdb_path=None, mean_file=None,
             batch_size=125, scale=1.0, is_train=True, learn_all=True):
         """
         Creates a protoxt for the AlexNet architecture
@@ -170,7 +170,7 @@ class KITTINetFactory:
         """
         n = caffe.NetSpec()
 
-        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, batch_size=batch_size, scale=scale, is_train=is_train)
+        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, mean_file=mean_file, batch_size=batch_size, scale=scale, is_train=is_train)
 
         # Slice data/labels
         n.data0, n.data1 = L.Slice(n.data, slice_param=dict(axis=1, slice_point=3), ntop=2)
@@ -182,24 +182,23 @@ class KITTINetFactory:
         # TCNN
         n.concat = L.Concat(pool5, pool5_p, concat_param=dict(axis=1))
 
-
-        n.conv6 = L.Convolution(n.concat, kernel_size=3, stride=2, num_output=256, pad=1, group=2, param=[weight_param('conv6_w', learn_all=learn_all), bias_param('conv6_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
+        n.conv6 = L.Convolution(n.concat, kernel_size=3, stride=2, num_output=256, param=[weight_param('conv6_w', learn_all=learn_all), bias_param('conv6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_0)
         n.relu6 = L.ReLU(n.conv6, in_place=True)
 
-        n.conv7 = L.Convolution(n.relu6, kernel_size=3, stride=2, num_output=128, param=[weight_param('conv7_w', learn_all=learn_all), bias_param('conv7_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler)
+        n.conv7 = L.Convolution(n.relu6, kernel_size=3, stride=2, num_output=128, param=[weight_param('conv7_w', learn_all=learn_all), bias_param('conv7_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu7 = L.ReLU(n.conv7, in_place=True)
 
-        n.fc7_ego = L.InnerProduct(n.relu7, num_output=500, param=[weight_param('fc7_ego_w', learn_all=True), bias_param('fc7_ego_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fc7_ego = L.InnerProduct(n.relu7, num_output=500, param=[weight_param('fc7_ego_w', learn_all=True), bias_param('fc7_ego_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
         n.relu8 = L.ReLU(n.fc7_ego, in_place=True)
         if is_train:
-            n.drop = fcxinput = fcyinput = fczinput = L.Dropout(n.relu8, in_place=True)
+            n.drop = fcxinput = fcyinput = fczinput = L.Dropout(n.relu8, dropout_param=dict(dropout_ratio=0.5), in_place=True)
         else:
             fcxinput = fcyinput = fczinput = n.relu8
 
         # Classifiers
-        n.fcx = L.InnerProduct(fcxinput, num_output=20, param=[weight_param('fcx_w', learn_all=True), bias_param('fcx_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
-        n.fcy = L.InnerProduct(fcyinput, num_output=20, param=[weight_param('fcy_w', learn_all=True), bias_param('fcy_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
-        n.fcz = L.InnerProduct(fczinput, num_output=20, param=[weight_param('fcz_w', learn_all=True), bias_param('fcz_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler)
+        n.fcx = L.InnerProduct(fcxinput, num_output=20, param=[weight_param('fcx_w', learn_all=True), bias_param('fcx_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+        n.fcy = L.InnerProduct(fcyinput, num_output=20, param=[weight_param('fcy_w', learn_all=True), bias_param('fcy_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+        n.fcz = L.InnerProduct(fczinput, num_output=20, param=[weight_param('fcz_w', learn_all=True), bias_param('fcz_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
 
         if is_train:
             n.loss_x = L.SoftmaxWithLoss(n.fcx, n.labelx)
