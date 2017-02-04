@@ -26,8 +26,14 @@ def set_net(deploy, caffemodel, num_channels, im_size):
     net.blobs['data'].reshape(1,                 # batch size
                               num_channels,      # 3-channel (BGR) images
                               im_size, im_size)  # image size is 227x227
+    print("Output shape")
     for layer_name, blob in net.blobs.iteritems():
             print layer_name + '\t' + str(blob.data.shape)
+    print("Input shape")
+    for layer_name, param in net.params.iteritems():
+        print layer_name + '\t' + str(param[0].data.shape), str(param[1].data.shape)
+
+
     return (net, transformer)
 
 
