@@ -154,11 +154,11 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
             # Save snapshots names
             if it!=0 and it % solver_param.snapshot == 0:
                 snapshot_name = str(solver_param.snapshot_prefix + '_iter_{}.caffemodel'.format(it))
-                results['snaps'].append(snapshot_name)
                 if min_loss > total_loss:
                     min_loss = total_loss
                     min_loss_step = it
                     results['best_snap'] = snapshot_name
+                print("Best snapshot so far: Iteration {}, {}".format(it, results['best_snap']))    
 
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
