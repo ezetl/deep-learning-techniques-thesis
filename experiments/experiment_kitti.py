@@ -133,15 +133,15 @@ if __name__ == "__main__":
     # in finetuning stage
     iters = 60000
     ## Train our first siamese net with Egomotion method
-    if exists(join(results_path, 'egomotion.pickle')):
-       with open(join(results_path, 'egomotion.pickle'), 'rb') as handle:
-           results_ego = pickle.load(handle)
-    else:
-        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.01, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
-                loss_blobs=loss_blobs)
-        with open(join(results_path, 'egomotion.pickle'), 'wb') as handle:
-            pickle.dump(results_ego, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    del siam_kitti
+    #if exists(join(results_path, 'egomotion.pickle')):
+    #   with open(join(results_path, 'egomotion.pickle'), 'rb') as handle:
+    #       results_ego = pickle.load(handle)
+    #else:
+    #    results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.01, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
+    #            loss_blobs=loss_blobs)
+    #    with open(join(results_path, 'egomotion.pickle'), 'wb') as handle:
+    #        pickle.dump(results_ego, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    #del siam_kitti
 
     # CONTRASTIVE NET, m=10
     # Using a small batch size while training with Contrastive Loss leads
@@ -186,11 +186,9 @@ if __name__ == "__main__":
             pickle.dump(results_contr100, handle, protocol=pickle.HIGHEST_PROTOCOL)
     del siam_cont100_kitti
 
-    #sizes_lmdb = ['5', '20']
-    sizes_lmdb = ['20']
-    splits = ['01']
-    #outputs_to_test = ['1', '2', '3', '4', '5']
-    outputs_to_test = ['3']
+    sizes_lmdb = ['5', '20']
+    splits = ['01', '02']
+    outputs_to_test = ['1', '2', '3', '4', '5']
     iters = 10000
     for output in outputs_to_test:
         acc['egomotion'][output] = {}
@@ -227,8 +225,8 @@ if __name__ == "__main__":
                 snapshot_prefix = 'snapshots/kitti/egomotion_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
                 results_egomotion = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters,
                                                                    base_lr=0.0001, snapshot_prefix=snapshot_prefix),
-                                              loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['best_snap'])
-                                              #loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights="/home/eze/Projects/lsm/caffenet_con-conv5_scratch_pad24_imS227_con-conv_iter_80000.caffemodel")
+                                              #loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_f, pretrained_weights=results_ego['best_snap'])
+                                              loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights="snapshots/kitti/egomotion/kitti_siamese_iter_23000.caffemodel")
                 acc['egomotion'][output][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
 
                 ## CONTRASTIVE m=10
