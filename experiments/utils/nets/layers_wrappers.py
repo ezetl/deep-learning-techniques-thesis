@@ -3,6 +3,7 @@ from caffe import (layers as L, params as P)
 
 weight_filler = dict(type='gaussian', std=0.01)
 weight_filler_fc = dict(type='gaussian', std=0.005)
+weight_filler_fc_xavier = dict(type='xavier', std=0.05)
 bias_filler = dict(type='constant', value=0.1)
 
 class LayerWrapperException(Exception):
