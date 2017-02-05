@@ -137,7 +137,7 @@ if __name__ == "__main__":
        with open(join(results_path, 'egomotion.pickle'), 'rb') as handle:
            results_ego = pickle.load(handle)
     else:
-        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, gamma=0.1, stepsize=20000, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
+        results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.01, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
                 loss_blobs=loss_blobs)
         with open(join(results_path, 'egomotion.pickle'), 'wb') as handle:
             pickle.dump(results_ego, handle, protocol=pickle.HIGHEST_PROTOCOL)
