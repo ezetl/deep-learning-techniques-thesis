@@ -2451,6 +2451,7 @@ inicial de 0.001 (reducido en un factor de 2 cada 20K iteraciones)
      datos mediante mean substraction podria aumentar la performance.
 **** DONE Crear lmdb para SFA
 **** DONE Entrenar SFA
+**** DONE Aplicar los cambios de la siamese_egomotion a las otras redes
 
 *** Evaluación
 Los modelos KITTI-Net y SF-Net deben ser entrenados utilizando

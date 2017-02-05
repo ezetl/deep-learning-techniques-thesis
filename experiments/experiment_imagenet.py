@@ -30,7 +30,7 @@ def parse_options():
             help="Root dir where all the LMDBs were created.", metavar="PATH")
 
     group_example = OptionGroup(parser, "Example:",
-            './experiment_imagenet.py -L /media/eze/Datasets/KITTI/\\')
+            './experiment_imagenet.py -L /media/eze/Datasets/\\')
     parser.add_option_group(group_example)
 
     return parser.parse_args()
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     scale = 1 
     batch_size = 50 
     iters = 60000
-    results_path = './results/kitti/'
+    results_path = './results/imagenet/'
     try:
         makedirs(results_path)
     except:
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     del siam_cont10_kitti
 
     acc = {key: defaultdict(int) for key in ['egomotion', 'cont_10', 'AlexNet']}
-    sizes_lmdb = ['1', '5', '10', '20']
+    sizes_lmdb = ['1', '5', '10', '20', '1000']
     iters = 10000
     for num in sizes_lmdb:
         # Finetune network
