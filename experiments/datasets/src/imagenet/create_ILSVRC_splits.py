@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # Make the generation of the dataset reproducible
     seed(123)
     ilsvrc_path = argv[1]
-    for num_imgs_per_class in [20, 1000]:
+    for num_imgs_per_class in [1, 5, 10, 20, 1000]:
         train, test = get_train_test_splits(ilsvrc_path, num_imgs_per_class)
         with open("ILSVRC_{}_Training.txt".format(num_imgs_per_class), 'w') as f:
             f.write('\n'.join('{} {}'.format(*t) for t in train))

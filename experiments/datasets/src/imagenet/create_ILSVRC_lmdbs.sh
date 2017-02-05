@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-im_per_class=("20" "1000")
+im_per_class=("1" "5" "10" "20" "1000")
 files=("Testing" "Training")
 if [ -z $1 ]
 then
