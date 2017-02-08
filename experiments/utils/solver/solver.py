@@ -1,5 +1,6 @@
 from os import makedirs
 from os.path import join, exists, dirname
+import pickle
 from sys import exit
 import tempfile
 import numpy as np
@@ -83,7 +84,7 @@ def create_solver_params(train_netspec, test_netspec=None, test_interv=1000, tes
     return solver
 
 
-def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=""):
+def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights="", pickle_name=""):
     """
     Run a solver instance from solver_params for solver_params.max_iter iterations,
     returning the loss and accuracy recorded in each step.
@@ -92,6 +93,8 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
     :param loss_blobs: tuple of str. The names of the loss layers used to gather the loss info during training. These losses will then be returned as a result
     :param acc_blobs: tuple of str. Same as loss_blobs but related to accuracies 
     :param pretrained_weights: str. Path where the pretrained .caffemodel is. If not set, train from scratch is performed.
+    :param pickle_name: str. Path were the results (loss, paths to models) are going to be stored as a pickle file.
+                        If the pickle file already exists, then it loads it in memory and returns the precomputed results
 
     :return: A dict containing at most 3 keys:
               {
@@ -134,6 +137,11 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
     else:
         acc_blobs = []
 
+    if exists(pickle_name):
+        with open(pickle_name, 'rb') as handle:
+            results = pickle.load(handle)
+            return results
+    
     min_loss = MIN_LOSS
     min_loss_step = 0
     try:
@@ -162,5 +170,8 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
 
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")
+
+    with open(pickle_name, 'wb') as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     return results 
