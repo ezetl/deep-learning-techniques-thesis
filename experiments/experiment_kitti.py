@@ -45,12 +45,19 @@ if __name__ == "__main__":
            'imag_1000': {}}
 
     scale = 1
-    batch_size = 50
+    batch_size = 125 
     # Train AlexNet on ILSVRC'12 dataset with 20 and 1000 imgs per class
-    iters = 80000
+    iters = 60000
+    base_lr = 0.001
     results_path = './results/kitti/'
     try:
         makedirs(results_path)
+    except:
+        pass
+
+    snapshots_path = './snapshots'
+    try:
+        makedirs(snapshots_path)
     except:
         pass
 
@@ -73,9 +80,9 @@ if __name__ == "__main__":
             learn_all=False,
             is_imagenet=True
             )
-    snapshot_prefix = 'snapshots/imagenet/imagenet_lmdb20'
+    snapshot_prefix = join(snapshots_path, 'imagenet/imagenet_lmdb20')
     results_imagenet20 = train_net(create_solver_params(imagenet20, test_netspec=imagenet_test20, max_iter=iters, test_interv=iters,
-                                                       base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                                                       base_lr=base_lr, snapshot_prefix=snapshot_prefix),
                                   loss_blobs=loss_blobs_imagenet,
                                   acc_blobs=acc_blobs_imagenet,
                                   pickle_name=join(results_path, 'imagenet_20.pickle'))
@@ -101,9 +108,8 @@ if __name__ == "__main__":
             learn_all=False,
             is_imagenet=True
             )
-    snapshot_prefix = 'snapshots/imagenet/imagenet_lmdb1000'
     results_imagenet1000 = train_net(create_solver_params(imagenet1000, test_netspec=imagenet_test1000, max_iter=iters, test_interv=iters,
-                                                       base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                                                       base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'imagenet/imagenet_lmdb1000')),
                                   loss_blobs=loss_blobs_imagenet,
                                   acc_blobs=acc_blobs_imagenet,
                                   pickle_name=join(results_path, 'imagenet_1000.pickle'))
@@ -126,9 +132,8 @@ if __name__ == "__main__":
     # Create a SolverParameter instance with the predefined parameters for this experiment.
     # Some paths and iterations numbers will change for nets with contrastive loss or
     # in finetuning stage
-    iters = 80000
     # Train our first siamese net with Egomotion method
-    results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='snapshots/kitti/egomotion/kitti_siamese'),
+    results_ego = train_net(create_solver_params(siam_kitti, max_iter=iters, base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'kitti/egomotion/kitti_siamese')),
             loss_blobs=loss_blobs,
             pickle_name=join(results_path, 'egomotion.pickle'))
     del siam_kitti
@@ -137,6 +142,7 @@ if __name__ == "__main__":
     # Using a small batch size while training with Contrastive Loss leads
     # to high bias in the networks (i.e. they dont learn much)
     # A good ad-hoc value is between 250-500
+    batch_size = 250 
     siam_cont10_kitti, loss_cont_blobs, acc_cont_blobs = KITTINetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
             batch_size=batch_size,
@@ -146,7 +152,7 @@ if __name__ == "__main__":
             learn_all=True
             )
     # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
-    results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=0.001, snapshot_prefix='snapshots/kitti/contrastive/kitti_siamese_m10'),
+    results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'kitti/contrastive/kitti_siamese_m10')),
             loss_blobs=loss_cont_blobs,
             pickle_name=join(results_path, 'contr_10.pickle'))
     del siam_cont10_kitti
@@ -161,7 +167,7 @@ if __name__ == "__main__":
             is_train=True,
             learn_all=True
             )
-    results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=0.001, snapshot_prefix='snapshots/kitti/contrastive/kitti_siamese_m100'),
+    results_contr100 = train_net(create_solver_params(siam_cont100_kitti, max_iter=iters,  base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'kitti/contrastive/kitti_siamese_m100')),
             loss_blobs=loss_cont_blobs2,
             pickle_name=join(results_path, 'contr_100.pickle'))
     del siam_cont100_kitti
@@ -170,6 +176,7 @@ if __name__ == "__main__":
     splits = ['01', '02']
     outputs_to_test = ['3', '4', '5']
     iters = 10000
+    batch_size = 50
     for output in outputs_to_test:
         for k in acc:
             acc[k][output] = defaultdict(int)
@@ -198,19 +205,18 @@ if __name__ == "__main__":
                         )
 
                 # EGOMOTION
-                snapshot_prefix = 'snapshots/kitti/egomotion_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
+                snapshot_prefix = join(snapshots_path, 'kitti/egomotion_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
                 results_egomotion = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters,
-                                                                   base_lr=0.0001, snapshot_prefix=snapshot_prefix),
+                                                                   base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                               loss_blobs=loss_blobs_f,
                                               acc_blobs=acc_blobs_f,
                                               pretrained_weights=results_ego['best_snap'],
                                               pickle_name=join(results_path, 'egomotion_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
-                                              #loss_blobs=loss_blobs_f, acc_blobs=acc_blobs_test, pretrained_weights="snapshots/kitti/egomotion/kitti_siamese_iter_23000.caffemodel")
                 acc['egomotion'][output][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
 
                 ## CONTRASTIVE m=10
-                snapshot_prefix = 'snapshots/kitti/contrastive10_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
-                results_contrastive10 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                snapshot_prefix = join(snapshots_path, 'kitti/contrastive10_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
+                results_contrastive10 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                   loss_blobs=loss_blobs_f, 
                                                   acc_blobs=acc_blobs_test,
                                                   pretrained_weights=results_contr10['best_snap'],
@@ -218,8 +224,8 @@ if __name__ == "__main__":
                 acc['cont_10'][output][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
 
                 ## Contrastive m=100
-                snapshot_prefix = 'snapshots/kitti/contrastive100_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
-                results_contrastive100 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                snapshot_prefix = join(snapshots_path, 'kitti/contrastive100_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
+                results_contrastive100 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                    loss_blobs=loss_blobs_f, 
                                                    acc_blobs=acc_blobs_test,
                                                    pretrained_weights=results_contr100['best_snap'],
@@ -227,8 +233,8 @@ if __name__ == "__main__":
                 acc['cont_100'][output][num] += results_contrastive100['acc'][acc_blobs_test[0]][0]
 
                 ##Imagenet 20
-                snapshot_prefix = 'snapshots/kitti/imagenet20_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
-                results_finet_imagenet20 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                snapshot_prefix = join(snapshots_path, 'kitti/imagenet20_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
+                results_finet_imagenet20 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                    loss_blobs=loss_blobs_f,
                                                    acc_blobs=acc_blobs_test,
                                                    pretrained_weights=results_imagenet20['best_snap'],
@@ -236,11 +242,11 @@ if __name__ == "__main__":
                 acc['imag_20'][output][num] += results_finet_imagenet20['acc'][acc_blobs_test[0]][0]
 
                 ##Imagenet 1000
-                snapshot_prefix = 'snapshots/kitti/imagenet1000_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split)
-                results_finet_imagenet1000 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=0.001, snapshot_prefix=snapshot_prefix),
+                snapshot_prefix = join(snapshots_path, 'kitti/imagenet1000_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
+                results_finet_imagenet1000 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                    loss_blobs=loss_blobs_f,
                                                    acc_blobs=acc_blobs_test,
-                                                   pretrained_weights=results_imagenet1000['snaps'][-1],
+                                                   pretrained_weights=results_imagenet1000['best_snap'],
                                                    pickle_name=join(results_path, 'imagenet1000perclass_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['imag_1000'][output][num] += results_finet_imagenet1000['acc'][acc_blobs_test[0]][0]
 
