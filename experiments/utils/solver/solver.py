@@ -84,7 +84,7 @@ def create_solver_params(train_netspec, test_netspec=None, test_interv=1000, tes
     return solver
 
 
-def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights="", pickle_name=""):
+def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights="", pickle_name="./pickle.pickle"):
     """
     Run a solver instance from solver_params for solver_params.max_iter iterations,
     returning the loss and accuracy recorded in each step.
