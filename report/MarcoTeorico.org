@@ -2040,17 +2040,28 @@ imágenes de los dos métodos utilizados (automovimiento y SFA) y una
 comparación con un entrenamiento desde cero utilizando esa misma
 cantidad de imágenes.
 
-#+caption: Exactitud de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).
-#+name: tab:one
-
-|---+-----------------------------+------+------+------+------|
-|   | método\#datos entrenamiento |  100 |  300 | 1000 | 1000 |
-| / | <>                          |    < |      |      |    > |
-| # | Desde cero                  | 0.42 | 0.70 | 0.82 | 0.97 |
-| # | SFA(m=10)                   | 0.52 | 0.71 | 0.77 | 0.82 |
-| # | SFA(m=100)                  | 0.58 | 0.73 | 0.80 | 0.88 |
-| # | Automovimiento              | 0.75 | 0.90 | 0.92 | 0.99 |
-|---+-----------------------------+------+------+------+------|
+#+BEGIN_LaTeX
+\begin{table*}[htb]
+\centering
+\begin{tabular}{l|rrrr}
+\hline
+\multicolumn{1}{r}{}
+& \multicolumn{4}{c}{datos entrenamiento}
+& \multicolumn{1}{l}{Método}
+& \multicolumn{1}{r}{100}
+& \multicolumn{1}{r}{300}
+& \multicolumn{1}{r}{1000}
+& \multicolumn{1}{r}{10000} \\ \cline{1-5}
+\hline
+Desde cero & 0.42 & 0.70 & 0.82 & 0.97\\
+SFA(m=10) & 0.52 & 0.71 & 0.77 & 0.82\\
+SFA(m=100) & 0.58 & 0.73 & 0.80 & 0.88\\
+Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
+\hline
+\end{tabular}%
+\caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).}
+\end{table*}
+#+END_LaTeX
 
 Se puede observar que entrenar mediante automovimiento presenta una
 performance claramente superior a entrenar una red desde cero con la
@@ -2146,24 +2157,50 @@ partición.
 
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
-salidas de las primeras 5 capas convolucionales.
+salidas de las primeras 5 capas convolucionales. Los resultados pueden
+verse en el Cuadro \ref{tab:two}
 
-|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
-| Metodo    | #preentrenamiento | #finetuning |    L1 |    L2 |    L3 |    L4 |    L5 | #finetuning |    L1 |    L2 |    L3 |    L4 |    L5 |
-|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
-| imag_1000 | 1M                |           5 | 0.020 | 0.050 | 0.060 | 0.170 | 0.150 |          20 | 0.030 | 0.120 | 0.040 | 0.180 | 0.200 |
-| imag_20   | 20K               |           5 | 0.040 | 0.010 | 0.030 | 0.030 | 0.030 |          20 | 0.010 | 0.020 | 0.000 | 0.010 | 0.020 |
-| cont_10   | 20.7K             |           5 | 0.018 | 0.022 | 0.034 | 0.030 | 0.028 |          20 | 0.044 | 0.054 | 0.054 | 0.050 | 0.022 |
-| egomotion | 20.7K             |           5 | 0.030 | 0.050 | 0.050 | 0.050 | 0.030 |          20 | 0.050 | 0.060 | 0.050 | 0.070 | 0.050 |
-|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
+#+BEGIN_LaTeX
+\begin{table*}[htb]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|r|r|ccccc|r|ccccc}
+\hline
+\multicolumn{1}{l}{Método}
+& \multicolumn{1}{r}{\#preentr.}
+& \multicolumn{1}{r}{\#finet.}
+& \multicolumn{1}{c}{L1}
+& \multicolumn{1}{c}{L2}
+& \multicolumn{1}{c}{L3}
+& \multicolumn{1}{c}{L4}
+& \multicolumn{1}{c}{L5}
+& \multicolumn{1}{r}{\#finet.}
+& \multicolumn{1}{c}{L1}
+& \multicolumn{1}{c}{L2}
+& \multicolumn{1}{c}{L3}
+& \multicolumn{1}{c}{L4}
+& \multicolumn{1}{c}{L5} \\ \cline{1-14}
+\hline
+ALEX-1000 & 1M        &       5 & 0.020 & 0.050 & 0.060 & 0.170 & 0.150 &      20 & 0.030 & 0.120 & 0.040 & 0.180 & 0.200 \\
+ALEX-20   & 20K       &       5 & 0.040 & 0.010 & 0.030 & 0.030 & 0.030 &      20 & 0.010 & 0.020 & 0.000 & 0.010 & 0.020 \\
+KITTI-SFA & 20.7K     &       5 & 0.018 & 0.022 & 0.034 & 0.030 & 0.028 &      20 & 0.044 & 0.054 & 0.054 & 0.050 & 0.022 \\
+KITTI-EGO & 20.7K     &       5 & 0.030 & 0.050 & 0.050 & 0.050 & 0.030 &      20 & 0.050 & 0.060 & 0.050 & 0.070 & 0.050 \\
+\hline
+\end{tabular}%
+}
+\caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397.}
+\end{table*}
+#+END_LaTeX
 
-
-
-
-** Pruebas con SF
-*** Descripción del conjunto de datos y preprocesamiento
-*** Descripción de la red
-*** Entrenamiento y evaluación
+Se puede observar que el pre-entrenamiento con automoviento no supera
+la performance que se obtiene al pre-entrenar la misma red con
+ILSVRC'12 con 1000 imagenes por clase. Sin embargo, sí supera la
+performance de pre-entrenar la red con 20 imágenes por clase en
+ILSVRC'12. No solamente eso sino que también supera la performance de
+la red siamesa entrenada con SFA. Esto nos indica que cuando se tiene
+un conjunto acotado de datos de entrenamiento, se puede lograr
+entrenar un modelo que logre resultados similares al estado del arte
+si utilizamos redes siamesas entrenadas con automovimiento.
 
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
