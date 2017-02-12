@@ -1972,7 +1972,7 @@ agrupan todas las posibles transformaciones en clases de rangos
 iguales, y la tarea de la red es predecir a que clase pertenece la
 imagen.
 
-*** Reproducción de resultados
+* Experimentos
 #+LaTeX: \label{sec:agrawal}
 
 Todos los experimentos realizados se encuentran en Github
@@ -1982,14 +1982,14 @@ la descarga de los conjuntos de datos y la reproducción de los
 experimentos. Parte del tiempo fue dedicado a tratar de que los
 experimentos sean reproducibles por otras personas, por lo que se
 trató de seguir buenas prácticas a la hora de modularizar y organizar
-los distintos módulos.
+los el código.
 
 Los experimentos fueron desarrollados en su mayoría en el lenguaje
 Python, excepto por algunos scripts de preprocesamiento que
 originalmente fueron creados en C++.
 
-**** Prueba de concepto con MNIST
-***** Conjunto de datos
+** Prueba de concepto con MNIST
+*** Conjunto de datos
 
 El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de caracteres
 numéricos manuscritos para entrenamiento, más 10000 imágenes para
@@ -2006,7 +2006,7 @@ creado las transformaciones se eligen de manera aleatoria uniforme.
 En la Figura XX se pueden observar varios pares de imágenes generadas durante la creación de 
 la base de datos que luego fue usada para entrenar la red siamesa.
 
-***** Descripción de la red
+*** Descripción de la red
 
 La arquitectura utilizada para las BCNN fue C96-P-C256-P, y para la
 TCNN se eligió F1000-D-Op. Tener en cuenta que para el caso del
@@ -2017,7 +2017,7 @@ transformaciones.
 Para transferencia de aprendizaje se añadió F500-D-F10-Softmax a una
 BCNN.
 
-***** Entrenamiento y evaluación
+*** Entrenamiento y evaluación
 
 Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
 tasa de aprendizaje de 0.01. Siguiendo los lineamientos del paper se
@@ -2057,16 +2057,16 @@ performance claramente superior a entrenar una red desde cero con la
 misma cantidad de imágenes en los casos en los que el conjunto de
 datos es relativamente pequeño. Es también superior al entrenamiento
 utilizando \textit{Slow Feature Analysis}, y dado que no se
-modificaron las capas convolucionales aprendidas durante el
-pre-entrenamiento, podemos concluir que las \textit{features}
+modificaron los pesos de las capas convolucionales aprendidas durante
+el pre-entrenamiento, podemos concluir que las \textit{features}
 aprendidas son buenas y logran captar las representaciones necesarias
 para el domino del problema en cuestión. El siguiente paso es
 verificar que efectivamente las \textit{features} aprendidas se puedan
 aplicar a diferentes dominios de problemas y sean lo suficientemente
 generalizables.
 
-**** Pruebas con KITTI
-***** Conjunto de datos
+** Pruebas con KITTI
+*** Conjunto de datos
 
 El conjunto de datos KITTI \cite{Geiger2012CVPR} consiste en 11
 secuencias que registran el movimiento de un automóvil en una
@@ -2098,7 +2098,7 @@ originales de \(1241 \times 376\) píxeles. No se aplicaron
 transformaciones extras más allá de las otorgadas por el movimiento de
 la cámara.
 
-***** Odometria 
+*** Odometria 
 
 KITTI provee anotaciones con las poses de la camara (es decir, su
 trayectoria) para las secuencias de imágenes. Estas poses estan dadas
@@ -2111,12 +2111,12 @@ asumimos que el primer bloque \(3 \times 3\) es una matriz de rotación
 http://robotics.stackexchange.com/questions/7040/how-to-get-the-projection-matrix-from-odometry-tf-data
 http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
-***** Descripción de la red
+*** Descripción de la red
 
 La red utilizada como base de las BCNN está inspirada en las primeras 5 capas convolucionales de AlexNet /cite{alexnet}, es 
 decir, C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
 
-***** Entrenamiento y evaluación
+*** Entrenamiento y evaluación
 
 Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño
 de \textit{mini batch} de 250 y una tasa de aprendizaje inicial de
@@ -2136,7 +2136,7 @@ Para hacer una comparación justa con ALEX-20 y ALEX-1000, las redes
 siamesas fueron entrenadas con aproximadamente 20K pares de
 imágenes.
 
-****** Evaluación utilizando el conjunto de datos SUN-397
+**** Evaluación utilizando el conjunto de datos SUN-397
 
 El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías
 de paisajes interiores y exteriores y además provee 10 particiones del
@@ -2148,19 +2148,22 @@ La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
 salidas de las primeras 5 capas convolucionales.
 
-|-----------+---+---+-------+-------+-------+-------+-------+----+---+-------+-------+-------+-------+-------|
-| imag_1000 | 5 |   | 0.022 | 0.040 | 0.068 | 0.064 | 0.122 | 20 |   | 0.088 | 0.156 | 0.158 | 0.166 | 0.230 |
-| imag_20   | 5 |   | 0.024 | 0.022 | 0.038 | 0.016 | 0.032 | 20 |   | 0.042 | 0.066 | 0.050 | 0.054 | 0.042 |
-| cont_10   | 5 |   | 0.018 | 0.022 | 0.034 | 0.030 | 0.028 | 20 |   | 0.044 | 0.054 | 0.054 | 0.050 | 0.022 |
-| cont_100  | 5 |   | 0.018 | 0.022 | 0.030 | 0.024 | 0.004 | 20 |   | 0.058 | 0.050 | 0.032 | 0.032 | 0.014 |
-| egomotion | 5 |   | 0.042 | 0.028 | 0.008 | 0.008 | 0.010 | 20 |   | 0.076 | 0.048 | 0.008 | 0.012 | 0.008 |
-|-----------+---+---+-------+-------+-------+-------+-------+----+---+-------+-------+-------+-------+-------|
+|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
+| Metodo    | #preentrenamiento | #finetuning |    L1 |    L2 |    L3 |    L4 |    L5 | #finetuning |    L1 |    L2 |    L3 |    L4 |    L5 |
+|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
+| imag_1000 | 1M                |           5 | 0.020 | 0.050 | 0.060 | 0.170 | 0.150 |          20 | 0.030 | 0.120 | 0.040 | 0.180 | 0.200 |
+| imag_20   | 20K               |           5 | 0.040 | 0.010 | 0.030 | 0.030 | 0.030 |          20 | 0.010 | 0.020 | 0.000 | 0.010 | 0.020 |
+| cont_10   | 20.7K             |           5 | 0.018 | 0.022 | 0.034 | 0.030 | 0.028 |          20 | 0.044 | 0.054 | 0.054 | 0.050 | 0.022 |
+| egomotion | 20.7K             |           5 | 0.030 | 0.050 | 0.050 | 0.050 | 0.030 |          20 | 0.050 | 0.060 | 0.050 | 0.070 | 0.050 |
+|-----------+-------------------+-------------+-------+-------+-------+-------+-------+-------------+-------+-------+-------+-------+-------|
 
 
-**** Pruebas con SF
-***** Descripción del conjunto de datos y preprocesamiento
-***** Descripción de la red
-***** Entrenamiento y evaluación
+
+
+** Pruebas con SF
+*** Descripción del conjunto de datos y preprocesamiento
+*** Descripción de la red
+*** Entrenamiento y evaluación
 
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
