@@ -2222,21 +2222,19 @@ si utilizamos redes siamesas entrenadas con automovimiento.
 **** DONE Standar para kitti
 **** DONE Standar para mnist
 *** DONE Agregar docs para lo que falta de preprocessing (sun, kitti) 
-*** TODO [85%] Completar el pipeline de entrenamiento en Python:
+*** DONE [100%] Completar el pipeline de entrenamiento en Python:
 **** DONE crear nets
 **** DONE solver
 **** DONE entrenar
 **** DONE finetunear
-**** TODO guardar best snapshot, no usar siempre el ultimo
+**** DONE guardar best snapshot, no usar siempre el ultimo
 **** DONE Armar todos los entrenamientos para MNIST
 **** DONE mostrar resultados
 *** DONE Guardar resultados de los entrenamientos grandes (siamese, imagenet) con pickle. Cargar los archivos si existen para evitar reentrenar todo si se corto un entrenamiento 
 *** DONE Agregar experimentos de AlexNet con 20k y 1m de imagenes de Imagenet para SUN397
 *** DONE Agregar el finetuning con las 5 ultimas capas para SUN397
 *** DONE MNIST: cont_10 uso batch size de 800, hacer lo mismo para cont_100
-*** TODO Probar pandas para guardar y mostrar los datos y evitar usar tantos diccionarios
-*** TODO Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc. 
-Para esto tal vez sea mejor tener implementada la feature de guardar el mejor snapshot. De esa manera tenemos una marca de cuando llegamos a los mejores filtros
+*** DONE Hacer video con evolucion de los filtros a lo largo de las iteraciones. Puede ser util para mostrar que los filtros se aprenden mas rapido/lento/etc. 
 *** TODO Hacer plots de loss al finalizar el entrenamiento. Guardar .pdf
 *** DONE Actualizar script de MNIST con los nuevos cambios (pickle, defaultdict)
 *** DONE Hacer que se continue el entrenamiento desde el solverstate si se corta (leer del pickle y chequear si es la ultima iteracion)
