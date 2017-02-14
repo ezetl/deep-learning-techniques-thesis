@@ -24,3 +24,5 @@ experiments/sf/snapshots/
 ILSVRC_*\.txt
 results/
 snapshots/
+*.gif
+*.mp4
