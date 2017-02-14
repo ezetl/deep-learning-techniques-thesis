@@ -137,15 +137,28 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
     else:
         acc_blobs = []
 
+    init_iter = 0
+
     if exists(pickle_name):
         with open(pickle_name, 'rb') as handle:
             results = pickle.load(handle)
-            return results
+            if str(solver_param.max_iter) in results['snaps'][-1]:
+                print("This model has already been trained. Returning saved pickle")
+                # This training session has already finished, return the results
+                return results
+            else:
+                init_iter = int(results['snaps'][-1].split('iter_')[1].replace('.caffemodel','')) 
+                solverstate = results['snaps'][-1].replace('caffemodel', 'solverstate')
+                if exists(solverstate):
+                    print("Keep training model from iteration {}".format(init_iter))
+                    solver.restore(solverstate)
+                else:
+                    print("The .solverstate for iteration {} could not be found. Training again.".format(init_iter))
     
     min_loss = MIN_LOSS
     min_loss_step = 0
     try:
-        for it in range(0, solver_param.max_iter+1):
+        for it in range(init_iter, solver_param.max_iter+1):
             solver.step(1)
             # Retrieve loss of this step
             total_loss = 0
@@ -167,6 +180,9 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
                     min_loss_step = it
                     results['best_snap'] = snapshot_name
                 print("Best snapshot so far: Iteration {}, {}".format(it, results['best_snap']))    
+                results['snaps'].append(snapshot_name) 
+                with open(pickle_name, 'wb') as handle:
+                    pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     except KeyboardInterrupt:
         exit("Training has been interrupted. Bye!")

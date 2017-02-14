@@ -55,7 +55,7 @@ if __name__ == "__main__":
     except:
         pass
 
-    snapshots_path = './snapshots'
+    snapshots_path = '/media/eze/Datasets/snapshots'
     try:
         makedirs(snapshots_path)
     except:
@@ -90,6 +90,7 @@ if __name__ == "__main__":
     del imagenet_test20
 
     # Imagenet 1000 images per class
+    iters = 80000
     imagenet1000, loss_blobs_imagenet, acc_blobs_imagenet = KITTINetFactory.standar(
             lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Training_1000perclass_lmdb'),
             batch_size=batch_size,
@@ -112,7 +113,7 @@ if __name__ == "__main__":
                                                        base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'imagenet/imagenet_lmdb1000')),
                                   loss_blobs=loss_blobs_imagenet,
                                   acc_blobs=acc_blobs_imagenet,
-                                  pickle_name=join(results_path, 'imagenet_1000.pickle'))
+                                  pickle_name=join(results_path, 'imagenet_80K_1000.pickle'))
     del imagenet1000
     del imagenet_test1000
 
@@ -143,6 +144,7 @@ if __name__ == "__main__":
     # to high bias in the networks (i.e. they dont learn much)
     # A good ad-hoc value is between 250-500
     batch_size = 250 
+    base_lr = 0.0001
     siam_cont10_kitti, loss_cont_blobs, acc_cont_blobs = KITTINetFactory.siamese_contrastive(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
             batch_size=batch_size,
@@ -174,9 +176,10 @@ if __name__ == "__main__":
 
     sizes_lmdb = ['5', '20']
     splits = ['01', '02']
-    outputs_to_test = ['3', '4', '5']
+    outputs_to_test = ['1', '2', '3', '4', '5']
     iters = 10000
     batch_size = 50
+    other_results_path = '/media/eze/Datasets/'
     for output in outputs_to_test:
         for k in acc:
             acc[k][output] = defaultdict(int)
@@ -237,7 +240,7 @@ if __name__ == "__main__":
                 results_finet_imagenet20 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                    loss_blobs=loss_blobs_f,
                                                    acc_blobs=acc_blobs_test,
-                                                   pretrained_weights=results_imagenet20['best_snap'],
+                                                   pretrained_weights=join(other_results_path, results_imagenet20['best_snap']),
                                                    pickle_name=join(results_path, 'imagenet20perclass_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['imag_20'][output][num] += results_finet_imagenet20['acc'][acc_blobs_test[0]][0]
 
@@ -246,15 +249,14 @@ if __name__ == "__main__":
                 results_finet_imagenet1000 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                                    loss_blobs=loss_blobs_f,
                                                    acc_blobs=acc_blobs_test,
-                                                   pretrained_weights=results_imagenet1000['best_snap'],
-                                                   pickle_name=join(results_path, 'imagenet1000perclass_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
+                                                   pretrained_weights=join(other_results_path, results_imagenet1000['best_snap']),
+                                                   pickle_name=join(results_path, 'imagenet1000perclass_finetuning_80K_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['imag_1000'][output][num] += results_finet_imagenet1000['acc'][acc_blobs_test[0]][0]
 
             for k in acc:
                 acc[k][output][num] = acc[k][output][num] / float(len(splits))
 
     print('Accuracies')
-    #for a in ['cont_10', 'cont_100', 'egomotion', 'imag_20', 'imag_1000']:
     for k in acc:
         res = k
         for num in sizes_lmdb:

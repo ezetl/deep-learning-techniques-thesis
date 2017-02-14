@@ -2239,7 +2239,7 @@ si utilizamos redes siamesas entrenadas con automovimiento.
 Para esto tal vez sea mejor tener implementada la feature de guardar el mejor snapshot. De esa manera tenemos una marca de cuando llegamos a los mejores filtros
 *** TODO Hacer plots de loss al finalizar el entrenamiento. Guardar .pdf
 *** DONE Actualizar script de MNIST con los nuevos cambios (pickle, defaultdict)
-*** TODO Hacer que se continue el entrenamiento desde el solverstate si se corta (leer del pickle y chequear si es la ultima iteracion)
+*** DONE Hacer que se continue el entrenamiento desde el solverstate si se corta (leer del pickle y chequear si es la ultima iteracion)
 *** DONE probar con el modelo de lsm: extraer sus dimensiones y replicar en mis redes. CONCLUSION: las redes son identicas
 *** DONE Solucionar problema de overfitting en finetuning de kitti
 *** DONE Hacer test al finalizar entrenamiento, imprimir en pantalla log.
