@@ -253,6 +253,9 @@ if __name__ == "__main__":
                                                    pickle_name=join(results_path, 'imagenet1000perclass_finetuning_80K_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['imag_1000'][output][num] += results_finet_imagenet1000['acc'][acc_blobs_test[0]][0]
 
+                del kitti_finetune
+                del kitti_test
+
             for k in acc:
                 acc[k][output][num] = acc[k][output][num] / float(len(splits))
 
