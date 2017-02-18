@@ -142,12 +142,12 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
     if exists(pickle_name):
         with open(pickle_name, 'rb') as handle:
             results = pickle.load(handle)
-            if str(solver_param.max_iter) in results['snaps'][-1]:
+            init_iter = int(results['snaps'][-1].split('iter_')[1].replace('.caffemodel','')) 
+            if solver_param.max_iter <= init_iter: 
                 print("This model has already been trained. Returning saved pickle")
                 # This training session has already finished, return the results
                 return results
             else:
-                init_iter = int(results['snaps'][-1].split('iter_')[1].replace('.caffemodel','')) 
                 solverstate = results['snaps'][-1].replace('caffemodel', 'solverstate')
                 if exists(solverstate):
                     print("Keep training model from iteration {}".format(init_iter))
