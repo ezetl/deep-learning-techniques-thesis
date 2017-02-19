@@ -177,12 +177,12 @@ class KITTINetFactory:
         n.labelx, n.labely, n.labelz = L.Slice(n.label, slice_param=dict(axis=1, slice_point=[1,2]), ntop=3)
 
         # BCNN
-        relu5, relu5_p = bcnn(n.data0, n.data1, n, learn_all, False)
+        pool5, pool5_p = bcnn(n.data0, n.data1, n, learn_all, False)
 
         # TCNN
-        n.concat = L.Concat(relu5, relu5_p, concat_param=dict(axis=1))
+        n.concat = L.Concat(pool5, pool5_p, concat_param=dict(axis=1))
 
-        n.conv6 = L.Convolution(n.concat, kernel_size=3, stride=2, num_output=256, param=[weight_param('conv6_w', learn_all=learn_all), bias_param('conv6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_0)
+        n.conv6 = L.Convolution(n.concat, kernel_size=3, stride=2, num_output=256, pad=1, group=2, param=[weight_param('conv6_w', learn_all=learn_all), bias_param('conv6_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu6 = L.ReLU(n.conv6, in_place=True)
 
         n.conv7 = L.Convolution(n.relu6, kernel_size=3, stride=2, num_output=128, param=[weight_param('conv7_w', learn_all=learn_all), bias_param('conv7_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
@@ -235,15 +235,15 @@ class KITTINetFactory:
         n.data0, n.data1 = L.Slice(n.data, slice_param=dict(axis=1, slice_point=3), ntop=2)
 
         # BCNN
-        relu5, relu5_p = bcnn(n.data0, n.data1, n, learn_all, False)
+        pool5, pool5_p = bcnn(n.data0, n.data1, n, learn_all, False)
 
         # TCNNs
-        n.fc1 = L.InnerProduct(relu5, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+        n.fc1 = L.InnerProduct(pool5, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
         n.relu6 = L.ReLU(n.fc1, in_place=True)
         n.dropout1 = L.Dropout(n.relu6, in_place=True)
         n.fc2 = L.InnerProduct(n.relu6, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
 
-        n.fc1_p = L.InnerProduct(relu5_p, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+        n.fc1_p = L.InnerProduct(pool5_p, num_output=500, param=[weight_param('fc1_p_w', learn_all=True), bias_param('fc1_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
         n.relu6_p = L.ReLU(n.fc1_p, in_place=True)
         n.dropout1_p = L.Dropout(n.relu6_p, in_place=True)
         n.fc2_p = L.InnerProduct(n.relu6_p, num_output=100, param=[weight_param('fc2_p_w', learn_all=True), bias_param('fc2_p_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
@@ -326,10 +326,11 @@ class KITTINetFactory:
             return n, ('loss',), ('acc',)
         n.conv5 = L.Convolution(n.relu4, kernel_size=3, num_output=256, pad=1, group=2, param=[weight_param('conv5_w', learn_all=learn_all), bias_param('conv5_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu5 = L.ReLU(n.conv5, in_place=True)
+        n.pool5 = L.Pooling(n.relu5, pool=P.Pooling.MAX, kernel_size=3, stride=2)
 
         if not is_imagenet:
             if layers == '5':
-                n.fc_prev = L.InnerProduct(n.relu5, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+                n.fc_prev = L.InnerProduct(n.pool5, num_output=1000, param=[weight_param('fc_prev_w', learn_all=True), bias_param('fc_prev_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
                 n.relu_prev = L.ReLU(n.fc_prev, in_place=True)
                 n.fc_intermediate = L.InnerProduct(n.relu_prev, num_output=num_classes, param=[weight_param('fc_intermediate_w', learn_all=True), bias_param('fc_intermediate_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
                 if is_train:
@@ -337,7 +338,7 @@ class KITTINetFactory:
                 n.acc = L.Accuracy(n.fc_intermediate, n.label, include=dict(phase=caffe.TEST))
                 return n, ('loss',), ('acc',)
 
-            n.fc6 = L.InnerProduct(n.relu5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+            n.fc6 = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
             n.relu6 = L.ReLU(n.fc6, in_place=True)
 
             if is_train:
@@ -360,13 +361,13 @@ class KITTINetFactory:
             n.acc = L.Accuracy(n.fc8, n.label, include=dict(phase=caffe.TEST))
         else:
             if layers == '5':
-                n.fc_imgnet = L.InnerProduct(n.relu5, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+                n.fc_imgnet = L.InnerProduct(n.pool5, num_output=num_classes, param=[weight_param('fc_w', learn_all=True), bias_param('fc_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
                 if is_train:
                     n.loss = L.SoftmaxWithLoss(n.fc_imgnet, n.label)
                 n.acc = L.Accuracy(n.fc_imgnet, n.label, include=dict(phase=caffe.TEST))
                 return n, ('loss',), ('acc',)
 
-            n.fc6_imgnet = L.InnerProduct(n.relu5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+            n.fc6_imgnet = L.InnerProduct(n.pool5, num_output=4096, param=[weight_param('fc6_w', learn_all=True), bias_param('fc6_b', learn_all=learn_all)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
             n.relu6 = L.ReLU(n.fc6_imgnet, in_place=True)
 
             if is_train:

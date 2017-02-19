@@ -125,10 +125,12 @@ def bcnn(data0, data1, n, learn_all, is_mnist):
 
         n.conv5 = L.Convolution(n.relu4, kernel_size=3, num_output=256, pad=1, group=2, param=[weight_param('conv5_w', learn_all=learn_all), bias_param('conv5_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu5 = L.ReLU(n.conv5, in_place=True)
+        n.pool5 = L.Pooling(n.relu5, pool=P.Pooling.MAX, kernel_size=3, stride=2)
 
         n.conv5_p = L.Convolution(n.relu4_p, kernel_size=3, num_output=256, pad=1, group=2, param=[weight_param('conv5_w', learn_all=learn_all), bias_param('conv5_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu5_p = L.ReLU(n.conv5_p, in_place=True)
+        n.pool5_p = L.Pooling(n.relu5_p, pool=P.Pooling.MAX, kernel_size=3, stride=2)
 
-        return n.relu5, n.relu5_p
+        return n.pool5, n.pool5_p
 
     return n.norm2, n.norm2_p
