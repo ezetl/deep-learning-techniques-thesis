@@ -2517,6 +2517,9 @@ para comparar resultados obtenidos.
 ***** DONE Finetunear KITTI-Net, KITTI-SFA-Net con SUN, una vez con cada uno de los Softmax. Hacer 3 entrenamientos, uno con cada split.
 ***** DONE Comparar accuracies con AlexNet20, AlexNet1M, Kitti-Net, Kitti-SFA-Net. Usar accuracy normal, no se entiende que usan en el paper
 ***** DONE Probar con scale, mean substraction
+***** TODO probar con MNIST la version nueva y ver si da lo mismo. Si da lo mismo entonces es un problema de experiment_kitti.py
+***** TODO contrastive da loss casi cero, esta bien armado el dataset? como estan los labels?
+***** TODO probar con SUN397 viejo (sin padding, con croppeo)
 **** Object Recognition
 Utilizando subconjuntos de ILSVRC-2012 con 1, 5, 10 y 20 imagenes por
 clase, hacer finetuning de KITTI-Net, KITTI-SFA-Net y AlexNet-Scratch
