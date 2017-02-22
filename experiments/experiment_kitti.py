@@ -38,14 +38,14 @@ def parse_options():
 if __name__ == "__main__":
     (opts, args) = parse_options()
 
-    acc = {'egomotion': {}, 
+    acc = {'egomotion': {},
            'cont_10':{},
            'cont_100':{},
            'imag_20': {},
            'imag_1000': {}}
 
     scale = 1
-    batch_size = 125 
+    batch_size = 125
     # Train AlexNet on ILSVRC'12 dataset with 20 and 1000 imgs per class
     iters = 60000
     base_lr = 0.001
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     del imagenet_test20
 
     # Imagenet 1000 images per class
-    iters = 80000
+    iters = 60000
     imagenet1000, loss_blobs_imagenet, acc_blobs_imagenet = KITTINetFactory.standar(
             lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Training_1000perclass_lmdb'),
             batch_size=batch_size,
@@ -117,9 +117,11 @@ if __name__ == "__main__":
     del imagenet1000
     del imagenet_test1000
 
-    ## EGOMOTION NET
-    ## Used to train a siamese network from scratch following the method from the
-    ## paper
+    # EGOMOTION NET
+    # Used to train a siamese network from scratch following the method from the
+    # paper
+    batch_size = 50
+    iters = 60000
     siam_kitti, loss_blobs, acc_blobs = KITTINetFactory.siamese_egomotion(
             lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
             labels_lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb_labels'),
@@ -139,26 +141,26 @@ if __name__ == "__main__":
             pickle_name=join(results_path, 'egomotion.pickle'))
     del siam_kitti
 
-    # CONTRASTIVE NET, m=10
-    # Using a small batch size while training with Contrastive Loss leads
-    # to high bias in the networks (i.e. they dont learn much)
-    # A good ad-hoc value is between 250-500
-    iters=40000
-    batch_size = 250 
-    base_lr = 0.0001
-    siam_cont10_kitti, loss_cont_blobs, acc_cont_blobs = KITTINetFactory.siamese_contrastive(
-            lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
-            batch_size=batch_size,
-            scale=scale,
-            contrastive_margin=10,
-            is_train=True,
-            learn_all=True
-            )
-    # Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
-    results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'kitti/contrastive/kitti_siamese_m10')),
-            loss_blobs=loss_cont_blobs,
-            pickle_name=join(results_path, 'contr_10.pickle'))
-    del siam_cont10_kitti
+    ## CONTRASTIVE NET, m=10
+    ## Using a small batch size while training with Contrastive Loss leads
+    ## to high bias in the networks (i.e. they dont learn much)
+    ## A good ad-hoc value is between 250-500
+    #iters=10000
+    #batch_size = 50 
+    #base_lr = 0.001
+    #siam_cont10_kitti, loss_cont_blobs, acc_cont_blobs = KITTINetFactory.siamese_contrastive(
+    #        lmdb_path=join(opts.lmdb_root, 'KITTI/kitti_train_egomotion_lmdb'),
+    #        batch_size=batch_size,
+    #        scale=scale,
+    #        contrastive_margin=10,
+    #        is_train=True,
+    #        learn_all=True
+    #        )
+    ## Also, using a big lr (i.e. 0.01) while training with Contrastive Loss can lead to nan values while backpropagating the loss
+    #results_contr10 = train_net(create_solver_params(siam_cont10_kitti, max_iter=iters, base_lr=base_lr, snapshot_prefix=join(snapshots_path, 'kitti/contrastive/kitti_siamese_m10')),
+    #        loss_blobs=loss_cont_blobs,
+    #        pickle_name=join(results_path, 'contr_10.pickle'))
+    #del siam_cont10_kitti
 
 
     ## CONTRASTIVE NET, m=100
@@ -176,10 +178,11 @@ if __name__ == "__main__":
     del siam_cont100_kitti
 
     sizes_lmdb = ['5', '20']
-    splits = ['01', '02']
-    outputs_to_test = ['1', '2', '3', '4', '5']
+    splits = ['01']
+    outputs_to_test = ['3', '4', '5']
     iters = 10000
     batch_size = 50
+    base_lr = 0.00001
     for output in outputs_to_test:
         for k in acc:
             acc[k][output] = defaultdict(int)
@@ -213,23 +216,23 @@ if __name__ == "__main__":
                                                                    base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                               loss_blobs=loss_blobs_f,
                                               acc_blobs=acc_blobs_f,
-                                              pretrained_weights=results_ego['best_snap'],
+                                              pretrained_weights=results_ego['snaps'][-1],
                                               pickle_name=join(results_path, 'egomotion_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['egomotion'][output][num] += results_egomotion['acc'][acc_blobs_test[0]][0]
 
-                ## CONTRASTIVE m=10
-                snapshot_prefix = join(snapshots_path, 'kitti/contrastive10_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
-                results_contrastive10 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
-                                                  loss_blobs=loss_blobs_f, 
-                                                  acc_blobs=acc_blobs_test,
-                                                  pretrained_weights=results_contr10['best_snap'],
-                                                  pickle_name=join(results_path, 'contrastive_m10_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
-                acc['cont_10'][output][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
+                ### CONTRASTIVE m=10
+                #snapshot_prefix = join(snapshots_path, 'kitti/contrastive10_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
+                #results_contrastive10 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, test_interv=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
+                #                                  loss_blobs=loss_blobs_f,
+                #                                  acc_blobs=acc_blobs_test,
+                #                                  pretrained_weights=results_contr10['best_snap'],
+                #                                  pickle_name=join(results_path, 'contrastive_m10_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
+                #acc['cont_10'][output][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
 
                 ## Contrastive m=100
                 snapshot_prefix = join(snapshots_path, 'kitti/contrastive100_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
                 results_contrastive100 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
-                                                   loss_blobs=loss_blobs_f, 
+                                                   loss_blobs=loss_blobs_f,
                                                    acc_blobs=acc_blobs_test,
                                                    pretrained_weights=results_contr100['best_snap'],
                                                    pickle_name=join(results_path, 'contrastive_m100_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
