@@ -65,10 +65,8 @@ using namespace cv;
 #define IMAGES       "/sequences/"
 #define POSES        "/poses/"
 
-#define LMDB_TRAIN      "kitti_train_egomotion_lmdb"
-#define LMDB_LABEL_TRAIN "kitti_train_label_egomotion_lmdb"
-#define LMDB_VAL        "kitti_val_egomotion_lmdb"
-#define LMDB_LABEL_VAL "kitti_val_label_egomotion_lmdb"
+#define LMDB_TRAIN      "kitti_train"
+#define LMDB_VAL        "kitti_val"
 
 typedef char Byte;
 typedef unsigned char uByte;
@@ -109,10 +107,13 @@ RotMatrix multiply_rot_matrix(RotMatrix& t1, RotMatrix& t2);
 RotMatrix get_rot_matrix(TransformMatrix& t);
 EulerAngles mat2euler(RotMatrix& m);
 void create_lmdbs(string images_root, string lmdb_path, const vector<string> split);
-vector<ImgPair> generate_pairs(const string images_root, const vector<string> split);
+vector<ImgPair> generate_pairs(const string images_root, const vector<string> split, bool is_sfa);
 DataBlob process_images(ImgPair p);
 
-vector<ImgPair> generate_pairs(const string images_root, const vector<string> split) {
+vector<ImgPair> generate_pairs(const string images_root, const vector<string> split, bool is_sfa) {
+    int neighbours = 7;
+    if (is_sfa)
+        neighbours = 20;
     vector<ImgPair> pairs_paths;
     for (unsigned int i=0; i<split.size(); ++i) {
         // Load original paths
@@ -139,7 +140,7 @@ vector<ImgPair> generate_pairs(const string images_root, const vector<string> sp
         for (unsigned int j=0; j<PAIRS_PER_SPLIT; ++j) {
             int index = generate_rand(split_paths.size());
             int pair_index = 0;
-            int pair_offset = generate_rand(7)+1;
+            int pair_offset = generate_rand(neighbours)+1;
             if (index==0) {
                 pair_index = index + pair_offset;
             } else if (static_cast<unsigned int>(index) == split_paths.size()-1) {
@@ -159,26 +160,32 @@ vector<ImgPair> generate_pairs(const string images_root, const vector<string> sp
     return pairs_paths;
 }
 
-void create_lmdbs(string images_root, string lmdb_path, const vector<string> split)
+void create_lmdbs(string images_root, string lmdb_path, const vector<string> split, bool is_sfa)
 {
-    string labels_path = lmdb_path + "_labels";
-    LMDataBase *labels_lmdb = new LMDataBase(labels_path, (size_t)NUM_CLASSES, 1);
+    LMDataBase *labels_lmdb = NULL;
+    if (!is_sfa){
+      string labels_path = lmdb_path + "_labels";
+      labels_lmdb = new LMDataBase(labels_path, (size_t)NUM_CLASSES, 1);
+    }
     LMDataBase *data_lmdb = new LMDataBase(lmdb_path, (size_t)6, (size_t)HEIGHT);
 
     // Generate pairs of images for each sequence 
-    vector<ImgPair> pairs = generate_pairs(images_root, split);
+    vector<ImgPair> pairs = generate_pairs(images_root, split, is_sfa);
     random_shuffle(std::begin(pairs), std::end(pairs));
 
     for (unsigned int i = 0; i<pairs.size(); i++)
     {
       DataBlob data = process_images(pairs[i]);
       data_lmdb->insert2db(data.img1, data.img2, data.sfa);
-      vector<Label> labels = {(Label)data.x, (Label)data.y, (Label)data.z};
-      labels_lmdb->insert2db(labels);
+      if (!is_sfa) {
+       vector<Label> labels = {(Label)data.x, (Label)data.y, (Label)data.z};
+       labels_lmdb->insert2db(labels);
+      }
     }
 
-    delete labels_lmdb;
     delete data_lmdb;
+    if (!is_sfa)
+      delete labels_lmdb;
     return;
 }
 
@@ -312,20 +319,30 @@ EulerAngles mat2euler(RotMatrix& m){
 
 int main(int argc, char** argv)
 {
-  if (argc < 3) {
+  if (argc < 4) {
     cout << "You must provide the path where the KITTI original dataset\n"
-         << "lives ('sequences' and 'poses' folders downloaded from the official website)\n"
-         << "and the path were you want to save your generated LMDBs:\n\n"
-         << argv[0] << " path/to/sequences_and_poses path/where/to/save/LMDB\n\n";
+         << "lives ('sequences' and 'poses' folders downloaded from the official website),\n"
+         << "the path were you want to save your generated LMDBs and\n"
+         << "say if this lmdb has to be created for SFA ('sfa') or only for Egomotion ('ego')\n\n"
+         << argv[0] << " path/to/sequences_and_poses path/where/to/save/LMDB sfa\n\n";
   } else {
     srand(0);
-    string lmdb_data_path = string(argv[2]) + "/" + LMDB_TRAIN;
     string images_root(argv[1]);
+    string lmdb_data_path = string(argv[2]) + "/" + LMDB_TRAIN;
+    string val_lmdb_data_path = string(argv[2]) + "/" + LMDB_VAL;
+    string sfa_flag = argv[3];
+    bool is_sfa = sfa_flag == "sfa";
+    if (is_sfa){
+        lmdb_data_path += "_sfa_lmdb";
+        val_lmdb_data_path += "_sfa_lmdb";
+    } else {
+        lmdb_data_path += "_egomotion_lmdb";
+        val_lmdb_data_path += "_egomotion_lmdb";
+    }
     cout << "Creating train LMDB's\n";
-    create_lmdbs(images_root, lmdb_data_path, TRAIN_SPLITS);
+    create_lmdbs(images_root, lmdb_data_path, TRAIN_SPLITS, is_sfa);
     cout << "Creating val LMDB's\n";
-    lmdb_data_path = string(argv[2]) + "/" + LMDB_VAL;
-    create_lmdbs(images_root, lmdb_data_path, VAL_SPLITS);
+    create_lmdbs(images_root, val_lmdb_data_path, VAL_SPLITS, is_sfa);
   }
   return 0;
 }
