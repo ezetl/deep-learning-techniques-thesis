@@ -61,7 +61,7 @@ if __name__ == "__main__":
         pass
 
     # Imagenet 20 images per class
-    iters = 5000 
+    iters = 20000 
     imagenet20, loss_blobs_imagenet, acc_blobs_imagenet = KITTINetFactory.standar(
             lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Training_20perclass_lmdb'),
             mean_file='./datasets/data/mean_ilsvrc12.binaryproto',
