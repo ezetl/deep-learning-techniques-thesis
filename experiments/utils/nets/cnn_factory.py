@@ -211,7 +211,8 @@ class KITTINetFactory:
         return n, ('loss_x', 'loss_y', 'loss_z'), ('acc_x', 'acc_y', 'acc_z')
 
     @staticmethod
-    def siamese_contrastive(lmdb_path=None, labels_lmdb_path=None,
+    def siamese_contrastive(lmdb_path=None, labels_lmdb_path=None, mean_file=None,
+
             batch_size=125, scale=1.0, contrastive_margin=10, is_train=True, learn_all=True):
         """
         Creates a protoxt for siamese AlexNet architecture with a contrastive loss layer on top
@@ -229,7 +230,7 @@ class KITTINetFactory:
         """
         n = caffe.NetSpec()
 
-        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, batch_size=batch_size, scale=scale, is_train=is_train)
+        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, mean_file=mean_file, batch_size=batch_size, scale=scale, is_train=is_train)
 
         # Slice data/labels
         n.data0, n.data1 = L.Slice(n.data, slice_param=dict(axis=1, slice_point=3), ntop=2)
@@ -253,7 +254,7 @@ class KITTINetFactory:
         return n, ('contrastive',), None
 
     @staticmethod
-    def standar(lmdb_path=None, labels_lmdb_path=None, batch_size=125,
+    def standar(lmdb_path=None, labels_lmdb_path=None, batch_size=126,  mean_file=None,
             scale=1.0, is_train=True, num_classes=397, learn_all=True, layers='5', is_imagenet=False):
         """
         Creates a protoxt for the AlexNet architecture
@@ -273,7 +274,7 @@ class KITTINetFactory:
         """
         n = caffe.NetSpec()
 
-        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, batch_size=batch_size, scale=scale, is_train=is_train)
+        n.data, n.label = input_layers(lmdb_path=lmdb_path, labels_lmdb_path=labels_lmdb_path, mean_file=mean_file, batch_size=batch_size, scale=scale, is_train=is_train)
 
         n.conv1 = L.Convolution(n.data, kernel_size=11, stride=4, num_output=96, param=[weight_param('conv1_w', learn_all=learn_all), bias_param('conv1_b', learn_all=learn_all)], weight_filler=weight_filler, bias_filler=bias_filler_0)
         n.relu1 = L.ReLU(n.conv1, in_place=True)

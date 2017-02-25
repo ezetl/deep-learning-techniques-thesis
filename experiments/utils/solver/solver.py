@@ -125,7 +125,7 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
         print("Loading weights from {}".format(pretrained_weights))
         solver.net.copy_from(pretrained_weights)
 
-    results = {'snaps': []} 
+    results = {'snaps': [], 'best_snap': None} 
 
     if loss_blobs:
         results['loss'] = {loss_name: np.array([]) for loss_name in loss_blobs}
