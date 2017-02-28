@@ -168,11 +168,11 @@ if __name__ == "__main__":
     del siam_cont10_kitti
 
 
-    sizes_lmdb = ['20']
-    splits = ['01']
-    outputs_to_test = ['3'] #, '4', '5']
+    sizes_lmdb = ['5', '20']
+    splits = ['01', '02', '03']
+    outputs_to_test = ['1', '2', '3', '4', '5']
     iters = 10000
-    batch_size = 50
+    batch_size = 125
     for output in outputs_to_test:
         for k in acc:
             acc[k][output] = defaultdict(int)
@@ -221,15 +221,6 @@ if __name__ == "__main__":
                                                   pickle_name=join(results_path, 'contrastive_m10_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
                 acc['cont_10'][output][num] += results_contrastive10['acc'][acc_blobs_test[0]][0]
 
-                ## Contrastive m=100
-                snapshot_prefix = join(snapshots_path, 'kitti/contrastive100_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
-                results_contrastive100 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
-                                                   loss_blobs=loss_blobs_f, 
-                                                   acc_blobs=acc_blobs_test,
-                                                   pretrained_weights=results_contr100['best_snap'],
-                                                   pickle_name=join(results_path, 'contrastive_m100_finetuning_layer{}_lmdb{}perclass_split{}.pickle'.format(output, num, split)))
-                acc['cont_100'][output][num] += results_contrastive100['acc'][acc_blobs_test[0]][0]
-
                 ##Imagenet 20
                 snapshot_prefix = join(snapshots_path, 'kitti/imagenet20_finetuning/kitti_lmdb{}_outputL{}_split{}'.format(num, output, split))
                 results_finet_imagenet20 = train_net(create_solver_params(kitti_finetune, test_netspec=kitti_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
@@ -260,5 +251,5 @@ if __name__ == "__main__":
         for num in sizes_lmdb:
             res += "   \t {}\t".format(num)
             for out in outputs_to_test:
-                res += "    \t" + "{0:.3f}".format(acc[k][out][num])
+                res += "    \t" + "{0:.2f}".format(acc[k][out][num] * 100.0)
         print(res)
