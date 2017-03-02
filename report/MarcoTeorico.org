@@ -2034,7 +2034,7 @@ Para evaluar la calidad de las \textit{features} aprendidas por las
 redes siamesas se estableció la tasa de aprendizaje de las capas
 convolucionales a cero.
 
-En la Tabla \ref{tab:one} se puede observar la exactitud obtenida
+En el Cuadro \ref{tab:one} se puede observar la exactitud obtenida
 mediante la transferencia de aprendizaje con 100, 300, 1000 y 10000
 imágenes de los dos métodos utilizados (automovimiento y SFA) y una
 comparación con un entrenamiento desde cero utilizando esa misma
@@ -2182,11 +2182,10 @@ verse en el Cuadro \ref{tab:two}
 & \multicolumn{1}{c}{L5} \\ \cline{1-14}
 \hline
 
-
-ALEX-1000 & 1M        &       5 & 8 & 10 & 10 & 16 & 10 & 20 & 6 & 6 & 14 & 14 & 6 \\
-ALEX-20   & 20K       &       5 & 8 &  2 &  6 &  6 &  2 & 20 & 8 & 4 &  4 &  8 & 9 \\
-KITTI-SFA & 20.7K     &       5 & 4 &  4 &  2 &  4 &  4 & 20 & 4 & 0 &  0 &  2 & 2 \\
-KITTI-EGO & 20.7K     &       5 & 4 &  2 &  6 & 12 &  2 & 20 & 4 & 4 &  8 & 12 & 4 \\
+ALEX-1000 & 1M & 5 & 3.73 & 5.07 & 5.07 & 8.53 & 10.40 & 20 & 9.07 & 12.53 & 16.27 & 17.60 & 10.67\\
+ALEX-20 & 20K & 5 & 2.93 & 1.87 & 3.73 & 5.07 & 3.20 & 20 & 6.13 & 5.33 & 5.33 & 4.53 & 5.07\\
+KITTI-SFA & 20.7K & 5 & 2.13 & 3.20 & 2.40 & 1.60 & 1.87 & 20 & 4.53 & 3.73 & 2.13 & 2.40 & 2.93\\
+KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.87 & 9.33 & 4.00\\
 
 \hline
 \end{tabular}%
