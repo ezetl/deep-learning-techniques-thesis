@@ -115,6 +115,7 @@ if __name__ == "__main__":
         # Finetune network
         imagenet_finetune, loss_blobs_f, acc_blobs_f = KITTINetFactory.standar(
                 lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Training_{}perclass_lmdb'.format(num)),
+                mean_file='./datasets/data/mean_ilsvrc12.binaryproto',
                 batch_size=batch_size,
                 scale=scale,
                 num_classes=1000,
@@ -126,6 +127,7 @@ if __name__ == "__main__":
         # Test Net Used to test accuracy in finetunig stages
         imagenet_test, loss_blobs_test, acc_blobs_test = KITTINetFactory.standar(
                 lmdb_path=join(opts.lmdb_root, 'ILSVRC12/ILSVRC12_Testing_{}perclass_lmdb'.format(num)),
+                mean_file='./datasets/data/mean_ilsvrc12.binaryproto',
                 batch_size=batch_size,
                 scale=scale,
                 num_classes=1000,
@@ -146,7 +148,8 @@ if __name__ == "__main__":
 
         ## CONTRASTIVE m=10
         snapshot_prefix = join(snapshots_path, 'imagenet/contrastive10_finetuning/kitti_lmdb{}_outputL5'.format(num))
-        results_contrastive10 = train_net(create_solver_params(imagenet_finetune, test_netspec=imagenet_test, max_iter=iters, test_interv=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
+        results_contrastive10 = train_net(create_solver_params(imagenet_finetune, test_netspec=imagenet_test, max_iter=iters, test_interv=iters,
+                                                               base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                           loss_blobs=loss_blobs_f, 
                                           acc_blobs=acc_blobs_test,
                                           pretrained_weights=results_contr10['best_snap'],
@@ -155,7 +158,8 @@ if __name__ == "__main__":
 
         ##Imagenet
         snapshot_prefix = join(snapshots_path, 'imagenet/imagenet20_finetuning/kitti_lmdb{}_outputL5'.format(num))
-        results_imagenet = train_net(create_solver_params(imagenet_finetune, test_netspec=imagenet_test, max_iter=iters, base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
+        results_imagenet = train_net(create_solver_params(imagenet_finetune, test_netspec=imagenet_test, max_iter=iters,
+                                                          base_lr=base_lr, snapshot=iters, snapshot_prefix=snapshot_prefix),
                                            loss_blobs=loss_blobs_f,
                                            acc_blobs=acc_blobs_test,
                                            pickle_name=join(results_path, 'imagenet_finetuning_layer5_lmdb{}perclass.pickle'.format(num)))
