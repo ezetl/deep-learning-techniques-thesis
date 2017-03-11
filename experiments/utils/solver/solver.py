@@ -1,5 +1,6 @@
 from os import makedirs
 from os.path import join, exists, dirname
+from collections import defaultdict
 import pickle
 from sys import exit
 import tempfile
@@ -113,7 +114,8 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
         print("Path for snapshots does not exist. Creating dir {}".format(dirname(solver_param.snapshot_prefix)))
         makedirs(dirname(solver_param.snapshot_prefix))
 
-    with tempfile.NamedTemporaryFile(delete=False) as f:
+    #with tempfile.NamedTemporaryFile(delete=False) as f:
+    with open('/home/eze/Projects/tesis/experiments/solver.prototxt', 'w') as f:
         f.write(str(solver_param))
         solver_param_fname = f.name
 
@@ -134,6 +136,7 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
 
     if acc_blobs is not None:
         results['acc'] = {} 
+        results['best_acc'] = defaultdict(np.float32) 
     else:
         acc_blobs = []
 
@@ -156,7 +159,6 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
                     print("The .solverstate for iteration {} could not be found. Training again.".format(init_iter))
     
     min_loss = MIN_LOSS
-    min_loss_step = 0
     try:
         for it in range(init_iter, solver_param.max_iter+1):
             solver.step(1)
@@ -165,19 +167,22 @@ def train_net(solver_param, loss_blobs=None, acc_blobs=None, pretrained_weights=
             for name in loss_blobs:
                 partial_loss = solver.net.blobs[name].data.item()
                 results['loss'][name] = np.append(results['loss'].get(name, np.array([])), partial_loss)
+                # if we have several losses (like translations, rotations, etc) we must aggregate them
                 total_loss += partial_loss
 
-            # Retrieve accuracy of tests every 'test_interval' iterations                            
+            # Retrieve accuracy of tests every 'test_interval' iterations
             if solver_param.test_interval and it!=0 and it % solver_param.test_interval == 0:
-                for name in acc_blobs:     
-                    results['acc'][name] = np.append(results['acc'].get(name, np.array([])), solver.test_nets[0].blobs[name].data.item())
+                for name in acc_blobs:
+                    acc = solver.test_nets[0].blobs[name].data.item()
+                    results['acc'][name] = np.append(results['acc'].get(name, np.array([])), acc)
+                    if results['best_acc'][name] <= acc:
+                        results['best_acc'][name] = acc
 
             # Save snapshots names
             if it!=0 and it % solver_param.snapshot == 0:
                 snapshot_name = str(solver_param.snapshot_prefix + '_iter_{}.caffemodel'.format(it))
                 if min_loss > total_loss:
                     min_loss = total_loss
-                    min_loss_step = it
                     results['best_snap'] = snapshot_name
                 print("Best snapshot so far: Iteration {}, {}".format(it, results['best_snap']))    
                 results['snaps'].append(snapshot_name) 

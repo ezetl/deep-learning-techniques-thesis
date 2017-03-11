@@ -383,7 +383,7 @@ class KITTINetFactory:
             else:
                 fc8input = n.relu7
 
-            n.fc8_imgnet = L.InnerProduct(fc8input_imgnet, num_output=num_classes, param=[weight_param('fc8_w', learn_all=True), bias_param('fc8_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
+            n.fc8_imgnet = L.InnerProduct(fc8input, num_output=num_classes, param=[weight_param('fc8_w', learn_all=True), bias_param('fc8_b', learn_all=True)], weight_filler=weight_filler_fc, bias_filler=bias_filler_1)
 
             if is_train:
                 n.loss = L.SoftmaxWithLoss(n.fc8_imgnet, n.label)
