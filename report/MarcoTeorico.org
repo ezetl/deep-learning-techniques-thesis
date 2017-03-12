@@ -1991,17 +1991,17 @@ originalmente fueron creados en C++.
 ** Prueba de concepto con MNIST
 *** Conjunto de datos
 
-El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de caracteres
-numéricos manuscritos para entrenamiento, más 10000 imágenes para
-evaluación. La dimensión de cada imagen es \(1 \times 28 \times 28\).
-Para el entrenamiento mediante
-\textit{automovimiento} se crearon pares de imágenes siguiendo los
-lineamientos del paper. Esto significa que cada par está compuesto de la imagen
+El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de
+caracteres numéricos manuscritos para entrenamiento, más 10000
+imágenes para evaluación. La dimensión de cada imagen es \(1 \times 28
+\times 28\).  Para el entrenamiento mediante \textit{automovimiento}
+se crearon pares de imágenes siguiendo los lineamientos del
+paper. Esto significa que cada par está compuesto de la imagen
 original y la imagen con transformaciones en los ejes X, Y, Z. Las
-transformaciones en X e Y son traslaciones de 3 píxeles, mientras
-que la rotación en Z varía entre los -30° y los 30°. Tanto las
-rotaciones como las traslaciones son números enteros. Para cada par
-creado las transformaciones se eligen de manera aleatoria uniforme.
+transformaciones en X e Y son traslaciones de 3 píxeles, mientras que
+la rotación en Z varía entre los -30° y los 30°. Tanto las rotaciones
+como las traslaciones son números enteros. Para cada par creado las
+transformaciones se eligen de manera aleatoria uniforme.
 
 En la Figura XX se pueden observar varios pares de imágenes generadas durante la creación de 
 la base de datos que luego fue usada para entrenar la red siamesa.
@@ -2124,13 +2124,15 @@ http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
 *** Descripción de la red
 
-La red utilizada como base de las BCNN está inspirada en las primeras 5 capas convolucionales de AlexNet /cite{alexnet}, es 
-decir, C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
+La red utilizada como base de las BCNN está inspirada en las primeras
+5 capas convolucionales de AlexNet /cite{alexnet}, es decir,
+C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como
+C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
 
 *** Entrenamiento y evaluación
 
 Se pre-entrenaron las redes siamesas por 60K iteraciones con un tamaño
-de \textit{mini batch} de 250 y una tasa de aprendizaje inicial de
+de \textit{mini batch} de 125 y una tasa de aprendizaje inicial de
 \(0.001\), reducida en un factor de 2 cada 20K iteraciones. La
 transferencia de aprendizaje se hizo durante 10K iteraciones a una
 tasa de aprendizaje constante de 0.001. Para diferenciar los distintos
@@ -2152,8 +2154,8 @@ imágenes.
 El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías
 de paisajes interiores y exteriores y además provee 10 particiones del
 dataset para hacer \textit{cross-validation}, pero debido a lo costoso
-que es entrenar redes neuronales convolucionales solo se utilizó una
-partición.
+que es entrenar redes neuronales convolucionales solo se utilizaron
+tres particiones.
 
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
@@ -2194,6 +2196,16 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \end{table*}
 #+END_LaTeX
 
+|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
+| Método    | #preentr. | #finet. |   L1 |   L2 |   L3 |   L4 |    L5 | #finet. |   L1 |    L2 |    L3 |    L4 |    L5 |
+|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
+| ALEX-1000 | 1M        |       5 | 3.73 | 5.07 | 5.07 | 8.53 | 10.40 |      20 | 9.07 | 12.53 | 16.27 | 17.60 | 10.67 |
+| ALEX-20   | 20K       |       5 | 2.93 | 1.87 | 3.73 | 5.07 |  3.20 |      20 | 6.13 |  5.33 |  5.33 |  4.53 |  5.07 |
+| KITTI-SFA | 20.7K     |       5 | 2.13 | 3.20 | 2.40 | 1.60 |  1.87 |      20 | 4.53 |  3.73 |  2.13 |  2.40 |  2.93 |
+| KITTI-EGO | 20.7K     |       5 | 2.93 | 1.87 | 3.20 | 5.87 |  1.33 |      20 | 6.67 |  7.47 |  9.87 |  9.33 |  4.00 |
+|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
+
+
 Se puede observar que el pre-entrenamiento con automoviento no supera
 la performance que se obtiene al pre-entrenar la misma red con
 ILSVRC'12 con 1000 imagenes por clase. Sin embargo, sí supera la
@@ -2205,6 +2217,24 @@ entrenar un modelo que logre resultados similares al estado del arte
 si utilizamos redes siamesas entrenadas con automovimiento.
 
 **** Evaluacion utilizando el conjunto de imagenes Imagenet ILSVRC 2012
+
+Para evaluar que los filtros aprendidos mediante automovimiento son
+buenos para tareas de clasificación, se procedió a realizar
+transferencia de aprendizaje en todas las capaz convolucionales (es
+decir, reentrenar toda la red utilizando un nuevo conjunto de datos).
+
+Se evaluó la exactitud de una red preentrenada con automovimiento
+contra una entrenada con \textit{SFA} y una con pesos inicializados
+aleatoriamente. Para ello se utilizó el conjunto de datos ILSVRC 2012
+utilizado en la competencia de Imagenet. Dicho conjunto de datos
+cuenta con 1000 clases de objetos. Para el entrenamiento de las redes
+se utilizaron subconjuntons de todas las clases con 1, 5, 10, 20 y
+1000 elementos por cada una.  Los resultados se muestran en el Cuadro
+\ref{tab:three}. Se puede observar que los pesos de una red
+pre-entrenada con automovimiento (KITTI-EGO) supera en todos los casos
+a los pesos inicializados aleatoriamente (ALEXNET), mientras que los
+pesos aprendidos mediante \textit{SFA} (KITTI-SFA) presentan un
+rendimiento incluso peor que el de ALEXNET.
 
 #+BEGIN_LaTeX
 \begin{table*}[htb]
