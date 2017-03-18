@@ -2003,8 +2003,27 @@ la rotación en Z varía entre los -30° y los 30°. Tanto las rotaciones
 como las traslaciones son números enteros. Para cada par creado las
 transformaciones se eligen de manera aleatoria uniforme.
 
-En la Figura XX se pueden observar varios pares de imágenes generadas durante la creación de 
-la base de datos que luego fue usada para entrenar la red siamesa.
+En la Figura \ref{fig:mnist-sample} se pueden observar varios pares de
+imágenes generadas durante la creación de la base de datos que luego
+fue usada para entrenar la red siamesa.
+
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccccc}
+\includegraphics[width = 1.5in]{./images/mnist/a1.png} &
+\includegraphics[width = 1.5in]{./images/mnist/a.png} &
+\includegraphics[width = 1.5in]{./images/mnist/b1.png} &
+\includegraphics[width = 1.5in]{./images/mnist/b.png} &
+\includegraphics[width = 1.5in]{./images/mnist/c.png} &
+\includegraphics[width = 1.5in]{./images/mnist/c1.png}\\
+\end{tabular}
+}
+\caption{Ejemplo de transformaciones aplicadas a las imagenes de MNIST. Cada par contiene la imagen original y la transformada con traslaciones en los ejes X e Y, y con rotación en Z.}
+\label{fig:mnist-sample}
+\end{figure}
+#+END_LaTeX
 
 *** Descripción de la red
 
@@ -2109,6 +2128,28 @@ originales de \(1241 \times 376\) píxeles. No se aplicaron
 transformaciones extras más allá de las otorgadas por el movimiento de
 la cámara.
 
+En la Figura \ref{fig:kitti-sample} se pueden observar pares de
+imágenes utilizados durante el entrenamiento de las redes siamesas.
+
+
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccccc}
+\includegraphics[width = 1.5in]{./images/kitti/a.png} &
+\includegraphics[width = 1.5in]{./images/kitti/a1.png} &
+\includegraphics[width = 1.5in]{./images/kitti/b.png} &
+\includegraphics[width = 1.5in]{./images/kitti/b1.png} &
+\includegraphics[width = 1.5in]{./images/kitti/c.png} &
+\includegraphics[width = 1.5in]{./images/kitti/c1.png}\\
+\end{tabular}
+}
+\caption{Ejemplo de imágenes extraídos de KITTI. Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos. Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.}
+\label{fig:kitti-sample}
+\end{figure}
+#+END_LaTeX
+
 *** Odometria 
 
 KITTI provee anotaciones con las poses de la camara (es decir, su
@@ -2155,7 +2196,32 @@ El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías
 de paisajes interiores y exteriores y además provee 10 particiones del
 dataset para hacer \textit{cross-validation}, pero debido a lo costoso
 que es entrenar redes neuronales convolucionales solo se utilizaron
-tres particiones.
+tres particiones. En la Figura \ref{fig:sun-sample} se pueden observar
+algunas de las clases que provee este conjunto de datos.
+
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccc}
+\includegraphics[width = 1.5in]{./images/sun397/mountain_snowy.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/oilrig.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/nuclear_power_plant.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/rock_arch.jpg} \\
+\includegraphics[width = 1.5in]{./images/sun397/subway_station.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/kennel.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/pilothouse.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/abbey.jpg} \\
+\includegraphics[width = 1.5in]{./images/sun397/vegetable_garden.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/music_studio.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/waterfall.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/building.jpg}\\
+\end{tabular}
+}
+\caption{Ejemplo de clases del conjunto de datos SUN-397: paisajes exteriores, interiores, construcciones, etc.}
+\label{fig:sun-sample}
+\end{figure}
+#+END_LaTeX
 
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
@@ -2196,16 +2262,6 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \end{table*}
 #+END_LaTeX
 
-|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
-| Método    | #preentr. | #finet. |   L1 |   L2 |   L3 |   L4 |    L5 | #finet. |   L1 |    L2 |    L3 |    L4 |    L5 |
-|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
-| ALEX-1000 | 1M        |       5 | 3.73 | 5.07 | 5.07 | 8.53 | 10.40 |      20 | 9.07 | 12.53 | 16.27 | 17.60 | 10.67 |
-| ALEX-20   | 20K       |       5 | 2.93 | 1.87 | 3.73 | 5.07 |  3.20 |      20 | 6.13 |  5.33 |  5.33 |  4.53 |  5.07 |
-| KITTI-SFA | 20.7K     |       5 | 2.13 | 3.20 | 2.40 | 1.60 |  1.87 |      20 | 4.53 |  3.73 |  2.13 |  2.40 |  2.93 |
-| KITTI-EGO | 20.7K     |       5 | 2.93 | 1.87 | 3.20 | 5.87 |  1.33 |      20 | 6.67 |  7.47 |  9.87 |  9.33 |  4.00 |
-|-----------+-----------+---------+------+------+------+------+-------+---------+------+-------+-------+-------+-------|
-
-
 Se puede observar que el pre-entrenamiento con automoviento no supera
 la performance que se obtiene al pre-entrenar la misma red con
 ILSVRC'12 con 1000 imagenes por clase. Sin embargo, sí supera la
@@ -2227,14 +2283,40 @@ Se evaluó la exactitud de una red preentrenada con automovimiento
 contra una entrenada con \textit{SFA} y una con pesos inicializados
 aleatoriamente. Para ello se utilizó el conjunto de datos ILSVRC 2012
 utilizado en la competencia de Imagenet. Dicho conjunto de datos
-cuenta con 1000 clases de objetos. Para el entrenamiento de las redes
-se utilizaron subconjuntons de todas las clases con 1, 5, 10, 20 y
-1000 elementos por cada una.  Los resultados se muestran en el Cuadro
-\ref{tab:three}. Se puede observar que los pesos de una red
-pre-entrenada con automovimiento (KITTI-EGO) supera en todos los casos
-a los pesos inicializados aleatoriamente (ALEXNET), mientras que los
-pesos aprendidos mediante \textit{SFA} (KITTI-SFA) presentan un
-rendimiento incluso peor que el de ALEXNET.
+cuenta con 1000 clases de objetos. Ejemplos de clases en este conjunto
+de datos se pueden ver en la Figura \ref{fig:imagenet-sample}. 
+
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccc}
+\includegraphics[width = 1.5in]{./images/imagenet/n01531178_108.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01675722_126.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01753488_177.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01773797_48.JPEG} \\
+\includegraphics[width = 1.5in]{./images/imagenet/n02859443_1229.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03000134_789.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03017168_743.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03085013_2149.JPEG} \\
+\includegraphics[width = 1.5in]{./images/imagenet/n03089624_632.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03207941_946.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03218198_298.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n04154565_5799.JPEG} \\
+\end{tabular}
+}
+\caption{Ejemplo de clases del conjunto de datos ILSVRC'12.}
+\label{fig:imagenet-sample}
+\end{figure}
+#+END_LaTeX
+
+Para el entrenamiento de las redes se utilizaron subconjuntons de
+todas las clases con 1, 5, 10, 20 y 1000 elementos por cada una.  Los
+resultados se muestran en el Cuadro \ref{tab:three}. Se puede observar
+que los pesos de una red pre-entrenada con automovimiento (KITTI-EGO)
+supera en todos los casos a los pesos inicializados aleatoriamente
+(ALEXNET), mientras que los pesos aprendidos mediante \textit{SFA}
+(KITTI-SFA) presentan un rendimiento incluso peor que el de ALEXNET.
 
 #+BEGIN_LaTeX
 \begin{table*}[htb]
@@ -2262,6 +2344,48 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
+
+Si bien actualmente se suele recurrir a la transferencia de
+aprendizaje de redes del estado del arte pre-entrenadas por otras
+personas (por ejemplo, por grandes empresas como Google, Facebook, o
+algunas universidades), puede haber casos en los que se requiera
+entrenar los pesos de una red desde cero. Y como ya se dijo, los
+conjuntos de datos para tareas específicas suelen ser muy reducidos
+como para obtener buenos resultados con redes convolucionales
+profundas.
+
+En este trabajo se propuso reproducir algunos de los resultados de
+Agrawal et al. \cite{LSM2015}.  Se logró demostrar la hipótesis
+principal de ese trabajo en cada uno de los experimentos: que
+utilizando información de \textit{automovimiento} libremente
+disponible se puede entrenar una red neuronal convolucional profunda y
+obtener resultados similares a los del estado del arte. Los
+experimentos propuestos aquí son todas tareas de clasificación, aunque
+bien podría extenderse este trabajo a otros problemas.
+
+Se demostró que utilizando unos 20 mil pares de imágenes durante el
+pre-entrenamiento de una red (mediante redes siamesas) los resultados
+son equiparables a los que se obtendrían entrenando normalmente
+utilizando clasificación, lo cual hace al entrenamiento con
+\textit{automovimiento} un candidato ideal para para los tipos de
+tareas mencionados.
+
+* Trabajo a futuro
+#+LaTeX: \label{sec:future}
+
+Hay que destacar que todas las pruebas se hicieron con arquitecturas
+basadas en AlexNet, que ya resulta anticuada en lo que se refiere al
+estado del arte, donde las redes se han vuelto más profundas y
+complejas. Sin embargo puede haber casos en los que se busque una red
+menos profunda por cuestiones de rendimiento en velocidad,
+característica de los datos, etc. Queda como trabajo a futuro probar
+nuevas arquitecturas con la metodología propuesta.
+
+Además sólo se probó la técnica propuesta en Agrawal et
+al. \cite{LSM2015} con pocos conjuntos de datos por cuestión de tiempo
+(ILSVRC'12, SUN-397, MNIST, KITTI). Probar esta técnica en otros
+dominios de problemas queda como trabajo a futuro.
+
 
 #+LaTeX: \bibliographystyle{babplain}
 #+LaTeX: \bibliography{MarcoTeorico}
