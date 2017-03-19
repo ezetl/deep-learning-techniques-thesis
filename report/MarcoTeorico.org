@@ -120,9 +120,9 @@ colores y pequeños detalles (\textit{variación intraclase}).
 Diferentes métodos se han utilizado a lo largo de la historia para
 taclear este problema: \textit{máquinas de vectores de soporte},
 árboles de decisión, \textit{bolsas de palabras}, etc. En la mayoría
-de los casos las \features y descriptores que se extraían de las
+de los casos las \features{} y descriptores que se extraían de las
 imágenes debían ser implementadas manualmente (por ejemplo:
-histogramas de colores o descriptores \sift \cite{Lowe-SIFT}).
+histogramas de colores o descriptores \sift{} \cite{Lowe-SIFT}).
 
 En los últimos años toda la parafernalia relativa a la clasificación
 de imágenes fue ampliamente superada por las Redes Neuronales
@@ -149,8 +149,8 @@ de las decenas de miles hasta millones de imágenes. Generalmente se
 requiere un gran esfuerzo humano para etiquetar tantas imágenes.
 
 Actualmente contamos con una increíble cantidad de imágenes para
-etiquetar. Para 2016, Cisco estima que el 51\% del trafico de Internet
-va a provenir de dispositivos WiFi, tales como celulares,
+etiquetar. Para 2016, Cisco estimaba que el 51\% del trafico de Internet
+iba a provenir de dispositivos WiFi, tales como celulares,
 \textit{tablets}, \textit{smart TV's}, etc.  Más aún, se estima que
 para el 2019 el 80\% del tráfico IP va a ser en forma de píxeles
 (multimedia), superando al 67\% que existente en 2014
@@ -172,8 +172,8 @@ transferencia de aprendizaje sobre un conjunto de datos anotados que
 se desee, obteniendo la ventaja de no necesitar un conjunto tan grande
 para lograr buena precisión.
 
-En este trabajo final nos proponemos reproducir este paper, analizando
-cada paso para luego proponer mejoras y aplicaciones al mundo real.
+Este trabajo final tiene como objetivo reproducir las metodologías de 
+este paper.
 
 El trabajo está organizado como sigue: en la Sección \ref{sec:marco}
 se introducirán conceptos del aprendizaje automático y las redes
@@ -181,8 +181,10 @@ neuronales artificiales para concluir con redes convolucionales, en la
 Sección \ref{sec:siamesa} se presentará un método para entrenar
 modelos de aprendizaje profundo mediante redes siamesas, que luego se
 utilizará para reproducir los resultados de \cite{LSM2015} en la
-Sección \ref{sec:odometry}. Finalmente, la Sección \ref{sec:concl}
-presenta pensamientos finales y trabajo a futuro.
+Sección \ref{sec:agrawal}. Finalmente, las secciones \ref{sec:concl} y 
+\ref{sec:future} presentan una discusión final y trabajo a futuro.
+
+#+LaTeX: \newpage
 
 * Marco Teórico
 #+LaTeX: \label{sec:marco}
@@ -221,7 +223,8 @@ hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
 una lista de casas con sus respectivos precios, su área en metros
 cúbicos y cantidad de habitaciones y quisieramos encontrar alguna
 relación entre ellas. Los algoritmos no supervisados trabajan
-netamente sobre los datos \textit{tal como están}.
+netamente sobre los datos \textit{tal como están} (lo que no significa que
+     los datos no necesiten preprocesamiento).
 
 **** Aprendizaje pasivo vs. activo
 
@@ -229,7 +232,7 @@ El aprendizaje pasivo implica utilizar solamente los datos ya
 existentes. El aprendizaje activo se refiere a interactuar con el
 ambiente para obtener información, como por ejemplo preguntar a un
 usuario si un rostro es de cierta persona y utilizar los datos
-proporcionados durante su etrenamiento.
+proporcionados durante su entrenamiento.
 
 **** Aprendizaje \textit{online} vs. estadistico (\textit{batch learning})
 
@@ -354,7 +357,7 @@ plt.savefig('images/linear-classifier.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:cl
-#+caption: Clasificador lineal. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
+#+caption: \fontsize{9}{11}\selectfont Clasificador lineal. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
 Mas adelante veremos como definir \weights{} y \bias{} para obtener un
@@ -382,7 +385,7 @@ clasificador de la siguiente manera:
 
 \begin{enumerate}
 
-\item Primero se mide el error actual del model con el conjunto (o un
+\item Primero se mide el error actual del modelo con el conjunto (o un
       subconjunto) de datos de entrenamiento
 
 \item Luego se actualizan los parámetros del clasificador (\weights{} y
@@ -395,7 +398,7 @@ clasificador de la siguiente manera:
 Por lo tanto hay dos aspectos a tener en cuenta antes de
 entrenar un modelo: cómo medir efectivamente la tasa de error y cómo
 actualizar sus parámetros para minimizarla. Para el primer caso se
-define lo que se llama una \textit{función de pérdida}, mientras que
+define lo que se llama una \textit{función de pérdida o costo}, mientras que
 para el segundo analizaremos una técnica muy utilizada en aprendizaje
 automático denominada \textit{descenso de gradiente}. Esto no
 significa que sea la única alternativa para entrenar modelos, pero al
@@ -425,7 +428,7 @@ hablar de los parámetros de nuestro modelo.
 
 Un ejemplo de función de perdida popular es la función de pérdida de
 \textit{máquinas de vectores de soporte multiclase}. Sea \(f(x_i;
-\theta)_j\) el puntaje asignado por el clasificador \(f\) a la clase
+\theta)_j\) el puntaje (\textit{score}) asignado por el clasificador \(f\) a la clase
 \(j\) con \(x_i\) como dato de entrada y parámetros \(\theta\) y sea
 \(f(x_i, \theta)_{y_i}\) el puntaje asignado por \(f\) a la clase
 verdadera de \(x_i\), o sea \(y_i\), entonces la pérdida para \(x_i\)
@@ -448,7 +451,7 @@ la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
 puede observar, esta función depende de nuestro \weights{} y las
-imágenes (o \features{} que estemos usando). Nosotros no tenemos
+imágenes (o \features{} de entrenamiento que estemos usando). Nosotros no tenemos
 control sobre nuestro conjunto de datos de entrenamiento, pero sí
 podemos modificar los parámetros de \weights{} para producir la menor
 pérdida posible.
@@ -526,16 +529,16 @@ plt.savefig('images/gradient-descent.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:gd
-#+caption: Descenso de gradiente. Sea \(w\) un parámetro de \(\theta\), el gráfico ilustra cómo nuestra función de clasificación \(f\) alcaza un mínimo en \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro. Puesto de otra manera, podemos imaginar a \(w\) como una pelota que se suelta desde la cima de una montaña y desciende por la fuerza de la gravedad hasta el valle (instancia \(w_3\)). Una vez que la pelota alcanza el punto más bajo, se detendrá.
+#+caption: \fontsize{9}{11}\selectfont Descenso de gradiente. Sea \(w\) un parámetro de \(\theta\), el gráfico ilustra cómo nuestra función de clasificación \(f\) alcaza un mínimo en \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro. Puesto de otra manera, podemos imaginar a \(w\) como una pelota que se suelta desde la cima de una montaña y desciende por la fuerza de la gravedad hasta el valle (instancia \(w_3\)). Una vez que la pelota alcanza el punto más bajo, se detendrá.
 [[file:images/gradient-descent.pdf]]
 
 Existen variantes mas sofisticadas del descenso de gradiente
 (\textit{Momentum}, \textit{Nesterov Momentum}, \textit{Adagrad},
 \textit{Rmsprop} entre otros). Lo más comun es utilizar alguna de
-ellas con una técnica llamada \textit{descenso de gradiente
-estocástico}, que se basa en calcular el gradiente de un subconjunto
-del total de datos (\textit{batch}) y actualizar \weights{} al final
-de cada \textit{batch}. Esto es muy útil dado que es
+ellas con una técnica llamada \textit{descenso de gradiente estocástico}, 
+que se basa en calcular el gradiente de un subconjunto
+del total de datos (llamado \textit{mini-batch}) y actualizar \weights{} al final
+de cada \textit{mini-batch}. Esto es muy útil dado que es
 computacionalmente costoso calcular el gradiente de todo un conjunto
 de datos con miles de imágenes a la vez y calcular el gradiente de un
 \textit{batch} aproxima bastante bien el gradiente del total.
@@ -562,7 +565,7 @@ devuelve probabilidades normalizadas para cada clase.
 
 Un clasificador Softmax no modifica la funcion \(f\) que ya
 conocemos, pero sí interpreta los puntajes como probabilidades
-logarítmicas sin normalizar, reemplazando la pérdida bisagra por una
+logarítmicas sin normalizar, reemplazando la función de cost que ya conocemos por una
 \textit{entropía cruzada}:
 
 \begin{equation}
@@ -623,8 +626,8 @@ años.
 Inicialmente se intentó simular el comportamiento de las conexiones
 sinápticas mediante la función de activación Sigmoide (\(\sigma\)),
 por tener la propiedad de transformar la entrada a un rango entre 0 y
-1, y tener además una derivada fácil de calcular (útil para
-\textit{backpropagation}).  Luego se propuso la Tangente Hiperbólica
+1, y tener además una derivada fácil de calcular (muy útil para
+\back{} que explicaremos más adelante).  Luego se propuso la Tangente Hiperbólica
 (\(\tanh\)), pero ambas fueron desplazadas en favor de las unidades
 \textit{ReLU}, o \textit{Rectifier Linear Unit} en inglés, que son más
 fáciles de calcular y no sufren del problema de saturación de
@@ -653,7 +656,7 @@ sigmoide y tanh \cite{NIPS2012_4824}.
 Una desventaja de las \textit{ReLU} es que pueden provocar la ``muerte''
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
 través de una \textit{ReLU} durante el proceso de
-\textit{backpropagation} entonces va a actualizar los pesos de esa
+\back{} entonces va a actualizar los pesos de esa
 neurona de tal manera que no se vuelva a activar. Pensemos que el
 proceso de actualización de \weights{} implica restar un porcentaje
 del gradiente en \weights{}. Si el gradiente es muy grande entonces
@@ -666,7 +669,7 @@ aprendizaje es muy grande.
 Una vez que la ReLU alcanza este estado, es improbable que vuelva a
 activarse, dado que su gradiente en \(0\) es también \(0\), por lo que
 un entrenamiendo mediante descenso de gradiente y
-\textit{backpropagation} no va a modificar los pesos locales, dejando
+\back{} no va a modificar los pesos locales, dejando
 a esa neurona ``muerta''.
 
 **** \textit{Leaky ReLU}
@@ -682,11 +685,11 @@ f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
 \end{equation}
 
 De esta manera nos aseguramos que al menos un pequeño gradiente fluya
-durante \textit{backpropagation} cuando la neurona emite resultados
+durante \back{} cuando la neurona emite resultados
 negativos, permitiendo que se normalicen los pesos a mediano/largo
-plazo. Sin embargo no está demostrado del todo que las \textit{Leaky
-ReLU} presenten una mejora sustancial en el entrenamiento de las
-redes, por lo que las \{ReLU} convencionales siguen siendo ampliamente
+plazo. Sin embargo no está demostrado del todo que las \textit{Leaky ReLU}
+presenten una mejora sustancial en el entrenamiento de las
+redes, por lo que las \textit{ReLU} convencionales siguen siendo ampliamente
 usadas.
 
 **** \textit{Maxout}
@@ -784,7 +787,7 @@ plt.savefig('images/relu2.pdf')
         \caption{\textit{Leaky ReLU}}
         \label{fig:relu2}
     \end{subfigure}
-    \caption{\textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
+    \caption{\fontsize{9}{11}\selectfont \textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
 \end{figure}
 #+END_LaTeX
 
@@ -821,7 +824,7 @@ plt.savefig('images/neuron.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:neuron
-#+caption: Esquema \textit{näive} de una neurona biológica.
+#+caption: \fontsize{9}{11}\selectfont Esquema \textit{näive} de una neurona biológica.
 [[file:images/neuron.pdf]]
 
 El cuerpo de la neurona esta compuesto de tres partes principales, el
@@ -890,10 +893,10 @@ plt.savefig('images/artificial-neuron.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:art-neuron
-#+caption: Esquema de una neurona artificial. Las entradas (\(x\)) interactuan multiplicativamente con los pesos sinapticos (\(w\)) y se adicionan junto con un vector de sesgo (\(b\)). El resultado pasa por una funcion de activacion (\(f\)) que decide si la señal debe propagarse o no.
+#+caption: \fontsize{9}{11}\selectfont Esquema de una neurona artificial. Las entradas (\(x\)) interactuan multiplicativamente con los pesos sinapticos (\(w\)) y se adicionan junto con un vector de sesgo (\(b\)). El resultado pasa por una funcion de activacion (\(f\)) que decide si la señal debe propagarse o no.
 [[file:images/artificial-neuron.pdf]]
 
-En la Figura \ref{fig:art-neuron} vemos un model formal de una neurona
+En la Figura \ref{fig:art-neuron} vemos un modelo formal de una neurona
 estandar, en el que las entradas \(x_i\) interactúan
 multiplicativamente con los pesos \(w_i\). En nuestra analogía con la
 neurona biológica, esas son las sinapsis. Luego, el el cuerpo de la
@@ -936,7 +939,7 @@ neuronales son la substracción de la media y la normalización.
 Como su nombre lo indica, se le resta la media a cada elemento del
 conjunto de datos con el objetivo de \textit{centrar} los datos
 alrededor del origen en todas las dimensiones (Figura
-\ref{fig:mean2}). En las redes convolucionales esto equivale a
+\ref{fig:mean2}). Si hablamos de un conjunto de datos de imágenes esto equivale a
 restarle el valor medio de los píxeles a cada píxel de la imagen de
 entrada.
 
@@ -1007,7 +1010,7 @@ plot_norm(x3, y3, 'firebrick', '3')
         \caption{Normalizacion}
         \label{fig:mean3}
     \end{subfigure}
-    \caption{Se puede observar en \ref{fig:mean2} cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
+    \caption{\fontsize{9}{11}\selectfont Se puede observar en \ref{fig:mean2} cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
 \end{figure}
 #+END_LaTeX
 
@@ -1035,7 +1038,7 @@ vamos a lograr que la red aprenda mejor que \textit{features} extraer
 de las imágenes.
 
 Además no siempre se puede contar con un dataset de millones de
-imágenes para entrenar nuestra red, por lo que hay que aumentar
+imágenes para entrenar nuestra red, por lo que suele ser necesario aumentar
 nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
@@ -1066,7 +1069,7 @@ saturación, incluso hacer leves desplazamientos y rotaciones.
         \caption{Traslaciones}
         \label{fig:faug2}
     \end{subfigure}
-    \caption{Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
+    \caption{\fontsize{9}{11}\selectfont Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
 \end{figure}
 #+END_LaTeX
 
@@ -1233,7 +1236,7 @@ explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, widt
         \caption{\textit{Overfitting}}
         \label{fig:over3}
     \end{subfigure}
-    \caption{Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1}) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1}) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
 \end{figure}
 #+END_LaTeX
 
@@ -1243,8 +1246,7 @@ regularización \(R(W)\). Lo que buscamos con esto es poner
 preferencias para algunos conjuntos de \weights{} sobre otros.
 
 De esta manera, nuestra función de pérdida ahora cuenta con dos
-componentes: \textit{pérdida de los datos} y \textit{componente de
-regularización}:
+componentes: \textit{pérdida de los datos} y \textit{componente de regularización}:
 
 \begin{equation}
      \boldsymbol{ L =\frac{1}{N} \sum_{i} L_i + \lambda R(W)}
@@ -1359,8 +1361,8 @@ manera los cálculos se hacen con operaciones entre matrices, algo que
 no podríamos hacer tan fácil si tuvieramos neuronas conectadas
 aleatoriamente entre ellas.
 
-El tipo más común de capa de neuronas es la capa \textit{totalmente
-conectada} (de ahora en más FC, abreviación de su nombre en inglés
+El tipo más común de capa de neuronas es la capa \textit{totalmente conectada} 
+(de ahora en más FC, abreviación de su nombre en inglés
 \textit{Fully Connected}), en donde cada neurona de la capa anterior
 se conecta con todas las neuronas de la capa siguiente, pero no
 comparten conexiones dentro de la misma capa.
@@ -1376,7 +1378,7 @@ denominadas \textit{capas ocultas} (Figura \ref{fig:nnet}).
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/neural-net.pdf}
-    \caption{Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.}\label{fig:nnet}
+    \caption{\fontsize{9}{11}\selectfont Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.}\label{fig:nnet}
 \end{figure}
 #+END_LaTeX
 
@@ -1390,7 +1392,7 @@ poder actualizar sus parámetros. Ahora bien, derivar una función con
 millones de parámetros (cantidad que suelen tener las redes neuronales
 artificiales) es computacionalmente costoso, por lo que para
 actualizar \weights{} con los nuevos pesos se utiliza un algoritmo
-llamado \textit{backpropagation}.
+llamado \back{}.
 
 *** Entrenamiento: \textit{Backpropagation}
 El entrenamiento de las redes neuronales se basa en el algoritmo de
@@ -1459,7 +1461,7 @@ en dos pasos: primero, evaluamos nuestra función \loss{} en los
 parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
 resultado calculamos el gradiente en cada variable utilizando la
 \textit{regla de la cadena}. De esta manera ``propagamos'' el error de la
-predicción hacia atrás (\textit{backpropagation}) y corregimos
+predicción hacia atrás (\back{}) y corregimos
 ligeramente los pesos para mejorar las futuras predicciones.
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
@@ -1483,11 +1485,14 @@ distinto. Esto parte de la suposición de que todas las imágenes del
 conjunto de datos estan correlacionadas entre sí. En teoría
 \textit{SGD} utiliza una sola imagen por batch, pero dada la alta
 paralelización que provee el hardware actual, conviene hacer lotes de
-imágenes de 62, 128, 512 imágenes. El tamaño de los \textit{batches}
+imágenes de 62, 128, 512 imágenes o más dependiendo de la capacidad de
+cómputo del hardware a usar . El tamaño de los \textit{batches}
 no es estrictamente un hiperparámetro que uno pueda
-\textit{cross-}validar, sino que más bien depende del hardware sobre
+validar durante el entrenamiento, sino que más bien depende del hardware sobre
 el que se esté entrenando la red (en general se eligen potencias de
-dos por cuestiones de eficiencia).
+dos por cuestiones de eficiencia). No obstante puede haber casos en los que se elija un
+tamaño de \textit{mini-batch} chico para tener más varianza en los datos de
+entrada de la red y evitar que la se caiga en un mínimo local.
 
 **** Transferencia de aprendizaje
 
@@ -1591,7 +1596,7 @@ el resultado de una convolución.
         \caption{\(A * K\)}
         \label{fig:conv-edge}
     \end{subfigure}
-    \caption{Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
+    \caption{\fontsize{9}{11}\selectfont Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
 \end{figure}
 #+END_LaTeX
 
@@ -1642,11 +1647,11 @@ un volumen de pixeles. Notar que si una imagen tiene un alto y ancho
 de 256 pixeles y tres canales de colores (RGB) entonces el volumen de
 salida de esta capa va a ser \(256 \times 256 \times 3\).
 
-En general la capa de salida suele ser una capa completamente
+En general la capa de salida de una red suele ser una capa completamente
 conectada con los puntajes de cada clase en el caso de tareas de
 clasificacion o con un vector de numeros reales en el caso de tareas
-de regresion. Para clasificacion tambien es muy comun agregar una
-ultima capa con un clasificador (por ejemplo, \textit{Softmax}) que
+de regresion. Para clasificación también es muy común agregar una
+última capa con un clasificador (por ejemplo, \textit{Softmax}) que
 transforme los puntajes obtenidos en probabilidades normalizadas.
 
 **** Capas Convolucionales
@@ -1805,7 +1810,12 @@ modelos ya preentrenados.
 
 Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
-cuenta con 19) y obteniendo un error de 3.57% en el top-5.
+cuenta con 19) y obteniendo un error de 3.57% en el top-5. A finales de 2016 
+se publicó una nueva variante de ResNet denominada DenseNet que incluye 
+conexiones entre todas las capas de la misma, obteniendo resultados de 
+estado del arte pero consumiendo menos memoria y tiempo de cómputo.
+
+#+LaTeX: \newpage
 
 * Redes neuronales convolucionales siamesas
 #+LaTeX: \label{sec:siamesa}
@@ -1818,7 +1828,7 @@ de ambas redes son redireccionadas a una función de pérdida que
 calcula alguna métrica respecto a las dos entradas (Figura
 \ref{fig:siamese-diagram}). Las redes siamesas no difieren en más que
 eso de las redes convolucionales que ya vimos. Se pueden entrenar
-mediante \textit{backpropagation} y, dependiendo del problema,
+mediante \back{} y, dependiendo del problema,
 utilizando hasta las mismas funciones de pérdida.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
@@ -1853,7 +1863,7 @@ asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
-    \caption{Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
+    \caption{\fontsize{9}{11}\selectfont Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
 \end{figure}
 #+END_LaTeX
 
@@ -1910,14 +1920,14 @@ no debieron utilizar tantas imágenes.
 En este trabajo final se tratará de validar la hipótesis propuesta por
 Agrawal et al. reproduciendo varios de los experimentos propuestos en
 su investigación. Para ello nos valdremos de técnicas similares a las
-mencionadas en la Sección XX , de pre-entrenamiento de redes y
-finalmente de transferencia de aprendizaje para validar las redes
+mencionadas en la Sección \ref{sec:marco} de pre-entrenamiento de redes y
+transferencia de aprendizaje para validar las redes
 entrenadas.
 
 En la Sección \ref{sec:agrawal} reproduciremos los resultados del
 paper previamente citado. Primero haremos una prueba de concepto
 utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
-experimentos con el conjunto de datos KITTI \cite{KITTI}.
+experimentos con el conjunto de datos KITTI \cite{Geiger2012CVPR}.
 
 *** Nomenclatura
 
@@ -1972,6 +1982,8 @@ agrupan todas las posibles transformaciones en clases de rangos
 iguales, y la tarea de la red es predecir a que clase pertenece la
 imagen.
 
+#+LaTeX: \newpage
+
 * Experimentos
 #+LaTeX: \label{sec:agrawal}
 
@@ -2020,7 +2032,7 @@ fue usada para entrenar la red siamesa.
 \includegraphics[width = 1.5in]{./images/mnist/c1.png}\\
 \end{tabular}
 }
-\caption{Ejemplo de transformaciones aplicadas a las imagenes de MNIST. Cada par contiene la imagen original y la transformada con traslaciones en los ejes X e Y, y con rotación en Z.}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de transformaciones aplicadas a las imagenes de MNIST. Cada par contiene la imagen original y la transformada con traslaciones en los ejes X e Y, y con rotación en Z.}
 \label{fig:mnist-sample}
 \end{figure}
 #+END_LaTeX
@@ -2145,7 +2157,7 @@ imágenes utilizados durante el entrenamiento de las redes siamesas.
 \includegraphics[width = 1.5in]{./images/kitti/c1.png}\\
 \end{tabular}
 }
-\caption{Ejemplo de imágenes extraídos de KITTI. Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos. Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de imágenes extraídos de KITTI. Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos. Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.}
 \label{fig:kitti-sample}
 \end{figure}
 #+END_LaTeX
@@ -2160,13 +2172,10 @@ columna las traslaciones en X, Y, Z. De esa matriz se puede extraer el
 asumimos que el primer bloque \(3 \times 3\) es una matriz de rotación
 \(R\).
 
-http://robotics.stackexchange.com/questions/7040/how-to-get-the-projection-matrix-from-odometry-tf-data
-http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
-
 *** Descripción de la red
 
 La red utilizada como base de las BCNN está inspirada en las primeras
-5 capas convolucionales de AlexNet /cite{alexnet}, es decir,
+5 capas convolucionales de AlexNet \cite{alexnet}, es decir,
 C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como
 C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
 
@@ -2218,7 +2227,7 @@ algunas de las clases que provee este conjunto de datos.
 \includegraphics[width = 1.5in]{./images/sun397/building.jpg}\\
 \end{tabular}
 }
-\caption{Ejemplo de clases del conjunto de datos SUN-397: paisajes exteriores, interiores, construcciones, etc.}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos SUN-397: paisajes exteriores, interiores, construcciones, etc.}
 \label{fig:sun-sample}
 \end{figure}
 #+END_LaTeX
@@ -2305,7 +2314,7 @@ de datos se pueden ver en la Figura \ref{fig:imagenet-sample}.
 \includegraphics[width = 1.5in]{./images/imagenet/n04154565_5799.JPEG} \\
 \end{tabular}
 }
-\caption{Ejemplo de clases del conjunto de datos ILSVRC'12.}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos ILSVRC'12.}
 \label{fig:imagenet-sample}
 \end{figure}
 #+END_LaTeX
@@ -2337,10 +2346,11 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 
 \hline
 \end{tabular}%
-\caption{\fontsize{9}{11}\selectfont \label{tab:three}Exactitud de los modelos aprendidos mediante redes siamesas (KITTI-EGO corresponde a la red de automovimiento, KITTI-SFA a la que utiliza \textit{contrastive loss}) contra una red cuyos pesos fueron inicializados aleatoriamente (ALEXNET). Se entrenaron las 3 redes utilizando el conjunto de datos ILSVRC 2012 con 1, 5, 10, 20 y 1000 imágenes por clase.}
+\caption{\fontsize{9}{11}\selectfont \label{tab:three}Exactitud de los modelos aprendidos mediante redes siamesas (KITTI-EGO corresponde a la red de automovimiento, KITTI-SFA a la que utiliza \textit{slow feature analysis}) contra una red cuyos pesos fueron inicializados aleatoriamente (ALEXNET). Se entrenaron las 3 redes utilizando el conjunto de datos ILSVRC 2012 con 1, 5, 10, 20 y 1000 imágenes por clase.}
 \end{table*}
 #+END_LaTeX
 
+#+LaTeX: \newpage
 
 * Conclusiones 
 #+LaTeX: \label{sec:concl}
@@ -2386,6 +2396,8 @@ al. \cite{LSM2015} con pocos conjuntos de datos por cuestión de tiempo
 (ILSVRC'12, SUN-397, MNIST, KITTI). Probar esta técnica en otros
 dominios de problemas queda como trabajo a futuro.
 
+
+#+LaTeX: \newpage
 
 #+LaTeX: \bibliographystyle{babplain}
 #+LaTeX: \bibliography{MarcoTeorico}
@@ -2642,6 +2654,10 @@ El numero total de imagenes usadas para entrenamiento es 20501
 **** SF
 Análogo a KITTI, solo que además de las transformaciones en X,Y,Z
 agregan los 3 ``euler angles'' (no entendi eso).
+
+*** Odometria
+http://robotics.stackexchange.com/questions/7040/how-to-get-the-projection-matrix-from-odometry-tf-data
+http://www.staff.city.ac.uk/~sbbh653/publications/euler.pdf
 
 *** Arquitectura
 BCNN: C96-P-C256-P-C384-C384-C256-P (dice que estan inspiradas en las
