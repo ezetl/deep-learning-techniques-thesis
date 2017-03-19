@@ -657,7 +657,8 @@ Una desventaja de las \textit{ReLU} es que pueden provocar la ``muerte''
 de neuronas durante el entrenamiento. Si un gran gradiente fluye a
 través de una \textit{ReLU} durante el proceso de
 \back{} entonces va a actualizar los pesos de esa
-neurona de tal manera que no se vuelva a activar. Pensemos que el
+neurona de tal manera que no se vuelva a activar. El algoritmo de \back{}
+será explicado en la Sección \ref{sec:backprop}, pero por ahora pensemos que el
 proceso de actualización de \weights{} implica restar un porcentaje
 del gradiente en \weights{}. Si el gradiente es muy grande entonces
 los pesos sobre los que se realice la actualización terminarán siendo
@@ -1291,7 +1292,8 @@ Si consideramos una red neuronal con \(L\) capas, sea \(l \in
 (\(\boldsymbol{y}^{(0)} = \boldsymbol{x}\) son los datos de entrada a
 la red). \(W^{(l)}\) y \(\boldsymbol{b}^{(l)}\) son los parametros de
 la capa \(l\). Dada una neurona \(i\) de la capa \(l\), la operacion
-de \textit{feed-forward} de la red puede ser descripta como:
+de \textit{feed-forward} (o sea, cuando se procesa una imagen a traves de
+todas las capas de la red) de la red puede ser descripta como:
 
 \begin{equation}
 z^{(l+1)}_{i} = \boldsymbol{w}^{(l+1)}_{i} \boldsymbol{y}^{l} + b^{(l+1)}_{i},
@@ -1395,6 +1397,7 @@ actualizar \weights{} con los nuevos pesos se utiliza un algoritmo
 llamado \back{}.
 
 *** Entrenamiento: \textit{Backpropagation}
+#+LaTeX: \label{sec:backprop}
 El entrenamiento de las redes neuronales se basa en el algoritmo de
 \textit{descenso de gradiente} que ya vimos. Sea \(g\) una funcion de
 una dimension, entonces su derivada se expresa como:
