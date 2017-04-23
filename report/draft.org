@@ -36,7 +36,7 @@ blocks de nuevo.
 
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
-#+LATEX_HEADER: \usepackage{ifthen,figlatex}
+#+LATEX_HEADER: \usepackage{ifthen,figComision Por Servicio De Cuentalatex}
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{wrapfig}
@@ -99,36 +99,57 @@ clasificación de imágenes. Es decir, dada una imagen y un conjunto de
 categorías, determinar a cual de las categorías pertenece esa
 imagen. Tener un buen entendimiento de los algoritmos de clasificación
 es crucial para desarrollar otras tareas dentro de la visión por
-computadoras, dado que muchos problemas pueden ser reducidos a
+computadoras dado que muchos problemas pueden ser reducidos a
 clasificación: detección de objetos, descripcion de imágenes y
 segmentación entre otros.
 
-Sin embargo, es un problema más difícil de lo que aparenta. Una
-fotografía es solamente un conjunto de números (píxeles), entonces
-¿cómo darle significado semántico a un conjunto de números? Se podría
-pensar en elaborar alguna métrica de distancia con los píxeles otra
-imagen la cual sepamos está en la misma categoría, y si la distancia
-es menor a un cierto umbral sabríamos que ambas pertenecen a la misma
-clase. Sin embargo este enfoque carece de robustez, ya que el menor
-cambio de \textit{iluminación} (o sea, variaciones en los píxeles)
-podría alterar las métricas y confundir a nuestro modelo. No solamente
-eso, los objetos en las imágenes podrían estar ocultos por el ambiente
-(\textit{oclusión}), o en una posición diferente
-(\textit{deformación}), o ser exactamente iguales, pero variar en
-colores y pequeños detalles (\textit{variación intraclase}).
+Sin embargo, la clasificación de imágenes es un problema más difícil
+de lo que aparenta. Una imagen es solamente un conjunto de números
+(llamados \textit{píxeles}). Surge la pregunta entonces, ¿cómo darle
+significado a un conjunto de números?. Se podría pensar en elaborar
+alguna métrica de distancia con los píxeles de otra imagen cuya
+categoría sea conocida, y si la distancia es menor a un cierto umbral
+sabríamos que ambas pertenecen a la misma clase. Puesto en otras
+palabras, lo que hicimos fue elegir una \textit{representación} de la
+imagen basada en sus píxeles.
 
-Diferentes métodos se han utilizado a lo largo de la historia para
-taclear este problema: \textit{máquinas de vectores de soporte},
-árboles de decisión, \textit{bolsas de palabras}, etc. En la mayoría
-de los casos las \features{} y descriptores que se extraían de las
-imágenes debían ser implementadas manualmente (por ejemplo:
-histogramas de colores o descriptores \sift{} \cite{Lowe-SIFT}).
+Sin embargo esta representación carece de robustez, ya que el menor cambio de
+\textit{iluminación} podría alterar las métricas y confundir a nuestro
+modelo. No solamente eso, los objetos en las imágenes podrían estar
+parcialmente ocultos por el ambiente (\textit{oclusión}), o en
+posiciones diferentes (\textit{deformación}), o ser exactamente
+iguales, pero variar en colores y pequeños detalles (\textit{variación
+intraclase}).
 
-En los últimos años toda la parafernalia relativa a la clasificación
-de imágenes fue ampliamente superada por las Redes Neuronales
-Convolucionales. Desde el año 2010, todos los equipos ganadores del
-desafío Imagenet usaron Redes Neuronales Convolucionales, cada vez con
-resultados más precisos \cite{imagenet}.
+Hay mejores métodos para representar imágenes: representaciones
+basadas en color \textit{Color1} \textit{Color2} \textit{Color3}
+\textit{Color4}, textura \textit{Texture1} \textit{Texture2} y
+descriptores locales \cite{Lowe-SIFT} \cite{ORB} \cite{FREAK}
+\cite{SURF} \cite{HOG} entre otros. Todos ellos fueron pensados para
+atacar problemas puntuales en diveras áreas del procesamiento de
+imágenes, lo que significa que utilizarlos para generar una
+representacion de una imagen requiere un diseño manual y adaptado al
+dominio de cada problema en particular.
+
+Una vez se tiene una representación adecuada de la imagen, podemos
+encarar el problema antes mencionado de clasificación. Diversos
+métodos se han utilizado a lo largo de la historia: \textit{máquinas
+de vectores de soporte} \cite{SVM}, árboles de decisión \cite{Tree},
+\textit{bolsas de palabras} \cite{BOW} entre otros. Comunmente el
+proceso consiste en obtener buenas representaciones mediante los
+métodos manuales previamente mencionados y luego entrenar los
+algoritmos.
+
+Sin embargo, en los últimos años todos los algoritmos relativos a la
+clasificación de imágenes fueron ampliamente superados por las Redes
+Neuronales Convolucionales. Desde el año 2010, todos los equipos
+ganadores del desafío ImageNet usaron Redes Neuronales
+Convolucionales, cada vez con resultados más precisos
+\cite{imagenet}. Un aspecto radicalmente distinto entre las redes
+neuronales convolucionales y los métodos mencionados anteriormente es
+que las primeras pueden obtener una representación de la imagen por si
+mismas. Esto significa que pueden aprender representaciones que sean
+más útiles al dominio del problema.
 
 A pesar de haber tenido su golpe de popularidad en los últimos años,
 los primeros esbozos de modelar redes neuronales artificiales datan de
@@ -146,11 +167,14 @@ se conoce como Aprendizaje Profundo (\textit{Deep Learning}).
 Para poder entrenar Redes Neuronales Profundas, es necesario contar
 con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
 de las decenas de miles hasta millones de imágenes. Generalmente se
-requiere un gran esfuerzo humano para etiquetar tantas imágenes.
+requiere un gran esfuerzo humano para etiquetar tantas imágenes, por
+lo que los conjuntos de datos de entrenamiento lo suficientemente
+grandes suelen ser escasos, por ejemplo ImageNet \cite{imagenet},
+SUN397 \cite{sun397}.
 
 Actualmente contamos con una increíble cantidad de imágenes para
-etiquetar. Para 2016, Cisco estimaba que el 51\% del trafico de Internet
-iba a provenir de dispositivos WiFi, tales como celulares,
+etiquetar. Para 2016, Cisco estimaba que el 51\% del trafico de
+Internet iba a provenir de dispositivos WiFi, tales como celulares,
 \textit{tablets}, \textit{smart TV's}, etc.  Más aún, se estima que
 para el 2019 el 80\% del tráfico IP va a ser en forma de píxeles
 (multimedia), superando al 67\% que existente en 2014
@@ -159,21 +183,22 @@ mitad de los videos son subidos desde dispositivos móviles
 \cite{youtustats}. Por otro lado, las redes sociales más populares
 como Facebook, Flickr o Instagram almacenan una gigantesca cantidad de
 imágenes, contando la última con más de 80 millones de imágenes
-subidas por día \cite{instastats}. Sin embargo, es practicamente
-imposible contar con los recursos suficientes para anotar tantos
-videos, imágenes y demás contenido multimedia.
+subidas por día \cite{instastats}. Podríamos concluir que hay
+suficientes recursos para generar buenos conjuntos de datos, pero es
+prácticamente imposible contar con los recursos suficientes para
+anotar tantos videos, imágenes y demás contenido multimedia.
 
 Una posible solución al entrenamiento de redes profundas cuando no se
 puede anotar una gran cantidad de datos es la propuesta por Agrawal et
 al. \cite{LSM2015}. En la misma proponen utilizar información
-odométrica disponible en cámaras (giróscopos, acelerómetros, etc) para
-pre-entrenar redes neuronales profundas, y luego realizar una
+odométrica -inclinación, movimiento, rotación- disponible en agentes
+móviles (giróscopos, acelerómetros, etc.) para \textit{preparar} los
+modelos de redes neuronales profundas, y luego realizar una
 transferencia de aprendizaje sobre un conjunto de datos anotados que
 se desee, obteniendo la ventaja de no necesitar un conjunto tan grande
-para lograr buena precisión.
-
-Este trabajo final tiene como objetivo reproducir las metodologías de 
-este paper.
+para lograr buena precisión. Este trabajo final tiene como objetivo
+evaluar experimentalmente las metodologías propuestas por
+\cite{LSM2015}.
 
 El trabajo está organizado como sigue: en la Sección \ref{sec:marco}
 se introducirán conceptos del aprendizaje automático y las redes
@@ -2403,7 +2428,7 @@ dominios de problemas queda como trabajo a futuro.
 #+LaTeX: \newpage
 
 #+LaTeX: \bibliographystyle{babplain}
-#+LaTeX: \bibliography{MarcoTeorico}
+#+LaTeX: \bibliography{biblio}
 
 * Plan de Trabajo                                :noexport:
 ** Backlog

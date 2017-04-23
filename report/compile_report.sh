@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # compiles latex file and open it
-file='MarcoTeorico'
+file='draft'
 rm -f $file.{aux,bbl,blg,log,out,pdf}
 
 pdflatex $file'.tex'
