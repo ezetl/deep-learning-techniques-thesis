@@ -218,18 +218,20 @@ Sección \ref{sec:agrawal}. Finalmente, las secciones \ref{sec:concl} y
 Las técnicas de aprendizaje automático tienen como objetivo
 identificar patrones en conjuntos de datos utilizando herramientas de
 la estadística, teoría de la información, cálculo y optimización entre
-otras. De esta manera se pueden automatizar tareas, como por ejemplo
-del filtro de correo basura (\textit{spam}), la verificación de
-rostros o incluso predicción de precios en el mercado.
+otras.
 
 El aprendizaje automático adquiere relevancia cuando las tareas que se
 desean automatizar son demasiado complejas para programarse
-directamente. Por ejemplo la verificación de rostros debe tener en
-cuenta detalles como variaciones en sombra, color, orientación, por no
-mencionar las diferentes características que hay que extraer de una
-cara para diferenciarla de otra (arrugas, prominencias y otros
-rasgos).  Otro caso es el análisis de grandes volúmenes de datos, como
-estadísticas del clima para crear nuevos modelos.
+directamente. Como ejemplo tomemos la tarea de verificación de
+rostros. Supongamos que queremos crear un sistema que genere
+representaciones de imágenes de caras para luego diferenciarlas. El
+sistema debe tener en cuenta detalles como variaciones en sombra,
+color, orientación, por no mencionar las diferentes características
+que hay que extraer de una cara para diferenciarla de otra (arrugas,
+prominencias, etc.) \cite{faces}. Se puede ver que son demasiados
+detalles y combinaciones a tener en cuenta como para programar cada
+caso posible manualmente, por lo que un sistema que utilize
+aprendizaje automático podría ser una mejor opción.
 
 Hay varios paradigmas o ejes dentro del aprendizaje automatico que
 definen los tipos de algoritmos, las técnicas de
@@ -247,9 +249,7 @@ Por otro lado, cuando los datos no estan categorizados de antemano
 hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
 una lista de casas con sus respectivos precios, su área en metros
 cúbicos y cantidad de habitaciones y quisieramos encontrar alguna
-relación entre ellas. Los algoritmos no supervisados trabajan
-netamente sobre los datos \textit{tal como están} (lo que no significa que
-     los datos no necesiten preprocesamiento).
+relación entre ellas.
 
 **** Aprendizaje pasivo vs. activo
 
@@ -259,7 +259,7 @@ ambiente para obtener información, como por ejemplo preguntar a un
 usuario si un rostro es de cierta persona y utilizar los datos
 proporcionados durante su entrenamiento.
 
-**** Aprendizaje \textit{online} vs. estadistico (\textit{batch learning})
+**** Aprendizaje \textit{online} vs. \textit{batch}
 
 En el aprendizaje \textit{online} los datos estan disponibles de
 manera secuencial, actualizando el modelo en cada paso para lograr
@@ -276,14 +276,15 @@ pertenecen los mismos, usualmente entrenado mediante técnicas de
 aprendizaje supervisado.
 
 Imaginemos que queremos clasificar imágenes, es decir, asignar una
-etiqueta a un conjunto de píxeles. Para ello vamos a definir una
-función \func{} que mapee píxeles \(\boldsymbol{x}\) a probablidades
-de cada etiqueta (\textit{scores}). Supongamos que contamos con un
-conjunto de datos de imágenes \(\boldsymbol{x_i} \in
-\boldsymbol{R^{D}}\), donde \(\boldsymbol{i = 1\cdots N}\),
-\(\boldsymbol{D}\) es la dimensión de cada imagen y \(\boldsymbol{y_i
-= 1\cdots K}\) es la etiqueta asociada. Es decir, tenemos
-\(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
+etiquetas a representaciones de imágenes desconocidas. Para ello vamos
+a definir una función \func{} que mapee estas representaciones
+\(\boldsymbol{x}\) a puntajes (\textit{scores}) para cada
+etiqueta. Tomemos por ahora como representación de una imagen a sus
+píxeles. Supongamos que contamos con un conjunto de datos de imágenes
+\(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), donde \(\boldsymbol{i =
+1\cdots N}\), \(\boldsymbol{D}\) es la dimensión de cada imagen y
+\(\boldsymbol{y_i = 1\cdots K}\) es la etiqueta asociada. Es decir,
+tenemos \(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
 
 Definamos ahora una función \(\boldsymbol{f\colon R^{D} \mapsto
 R^{K}}\) como un mapeo lineal entre píxeles y \scores:
@@ -305,7 +306,7 @@ representamos con un vector columna de dimensión \(D\) (en este caso
 \(D=1024=32 \times 32\)), entonces en ese espacio \textit{D-dimensional} la
 imagen es solamente un punto. Como se observa en la Figura
 \ref{fig:cl} de manera simplificada, nuestro clasificador lineal
-define una ``línea'' (un hiperplano en realidad) que separa cada clase
+define una ``línea'' (un hiperplano) que separa cada clase
 dentro de ese espacio multidimensional. Notar que en realidad la
 multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
 clasificadores en paralelo, donde cada uno es una fila de \weights{}.
@@ -391,7 +392,8 @@ buen clasificador.
 *** Entrenamiento
 En el caso de los clasificadores lineales, entrenar un modelo se
 traduce en encontrar buenos valores de \weights{} y \bias{} que
-minimicen el error.
+minimicen el \textit{error} de acuerdo a algun criterio sobre el
+conjunto de entrenamiento.
 
 Es muy común, cuando se cuenta con un conjunto de datos lo
 suficientemente grande, dividirlo en al menos 3 subconjuntos
@@ -402,8 +404,8 @@ aprendió características relevantes a la clasificación y las pudo
 aplicar a un conjunto de datos completamente nuevo (conjunto de
 pruebas). Si la precisión que obtuvo nuestro modelo sobre este
 conjunto de pruebas es muy baja, es un síntoma de que algo no anda
-bien en el entrenamiento (ver problema de \textit{sobre-ajuste} en la
-Sección \ref{sec:regular}).
+bien (ver problema de \textit{sobre-ajuste} en la Sección
+\ref{sec:regular}).
 
 A grandes rasgos, podemos describir el proceso de entrenamiento de un
 clasificador de la siguiente manera:
@@ -414,42 +416,43 @@ clasificador de la siguiente manera:
       subconjunto) de datos de entrenamiento
 
 \item Luego se actualizan los parámetros del clasificador (\weights{} y
-      \bias{}) para minimizar ese error.
+      \bias{}) para reducir ese error
 
-\item Se repiten los pasos anteriores hasta lograr la precisión deseada
+\item Se repiten los pasos anteriores hasta lograr la convergencia del modelo
 
 \end{enumerate}
 
-Por lo tanto hay dos aspectos a tener en cuenta antes de
-entrenar un modelo: cómo medir efectivamente la tasa de error y cómo
-actualizar sus parámetros para minimizarla. Para el primer caso se
-define lo que se llama una \textit{función de pérdida o costo}, mientras que
-para el segundo analizaremos una técnica muy utilizada en aprendizaje
+Por lo tanto hay dos aspectos a tener en cuenta antes de entrenar un
+modelo: cómo medir efectivamente la tasa de error y cómo actualizar
+sus parámetros para minimizarla. Para el primer caso se define lo que
+se llama una \textit{función de pérdida o costo}, mientras que para el
+segundo analizaremos una técnica muy utilizada en aprendizaje
 automático denominada \textit{descenso de gradiente}. Esto no
 significa que sea la única alternativa para entrenar modelos, pero al
-ser ampliamente utilizada en redes neuronales artifiales será la única
-que analizaremos.
+ser ampliamente utilizada en redes neuronales artifciales será la
+única que analizaremos.
 
 **** Función de costo
 
-Una función de costo nos ayuda a saber que tan bien o mal está
-actuando nuestro clasificador. Es decir, si la tasa de error del
-clasificador es muy alta, el costo o la \textit{pérdida} será muy alta
-y viceversa. Hay muchos tipos de funciones de costo, pero la idea
-subyacente es la misma y puede ser expresada en la siguiente ecuación:
+Una función de costo define un criterio de optimalidad que nos ayuda a
+saber que tan bien o mal está actuando nuestro clasificador. Es decir,
+si la tasa de error del clasificador es muy alta, el costo o la
+\textit{pérdida} será muy alta y viceversa. 
+
+Sea \(L\) la función de costo de la predicción la clase de \(x_i\)
+cuando la respuesta esperada es \(y_i\) utilizando la funcion \(f\)
+con parámetros \(\theta\), y supongamos que se cuenta con \(m\) datos
+de entrenamiento. Entonces el costo total de \(f(x_i;\theta)\) para
+todo el conjunto de datos es:
 
 \begin{equation}
-\boldsymbol{L}(\theta) = \frac{1}{N} \sum^{N}_{i} L(f(x_i;\theta), y_i)
+\boldsymbol{L}(\theta) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;\theta), y_i)
 \end{equation}
 
-donde \(L\) es la función de pérdidad individual de cada muestra en el
-conjunto de datos, \(f(x_i;\theta)\) es la predicción del modelo sobre
-una muestra \(x_i\) con parámetros \(\theta\), \(y_i\) es el objetivo
-(por ejemplo, la etiqueta de cada muestra del conjunto de datos en una
-tarea de clasificación). Notar que para el caso de un clasificador
-lineal los parámetros \(\theta\) son \weights{} y \bias{}. De ahora en
-adelante utilizaremos \(\theta\) o \weights{} indiferentemente para
-hablar de los parámetros de nuestro modelo.
+Notar que para el caso de un clasificador lineal los parámetros
+\(\theta\) son \weights{} y \bias{}. De ahora en adelante utilizaremos
+\(\theta\) o \weights{} indiferentemente para hablar de los parámetros
+de nuestro modelo.
 
 Un ejemplo de función de perdida popular es la función de pérdida de
 \textit{máquinas de vectores de soporte multiclase}. Sea \(f(x_i;
@@ -467,7 +470,7 @@ Se puede observar que esta función de pérdida busca que la clase
 correcta tenga un puntaje más alto que las otras por un margen
 \(\Delta\).
 
-Cuando tenemos una función con la forma \( \max{(0,\_)} \) a menudo se
+Cuando tenemos una función con la forma \( \max{(0, \cdot )} \) a menudo se
 la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 
 **** Descenso de Gradiente
@@ -481,25 +484,46 @@ control sobre nuestro conjunto de datos de entrenamiento, pero sí
 podemos modificar los parámetros de \weights{} para producir la menor
 pérdida posible.
 
+Para entender el algoritmo de descenso de gradiente tomemos un
+escenario hipotético: imaginemos por un momento que una persona con
+los ojos vendados está atrapada entre montañas y busca llegar al
+valle. Una manera de llegar al valle es probar dando un pequeño paso a
+su alrededor, y "sentir" hacia donde desciende más rápido la montaña,
+sólo valiéndose de la información local para moverse. Cuando
+finalmente esté seguro hacia donde descender, dará varios pasos en esa
+dirección, se detendrá y volverá a observar. Sabemos que eventualmente
+llegará al fondo del valle, pues lo único que tiene que hacer es
+seguir bajando por la pendiente de la montaña.
+
+Formalmente, la pendiente de la montaña es la pendiente de la función
+de costo \loss{} que estemos utilizando y la dirección hacia donde
+bajar se corresponde con la dirección negativa del gradiente de
+\loss{} en ese punto, ya que la función \textit{decrece} en el sentido
+opuesto que indica el gradiente. En otras palabras, lo que estamos
+haciendo es buscar el mínimo de \loss{}, y en consecuencia, el
+conjunto de parámetros de \weights{} que minimicen el costo.
+
 El descenso de gradiente se utiliza para optimizar los pesos partiendo
-de la premisa que el modelo es diferenciable con respecto a
-\weights{}. Dado que queremos minimizar la funcion de costo \loss{},
-lo que vamos a hacer es calcular su gradiente \(\boldsymbol{\nabla
-L}\) respecto a cada parámetro y luego modificar cada uno ligeramente
-con el objetivo de alcanzar un mínimo en la función. Entonces, si
-\(\theta_{n}\) son nuestros parámetros en el paso \(n\) del
-entrenamiento, calculamos \(\theta_{n+1}\) de la siguiente manera:
+de la premisa que el modelo es diferenciable localmente (o se puede
+aproximar su derivada) con respecto a \weights{}. Dado que queremos
+minimizar la funcion de costo \loss{}, lo que vamos a hacer es
+calcular su gradiente \(\boldsymbol{\nabla L}\) respecto a cada
+parámetro y luego modificar cada uno ligeramente con el objetivo de
+acercarlo al mínimo en la función. Entonces, si \(\theta_{n}\) son
+nuestros parámetros en el paso \(n\) del entrenamiento, calculamos
+\(\theta_{n+1}\) de la siguiente manera:
 
 \begin{equation}
     \theta_{n+1} = \theta_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta_{n}} L(f(x_i; \theta_n), y_i)
 \end{equation}
 
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
-\(m\) es la cantidad de elementos en el conjunto de datos. En la
-ecuación se puede observar que se modifican los parámetros con
-respecto a la dirección opuesta al gradiente, dado que el mismo indica
-la dirección de crecimiento de una función pero nosotros queremos
-encontrar un mínimo (Figura \ref{fig:gd}).
+\(m\) es la cantidad de elementos en el conjunto de datos. Notar que
+la tasa de aprendizaje determina una fracción del gradiente a
+substraer. En la ecuación se puede observar que se modifican los
+parámetros con respecto a la dirección opuesta al gradiente, dado que
+el mismo indica la dirección de crecimiento de una función pero
+nosotros queremos encontrar un mínimo (Figura \ref{fig:gd}).
 
 #+name: gradient-descent
 #+begin_src python :session :exports none :results silent :cache yes :eval no-export
@@ -554,19 +578,21 @@ plt.savefig('images/gradient-descent.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:gd
-#+caption: \fontsize{9}{11}\selectfont Descenso de gradiente. Sea \(w\) un parámetro de \(\theta\), el gráfico ilustra cómo nuestra función de clasificación \(f\) alcaza un mínimo en \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro. Puesto de otra manera, podemos imaginar a \(w\) como una pelota que se suelta desde la cima de una montaña y desciende por la fuerza de la gravedad hasta el valle (instancia \(w_3\)). Una vez que la pelota alcanza el punto más bajo, se detendrá.
+#+caption: \fontsize{9}{11}\selectfont Descenso de gradiente. Una función de clasificación \(f\) alcaza un mínimo en su parámetro \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro.
 [[file:images/gradient-descent.pdf]]
 
-Existen variantes mas sofisticadas del descenso de gradiente
-(\textit{Momentum}, \textit{Nesterov Momentum}, \textit{Adagrad},
-\textit{Rmsprop} entre otros). Lo más comun es utilizar alguna de
-ellas con una técnica llamada \textit{descenso de gradiente estocástico}, 
-que se basa en calcular el gradiente de un subconjunto
-del total de datos (llamado \textit{mini-batch}) y actualizar \weights{} al final
-de cada \textit{mini-batch}. Esto es muy útil dado que es
-computacionalmente costoso calcular el gradiente de todo un conjunto
-de datos con miles de imágenes a la vez y calcular el gradiente de un
-\textit{batch} aproxima bastante bien el gradiente del total.
+En la práctica se suele Existen variantes mas sofisticadas del
+descenso de gradiente (\textit{Momentum} \cite{momentum},
+\textit{Nesterov Accelerated Gradient} \cite{nesterov},
+\textit{Adagrad} \cite{adagrad}, \textit{Adam} \cite{adam} entre otros). Lo más
+comun es utilizar alguna de ellas con una técnica llamada
+\textit{descenso de gradiente por mini-batch}, que se basa en calcular el
+gradiente de un subconjunto del total de datos (llamado
+\textit{mini-batch}) y actualizar \weights{} al final de cada
+\textit{mini-batch}. Esto es muy útil dado que es computacionalmente
+costoso calcular el gradiente de todo un conjunto de datos con miles
+de imágenes a la vez y calcular el gradiente de un \textit{batch}
+aproxima bastante bien el gradiente del total \cite{minibatch}.
 
 **** Clasificador \textit{Softmax}
 Antes de saltar de lleno a las redes neuronales artificiales vamos a
