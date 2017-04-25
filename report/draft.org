@@ -503,15 +503,16 @@ opuesto que indica el gradiente. En otras palabras, lo que estamos
 haciendo es buscar el mínimo de \loss{}, y en consecuencia, el
 conjunto de parámetros de \weights{} que minimicen el costo.
 
-El descenso de gradiente se utiliza para optimizar los pesos partiendo
-de la premisa que el modelo es diferenciable localmente (o se puede
-aproximar su derivada) con respecto a \weights{}. Dado que queremos
-minimizar la funcion de costo \loss{}, lo que vamos a hacer es
-calcular su gradiente \(\boldsymbol{\nabla L}\) respecto a cada
-parámetro y luego modificar cada uno ligeramente con el objetivo de
-acercarlo al mínimo en la función. Entonces, si \(\theta_{n}\) son
-nuestros parámetros en el paso \(n\) del entrenamiento, calculamos
-\(\theta_{n+1}\) de la siguiente manera:
+El descenso de gradiente (\textit{SGD} por sus siglas en inglés) se
+utiliza para optimizar los pesos partiendo de la premisa que el modelo
+es diferenciable localmente (o se puede aproximar su derivada) con
+respecto a \weights{}. Dado que queremos minimizar la funcion de costo
+\loss{}, lo que vamos a hacer es calcular su gradiente
+\(\boldsymbol{\nabla L}\) respecto a cada parámetro y luego modificar
+cada uno ligeramente con el objetivo de acercarlo al mínimo en la
+función. Entonces, si \(\theta_{n}\) son nuestros parámetros en el
+paso \(n\) del entrenamiento, calculamos \(\theta_{n+1}\) de la
+siguiente manera:
 
 \begin{equation}
     \theta_{n+1} = \theta_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta_{n}} L(f(x_i; \theta_n), y_i)
@@ -581,17 +582,13 @@ plt.savefig('images/gradient-descent.pdf')
 #+caption: \fontsize{9}{11}\selectfont Descenso de gradiente. Una función de clasificación \(f\) alcaza un mínimo en su parámetro \(w\) a medida que se actualiza su valor mediante la substracción del gradiente calculado en ese parámetro.
 [[file:images/gradient-descent.pdf]]
 
-En la práctica se suele Existen variantes mas sofisticadas del
-descenso de gradiente (\textit{Momentum} \cite{momentum},
-\textit{Nesterov Accelerated Gradient} \cite{nesterov},
-\textit{Adagrad} \cite{adagrad}, \textit{Adam} \cite{adam} entre otros). Lo más
-comun es utilizar alguna de ellas con una técnica llamada
-\textit{descenso de gradiente por mini-batch}, que se basa en calcular el
-gradiente de un subconjunto del total de datos (llamado
+Lo más comun al utilizar SGD es mediante una técnica llamada
+\textit{descenso de gradiente por mini-batch}, que se basa en calcular
+el gradiente de un subconjunto del total de datos (llamado
 \textit{mini-batch}) y actualizar \weights{} al final de cada
-\textit{mini-batch}. Esto es muy útil dado que es computacionalmente
-costoso calcular el gradiente de todo un conjunto de datos con miles
-de imágenes a la vez y calcular el gradiente de un \textit{batch}
+iteración. Esto es muy útil dado que es computacionalmente costoso
+calcular el gradiente de todo un conjunto de datos con miles de
+imágenes a la vez y calcular el gradiente de un \textit{batch}
 aproxima bastante bien el gradiente del total \cite{minibatch}.
 
 **** Clasificador \textit{Softmax}
