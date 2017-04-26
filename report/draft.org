@@ -1,4 +1,4 @@
-#+TITLE: Reconocimiento visual empleando técnicas de apredizaje profundo
+#+TITLE: Reconocimiento visual empleando técnicas de aprendizaje profundo
 #+AUTHOR:  Rubén Ezequiel Torti López
 #+EMAIL:   ret0110@famaf.unc.edu.ar
 #+CREATOR: Rubén Ezequiel Torti López
@@ -100,7 +100,7 @@ categorías, determinar a cual de las categorías pertenece esa
 imagen. Tener un buen entendimiento de los algoritmos de clasificación
 es crucial para desarrollar otras tareas dentro de la visión por
 computadoras dado que muchos problemas pueden ser reducidos a
-clasificación: detección de objetos, descripcion de imágenes y
+clasificación: detección de objetos, descripción de imágenes y
 segmentación entre otros.
 
 Sin embargo, la clasificación de imágenes es un problema más difícil
@@ -118,24 +118,22 @@ Sin embargo esta representación carece de robustez, ya que el menor cambio de
 modelo. No solamente eso, los objetos en las imágenes podrían estar
 parcialmente ocultos por el ambiente (\textit{oclusión}), o en
 posiciones diferentes (\textit{deformación}), o ser exactamente
-iguales, pero variar en colores y pequeños detalles (\textit{variación
-intraclase}).
+iguales, pero variar en colores y pequeños detalles (\textit{variaciónintraclase}).
 
 Hay mejores métodos para representar imágenes: representaciones
-basadas en color \textit{Color1} \textit{Color2} \textit{Color3}
-\textit{Color4}, textura \textit{Texture1} \textit{Texture2} y
+basadas en color \cite{Color1} \cite{Color2} \cite{Color3}
+\cite{Color4}, textura \cite{Texture1} \cite{Texture2} y
 descriptores locales \cite{Lowe-SIFT} \cite{ORB} \cite{FREAK}
 \cite{SURF} \cite{HOG} entre otros. Todos ellos fueron pensados para
-atacar problemas puntuales en diveras áreas del procesamiento de
+atacar problemas puntuales en diversas áreas del procesamiento de
 imágenes, lo que significa que utilizarlos para generar una
 representacion de una imagen requiere un diseño manual y adaptado al
 dominio de cada problema en particular.
 
 Una vez se tiene una representación adecuada de la imagen, podemos
-encarar el problema antes mencionado de clasificación. Diversos
-métodos se han utilizado a lo largo de la historia: \textit{máquinas
-de vectores de soporte} \cite{SVM}, árboles de decisión \cite{Tree},
-\textit{bolsas de palabras} \cite{BOW} entre otros. Comunmente el
+encarar el problema antes mencionado de clasificación. Numerosos
+métodos se han utilizado a lo largo de la historia: \textit{máquinas vectores de soporte} \cite{SVM}, árboles de decisión \cite{Tree},
+\textit{bolsas de palabras} \cite{BOW} entre otros. Comúnmente el
 proceso consiste en obtener buenas representaciones mediante los
 métodos manuales previamente mencionados y luego entrenar los
 algoritmos.
@@ -173,9 +171,9 @@ grandes suelen ser escasos, por ejemplo ImageNet \cite{imagenet},
 SUN397 \cite{sun397}.
 
 Actualmente contamos con una increíble cantidad de imágenes para
-etiquetar. Para 2016, Cisco estimaba que el 51\% del trafico de
+etiquetar. Para 2016, Cisco estimaba que el 51\% del tráfico de
 Internet iba a provenir de dispositivos WiFi, tales como celulares,
-\textit{tablets}, \textit{smart TV's}, etc.  Más aún, se estima que
+\textit{tablets}, \textit{smart TVs}, etc.  Más aún, se estima que
 para el 2019 el 80\% del tráfico IP va a ser en forma de píxeles
 (multimedia), superando al 67\% que existente en 2014
 \cite{ciscostats}. Como tendencia podemos nombrar a Youtube, donde la
@@ -201,9 +199,9 @@ evaluar experimentalmente las metodologías propuestas por
 \cite{LSM2015}.
 
 El trabajo está organizado como sigue: en la Sección \ref{sec:marco}
-se introducirán conceptos del aprendizaje automático y las redes
+se introducen conceptos del aprendizaje automático y las redes
 neuronales artificiales para concluir con redes convolucionales, en la
-Sección \ref{sec:siamesa} se presentará un método para entrenar
+Sección \ref{sec:siamesa} se presenta un método para entrenar
 modelos de aprendizaje profundo mediante redes siamesas, que luego se
 utilizará para reproducir los resultados de \cite{LSM2015} en la
 Sección \ref{sec:agrawal}. Finalmente, las secciones \ref{sec:concl} y 
@@ -230,7 +228,7 @@ color, orientación, por no mencionar las diferentes características
 que hay que extraer de una cara para diferenciarla de otra (arrugas,
 prominencias, etc.) \cite{faces}. Se puede ver que son demasiados
 detalles y combinaciones a tener en cuenta como para programar cada
-caso posible manualmente, por lo que un sistema que utilize
+caso posible manualmente, por lo que un sistema que utilice
 aprendizaje automático podría ser una mejor opción.
 
 Hay varios paradigmas o ejes dentro del aprendizaje automatico que
@@ -242,13 +240,13 @@ entrenamiento y las potenciales aplicaciones de esos modelos:
 Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
 datos a aprender, hablamos de aprendizaje supervisado. Retomando el
 caso del verificador de rostros, las etiquetas serían el nombre o
-algun identificador de cada persona y nuestro clasificador aprendería
+algún identificador de cada persona y nuestro clasificador aprendería
 a diferenciar las caras tomando como referencia las anotaciones.
 
-Por otro lado, cuando los datos no estan categorizados de antemano
+Por otro lado, cuando los datos no están categorizados de antemano
 hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
 una lista de casas con sus respectivos precios, su área en metros
-cúbicos y cantidad de habitaciones y quisieramos encontrar alguna
+cúbicos y cantidad de habitaciones y quisiéramos encontrar alguna
 relación entre ellas.
 
 **** Aprendizaje pasivo vs. activo
@@ -261,7 +259,7 @@ proporcionados durante su entrenamiento.
 
 **** Aprendizaje \textit{online} vs. \textit{batch}
 
-En el aprendizaje \textit{online} los datos estan disponibles de
+En el aprendizaje \textit{online} los datos están disponibles de
 manera secuencial, actualizando el modelo en cada paso para lograr
 mejores predicciones/clasificaciones. En el aprendizaje estadístico
 primero se analiza una gran cantidad de datos (tal vez la totalidad
@@ -270,7 +268,7 @@ obtener conclusiones o un modelo final.
 
 *** Clasificadores lineales
 
-Un clasificador lineal combina linealmente las caracteristicas (o
+Un clasificador lineal combina linealmente las características (o
 \textit{features}) de los datos de entrada para determinar a que clase
 pertenecen los mismos, usualmente entrenado mediante técnicas de
 aprendizaje supervisado.
@@ -386,13 +384,13 @@ plt.savefig('images/linear-classifier.pdf')
 #+caption: \fontsize{9}{11}\selectfont Clasificador lineal. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
-Mas adelante veremos como definir \weights{} y \bias{} para obtener un
+Más adelante veremos cómo definir \weights{} y \bias{} para obtener un
 buen clasificador.
 
 *** Entrenamiento
 En el caso de los clasificadores lineales, entrenar un modelo se
 traduce en encontrar buenos valores de \weights{} y \bias{} que
-minimicen el \textit{error} de acuerdo a algun criterio sobre el
+minimicen el \textit{error} de acuerdo a algún criterio sobre el
 conjunto de entrenamiento.
 
 Es muy común, cuando se cuenta con un conjunto de datos lo
@@ -404,7 +402,7 @@ aprendió características relevantes a la clasificación y las pudo
 aplicar a un conjunto de datos completamente nuevo (conjunto de
 pruebas). Si la precisión que obtuvo nuestro modelo sobre este
 conjunto de pruebas es muy baja, es un síntoma de que algo no anda
-bien (ver problema de \textit{sobre-ajuste} en la Sección
+bien (ver problema de \textit{sobreajuste} en la Sección
 \ref{sec:regular}).
 
 A grandes rasgos, podemos describir el proceso de entrenamiento de un
@@ -424,12 +422,12 @@ clasificador de la siguiente manera:
 
 Por lo tanto hay dos aspectos a tener en cuenta antes de entrenar un
 modelo: cómo medir efectivamente la tasa de error y cómo actualizar
-sus parámetros para minimizarla. Para el primer caso se define lo que
-se llama una \textit{función de pérdida o costo}, mientras que para el
-segundo analizaremos una técnica muy utilizada en aprendizaje
+sus parámetros para minimizar la misma. Para el primer caso se define
+lo que se llama una \textit{función de pérdida o costo}, mientras que
+para el segundo analizaremos una técnica muy utilizada en aprendizaje
 automático denominada \textit{descenso de gradiente}. Esto no
 significa que sea la única alternativa para entrenar modelos, pero al
-ser ampliamente utilizada en redes neuronales artifciales será la
+ser ampliamente utilizada en redes neuronales artificiales será la
 única que analizaremos.
 
 **** Función de costo
@@ -440,7 +438,7 @@ si la tasa de error del clasificador es muy alta, el costo o la
 \textit{pérdida} será muy alta y viceversa. 
 
 Sea \(L\) la función de costo de la predicción la clase de \(x_i\)
-cuando la respuesta esperada es \(y_i\) utilizando la funcion \(f\)
+cuando la respuesta esperada es \(y_i\) utilizando la función \(f\)
 con parámetros \(\theta\), y supongamos que se cuenta con \(m\) datos
 de entrenamiento. Entonces el costo total de \(f(x_i;\theta)\) para
 todo el conjunto de datos es:
@@ -454,7 +452,7 @@ Notar que para el caso de un clasificador lineal los parámetros
 \(\theta\) o \weights{} indiferentemente para hablar de los parámetros
 de nuestro modelo.
 
-Un ejemplo de función de perdida popular es la función de pérdida de
+Un ejemplo de función de pérdida popular es la función de pérdida de
 \textit{máquinas de vectores de soporte multiclase}. Sea \(f(x_i;
 \theta)_j\) el puntaje (\textit{score}) asignado por el clasificador \(f\) a la clase
 \(j\) con \(x_i\) como dato de entrada y parámetros \(\theta\) y sea
@@ -506,7 +504,7 @@ conjunto de parámetros de \weights{} que minimicen el costo.
 El descenso de gradiente (\textit{SGD} por sus siglas en inglés) se
 utiliza para optimizar los pesos partiendo de la premisa que el modelo
 es diferenciable localmente (o se puede aproximar su derivada) con
-respecto a \weights{}. Dado que queremos minimizar la funcion de costo
+respecto a \weights{}. Dado que queremos minimizar la función de costo
 \loss{}, lo que vamos a hacer es calcular su gradiente
 \(\boldsymbol{\nabla L}\) respecto a cada parámetro y luego modificar
 cada uno ligeramente con el objetivo de acercarlo al mínimo en la
@@ -521,7 +519,7 @@ siguiente manera:
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
 \(m\) es la cantidad de elementos en el conjunto de datos. Notar que
 la tasa de aprendizaje determina una fracción del gradiente a
-substraer. En la ecuación se puede observar que se modifican los
+sustraer. En la ecuación se puede observar que se modifican los
 parámetros con respecto a la dirección opuesta al gradiente, dado que
 el mismo indica la dirección de crecimiento de una función pero
 nosotros queremos encontrar un mínimo (Figura \ref{fig:gd}).
@@ -2403,7 +2401,7 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 
 #+LaTeX: \newpage
 
-* Conclusiones 
+* Conclusiones
 #+LaTeX: \label{sec:concl}
 
 Si bien actualmente se suele recurrir a la transferencia de
@@ -2451,7 +2449,7 @@ dominios de problemas queda como trabajo a futuro.
 #+LaTeX: \newpage
 
 #+LaTeX: \bibliographystyle{babplain}
-#+LaTeX: \bibliography{biblio}
+#+LaTeX: \bibliography{draft}
 
 * Plan de Trabajo                                :noexport:
 ** Backlog
