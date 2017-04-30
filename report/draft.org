@@ -1,3 +1,4 @@
+
 #+TITLE: Reconocimiento visual empleando técnicas de aprendizaje profundo
 #+AUTHOR:  Rubén Ezequiel Torti López
 #+EMAIL:   ret0110@famaf.unc.edu.ar
@@ -600,33 +601,33 @@ La función \textit{Softmax} tiene la siguiente forma:
     \sigma(x)_j =  \frac{e^{f(x;\theta)_{j}}} {\sum_{k} e^{f(x;\theta)_{k}}}
 \end{equation}
 
-Actúa tomando un vector de valores reales arbitrarios y
-transformándolos en un vector de probabilidades normalizadas (cuya
-suma da uno).
+Dado que exponencia el resultado de \(f(x;\theta)\), se puede observar
+que sus resultados son siempre positivos. Además normaliza el valor de
+cada salida con respecto a todas las salidas, por lo que su resultado
+es siempre un número entre 0 y 1. Por lo tanto, \textit{Softmax}
+devuelve la \textit{probabilidad} de \(x\) de pertenecer a cada una de
+las clases \(k\).
 
-Por lo tanto el clasificador Softmax tiene una función de pérdida
-diferente. En vez de tratar a los resultados como puntajes para cada
-clase (lo cual puede ser confuso y dificíl de comparar), Softmax
-devuelve probabilidades normalizadas para cada clase.
-
-Un clasificador Softmax no modifica la funcion \(f\) que ya
-conocemos, pero sí interpreta los puntajes como probabilidades
-logarítmicas sin normalizar, reemplazando la función de cost que ya conocemos por una
-\textit{entropía cruzada}:
+La función de costo utilizada comúnmente con \textit{Softmax} se
+denomina en inglés \textit{log-likelihood}. Sea \(f(x_i,
+\theta)_{y_{i}}\) la probabilidad computada mediante \textit{Softmax}
+para la clas \(y_i\), entonces \textit{log-likelihood} se expresa:
 
 \begin{equation}
      L_i = - \log \bigg( \frac{e^{f(x_i, \theta)_{y_{i}}}} {\sum_j e^{f(x_i, \theta)_j}}\bigg)
 \end{equation}
 
-Que es equivalente a:
+Observar que si el clasificador se equivocó al predecir (o sea, asignó
+una probabilidad \(p\) muy baja a la clase correspondiente \(y_i\))
+entonces el costo será muy alto. Como \(log(p) \to -\inf\) cuando \(p
+\to 0\), intuitivamente podemos ver que \(-log(p) \to \inf\) cuando
+\(p \to 0\). En cambio si clasificador predijo con más probabilidad la
+clase \(y_i\), significa que \(p\) es más cercano a \(1\) y por ende,
+\(-log(p)\) es más cercano a \(0\).
 
-\begin{equation}
-     L_i = - f(x_i, \theta)_{y_{i}} + \log {\Big( \sum_j e^{f(x_i, \theta)_j}\Big)}
-\end{equation}
-
-Donde \(f_{y_{i}}\) representa el elemento \textit{j}-ésimo del vector
-de puntajes calculado por \(f\). Nuevamente, la pérdida total es el
-promedio de las pérdidas de cada imagen.
+Nuevamente, notar que la pérdida total de nuestro conjunto de datos en
+un determinado paso del entrenamiento es el promedio de las pérdidas
+de cada elemento del conjunto.
 
 ** Redes Neuronales Artificiales
 
