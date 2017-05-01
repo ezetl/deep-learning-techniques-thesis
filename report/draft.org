@@ -661,28 +661,62 @@ ejemplo, agregar lo que se llama \textit{función de activación}:
 Lo que acabamos de definir es una red neuronal básica de dos capas, de
 una neurona cada una.
 
-Una sola neurona puede funcionar como un clasificador también (notar
-el parecido con los clasificadores lineales), siempre que se eliga la
-función de pérdida adecuada.
+En la Figura \ref{fig:art-neuron} vemos un modelo formal de una
+neurona estándar, en el que las entradas \(x_i\) interactúan
+multiplicativamente con los pesos \(w_i\). Luego, esos resultados se
+suman junto con un vector de sesgo y sobre eso se computa lo que se
+llama \textit{función de activación} que decide si transmitir o no la
+salida.
+
+#+name: neuron
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.cbook as cbook
+
+image = plt.imread("images/artificial-neuron.png")
+
+fig, ax = plt.subplots()
+im = ax.imshow(image)
+
+props = {'ha': 'center', 'va': 'center'}
+ax.text(75.50, 31.16, r'$x_1$', props, rotation=0, fontsize=15)
+ax.text(75.50, 237.25, r'$x_2$', props, rotation=0, fontsize=15)
+ax.text(75.50, 361.72, r'$x_3$', props, rotation=0, fontsize=15)
+ax.text(84.50, 650.98, r'$x_{n-1}$', props, rotation=0, fontsize=15)
+ax.text(75.50, 822.76, r'$x_n$', props, rotation=0, fontsize=15)
+
+ax.text(419.30, 140.16, r'$\times w_1$', props, rotation=-25, fontsize=15)
+ax.text(419.30, 285.41, r'$\times w_2$', props, rotation=-15, fontsize=15)
+ax.text(419.30, 387.19, r'$\times w_3$', props, rotation=-8, fontsize=15)
+ax.text(450.30, 598.43, r'$\times w_{n-1}$', props, rotation=11, fontsize=15)
+ax.text(419.30, 729.36, r'$\times w_n$', props, rotation=28, fontsize=15)
+
+ax.text(856.71, 470.73, r'$\mathbf{\sum_{i=0}^n w_i x_i + b}$', props, rotation=0, fontsize=18)
+
+ax.text(1219.67, 433.80, r'$\mathbf{Y}$', props, rotation=0, fontsize=18)
+
+ax.text(1529.7, 480.88, r'$\mathbf{f(Y)}$', props, rotation=0, fontsize=18)
+
+ax.text(1808, 433.80, r'$\mathbf{\widetilde{Y}}$', props, rotation=0, fontsize=18)
+
+plt.axis('off')
+
+plt.savefig('images/artificial-neuron.pdf')
+#+end_src
+
+#+attr_latex: width=0.8\textwidth,placement=[p]
+#+label: fig:art-neuron
+#+caption: \fontsize{9}{11}\selectfont Esquema de una neurona artificial.
+[[file:images/artificial-neuron.pdf]]
+
  
 *** Funciones de activación comunes
 
 Se han propuesto varias funciones de activación a lo largo de los
-años. 
-
-Inicialmente se intentó simular el comportamiento de las conexiones
-sinápticas mediante la función de activación Sigmoide (\(\sigma\)),
-por tener la propiedad de transformar la entrada a un rango entre 0 y
-1, y tener además una derivada fácil de calcular (muy útil para
-\back{} que explicaremos más adelante).  Luego se propuso la Tangente Hiperbólica
-(\(\tanh\)), pero ambas fueron desplazadas en favor de las unidades
-\textit{ReLU}, o \textit{Rectifier Linear Unit} en inglés, que son más
-fáciles de calcular y no sufren del problema de saturación de
-gradiente que poseen \(\sigma\) y \(\tanh\).
-
-Nos concentraremos entonces en las unidades \textit{ReLU}, actualmente
-muy populares en las redes convolucionales debido a sus buenas
-propiedades.
+años. Nos concentraremos en las unidades \textit{ReLU}
+(\textit{Rectifier Liner Unit} en inglés), actualmente muy populares
+en las redes convolucionales.
 
 Hay tres tipos de rectificadores lineales:
 
@@ -696,29 +730,30 @@ salida fue negativa o un numero positivo en caso contrario (Figura
 f(x) = \max{(0,x)}
 \end{equation}
 
-Comparada con \(\sigma\) y \(\tanh\), requiere menos operaciones, no
-es saturante y converge hasta 6 veces más rápido que las funciones
-sigmoide y tanh \cite{NIPS2012_4824}.
+Se puede observar que requiere muy pocas operaciones, además está
+comprobado empíricamente que los modelos que utilizan \textit{ReLU}
+convergen hasta 6 veces más rápido \cite{NIPS2012_4824} que con otras
+funcines de activación (como la \textit{sigmoide}
+\cite{sigmoid} y \textit{tangente hiperbólica}).
 
-Una desventaja de las \textit{ReLU} es que pueden provocar la ``muerte''
-de neuronas durante el entrenamiento. Si un gran gradiente fluye a
-través de una \textit{ReLU} durante el proceso de
-\back{} entonces va a actualizar los pesos de esa
-neurona de tal manera que no se vuelva a activar. El algoritmo de \back{}
-será explicado en la Sección \ref{sec:backprop}, pero por ahora pensemos que el
-proceso de actualización de \weights{} implica restar un porcentaje
-del gradiente en \weights{}. Si el gradiente es muy grande entonces
-los pesos sobre los que se realice la actualización terminarán siendo
-muy pequeños. Como consecuencia, la unidad \textit{ReLU} no volverá a
-activarse, pues sus valores de entrada siempre van a ser valores
-negativos. Esta situación puede agravarse si la tasa de
-aprendizaje es muy grande.
+Una desventaja de las \textit{ReLU} es que pueden provocar la
+``muerte'' de neuronas durante el entrenamiento. El problema esta
+relacionado con el método más común de entrenamiento de redes
+neuronales, \back{}. El algoritmo de \back{} será explicado en la
+Sección \ref{sec:backprop}, pero por ahora pensemos que el proceso de
+optimización de \weights{} implica restar un porcentaje del gradiente
+de la función de costo en \weights{}. Si el gradiente es muy grande
+entonces los pesos sobre los que se realice la actualización
+terminarán siendo muy pequeños (negativos). Como consecuencia, la
+unidad \textit{ReLU} no volverá a activarse, pues sus valores de
+entrada siempre van a ser valores negativos. Esta situación puede
+agravarse si la tasa de aprendizaje es muy grande.
 
 Una vez que la ReLU alcanza este estado, es improbable que vuelva a
-activarse, dado que su gradiente en \(0\) es también \(0\), por lo que
-un entrenamiendo mediante descenso de gradiente y
-\back{} no va a modificar los pesos locales, dejando
-a esa neurona ``muerta''.
+activarse, dado que su gradiente (aproximado por lo que se llama el
+\textis{subgradiente}) en \(0\) es también \(0\), por lo que un
+entrenamiendo mediante descenso de gradiente y \back{} no va a
+modificar los pesos locales, dejando a esa neurona ``muerta''.
 
 **** \textit{Leaky ReLU}
 
@@ -733,12 +768,11 @@ f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
 \end{equation}
 
 De esta manera nos aseguramos que al menos un pequeño gradiente fluya
-durante \back{} cuando la neurona emite resultados
-negativos, permitiendo que se normalicen los pesos a mediano/largo
-plazo. Sin embargo no está demostrado del todo que las \textit{Leaky ReLU}
-presenten una mejora sustancial en el entrenamiento de las
-redes, por lo que las \textit{ReLU} convencionales siguen siendo ampliamente
-usadas.
+durante \back{} cuando la neurona emite resultados negativos,
+permitiendo que se normalicen los pesos a mediano/largo plazo. Sin
+embargo no está demostrado que las \textit{Leaky ReLU} presenten una
+mejora sustancial en el entrenamiento de las redes, por lo que las
+\textit{ReLU} convencionales siguen siendo ampliamente usadas.
 
 **** \textit{Maxout}
 
@@ -749,7 +783,7 @@ f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
 \textit{Maxout} \cite{Maxout} es una generalización de las funciones
 \textit{ReLU}, y obtiene lo mejor de los dos mundos: por un lado la
 forma lineal y no saturante de las \textit{ReLUs} y por el otro evita
-el problema de las neuronas que se mueren. A pesar de ello tiene la
+el problema de la muerte de neuronas. A pesar de ello tiene la
 desventaja de duplicar los parámetros para cada neurona, lo cual no
 siempre es deseable, pues implica más tiempo de entrenamiento y
 más consumo de memoria y recursos, sobre todo en redes profundas.
@@ -838,119 +872,6 @@ plt.savefig('images/relu2.pdf')
     \caption{\fontsize{9}{11}\selectfont \textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
 \end{figure}
 #+END_LaTeX
-
-*** Inspiración biológica de las redes neuronales artificiales
-
-Nuestro cerebro está compuesto de más de doscientos tipos de neuronas,
-sin embargo nos centraremos en el tipo estándar de neurona, un modelo
-\textit{näive}.
-
-#+name: neuron
-#+begin_src python :session :exports none :results silent :cache yes :eval no-export
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.cbook as cbook
-
-image = plt.imread("images/neuron.png")
-
-fig, ax = plt.subplots()
-im = ax.imshow(image)
-
-ax.annotate('dendrita', xy=(540.73, 63.20), xytext=(422.78, 26.51),
-             arrowprops=dict(width=2, headwidth=6, facecolor='black', shrink=0.01),)
-ax.annotate('nucleo', xy=(493.11,151.44), xytext=(355.95, 70.19),
-             arrowprops=dict(width=2, headwidth=6, facecolor='black', shrink=0.01),)
-ax.annotate('axon', xy=(302.65,143.58), xytext=(305.28, 230.95),
-             arrowprops=dict(width=2, headwidth=6, facecolor='black', shrink=0.01),)
-ax.annotate('terminal', xy=(144.52, 326.18), xytext=(192.57, 362.87),
-             arrowprops=dict(width=2, headwidth=6, facecolor='black', shrink=0.01),)
-
-plt.axis('off')
-
-plt.savefig('images/neuron.pdf')
-#+end_src
-
-#+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:neuron
-#+caption: \fontsize{9}{11}\selectfont Esquema \textit{näive} de una neurona biológica.
-[[file:images/neuron.pdf]]
-
-El cuerpo de la neurona esta compuesto de tres partes principales, el
-arbol dendrítico, el cuerpo celular o soma y una extensión llamada
-axón con ramificaciones en su extremo (Figura \ref{fig:neuron}). El
-árbol dendrítico se conecta con los axones de otras neuronas y recibe
-impulsos de éstas.  Una neurona puede estar conectada a cientos de
-neuronas desde las que recibe impulsos, los cuales pueden o no activar
-a la neurona en cuestión.  Si la esta se activa, entonces
-retransmite el impulso a través de su axón.
-
-Las conexiones del árbol dendrítico con otras neuronas no son todas
-iguales.  Los axones y las extremidades del arbol tienen un
-pequeño espacio entre ellos llamado espacio sináptico. Si la exitación
-que proviene de un axón es suficiente, entonces el impulso se
-transmite a la neurona, caso contrario no. Decimos que la primera es
-una transmisión exitadora, pues aumenta la posibilidad de transmitir
-el impulso, mientras que el otro caso se denomina transmisión
-inhibidora, dado que reduce esa posibilidad.  De esta manera surge la
-noción de \textit{pesos sinápticos}, que determinan cuando se activan
-las conexiones y cuando no.  Otro aspecto a tener en cuenta es el
-\textit{estímulo acumulativo}, en donde los estímulos de varios
-receptores del arbol dendrítico se combinan de alguna manera para
-activar o no la neurona (no hay punto intermedio). Este sistema de
-tomar los impulsos de entrada y determinar si emitir el impulso de
-salida se corresponde con nuestra \textit{función de activación} que
-ya vimos. La función de activación representa entonces la frecuencia
-con la que se activa la neurona.
-
-#+name: neuron
-#+begin_src python :session :exports none :results silent :cache yes :eval no-export
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.cbook as cbook
-
-image = plt.imread("images/artificial-neuron.png")
-
-fig, ax = plt.subplots()
-im = ax.imshow(image)
-
-props = {'ha': 'center', 'va': 'center'}
-ax.text(75.50, 31.16, r'$x_1$', props, rotation=0, fontsize=15)
-ax.text(75.50, 237.25, r'$x_2$', props, rotation=0, fontsize=15)
-ax.text(75.50, 361.72, r'$x_3$', props, rotation=0, fontsize=15)
-ax.text(84.50, 650.98, r'$x_{n-1}$', props, rotation=0, fontsize=15)
-ax.text(75.50, 822.76, r'$x_n$', props, rotation=0, fontsize=15)
-
-ax.text(419.30, 140.16, r'$\times w_1$', props, rotation=-25, fontsize=15)
-ax.text(419.30, 285.41, r'$\times w_2$', props, rotation=-15, fontsize=15)
-ax.text(419.30, 387.19, r'$\times w_3$', props, rotation=-8, fontsize=15)
-ax.text(450.30, 598.43, r'$\times w_{n-1}$', props, rotation=11, fontsize=15)
-ax.text(419.30, 729.36, r'$\times w_n$', props, rotation=28, fontsize=15)
-
-ax.text(856.71, 470.73, r'$\mathbf{\sum_{i=0}^n w_i x_i + b}$', props, rotation=0, fontsize=18)
-
-ax.text(1219.67, 433.80, r'$\mathbf{Y}$', props, rotation=0, fontsize=18)
-
-ax.text(1529.7, 480.88, r'$\mathbf{f(Y)}$', props, rotation=0, fontsize=18)
-
-ax.text(1808, 433.80, r'$\mathbf{\widetilde{Y}}$', props, rotation=0, fontsize=18)
-
-plt.axis('off')
-
-plt.savefig('images/artificial-neuron.pdf')
-#+end_src
-
-#+attr_latex: width=0.8\textwidth,placement=[p]
-#+label: fig:art-neuron
-#+caption: \fontsize{9}{11}\selectfont Esquema de una neurona artificial. Las entradas (\(x\)) interactuan multiplicativamente con los pesos sinapticos (\(w\)) y se adicionan junto con un vector de sesgo (\(b\)). El resultado pasa por una funcion de activacion (\(f\)) que decide si la señal debe propagarse o no.
-[[file:images/artificial-neuron.pdf]]
-
-En la Figura \ref{fig:art-neuron} vemos un modelo formal de una neurona
-estandar, en el que las entradas \(x_i\) interactúan
-multiplicativamente con los pesos \(w_i\). En nuestra analogía con la
-neurona biológica, esas son las sinapsis. Luego, el el cuerpo de la
-célula, esos resultados se suman junto con un vector de sesgo y sobre
-eso se calcula la función de activación que decide si transmitir o no
-la salida.
 
 ** Entrenamiento de redes neuronales artificiales
 
@@ -1078,12 +999,12 @@ entrada.
 A la hora de entrenar redes convolucionales importan dos cosas: la
 calidad de los datos y la cantidad. Es necesario que además de
 preprocesar los datos con las técnicas usuales (substracción de media
-por ejemplo), se tengan en cuenta aspectos de más alto nivel. Por ejemplo,
-si estuvieramos entrenando una red de reconocimiento de rostros, es
-mucho mejor contar con un dataset de caras alineadas en vez de un
-dataset de caras en diferentes posiciones y ángulos. De esa manera
-vamos a lograr que la red aprenda mejor que \textit{features} extraer
-de las imágenes.
+por ejemplo), se tengan en cuenta aspectos de más alto nivel. Por
+ejemplo, si estuvieramos entrenando una red de reconocimiento de
+rostros, puede ser mejor contar con un conjunto de datos de caras
+alineadas en vez de uno de caras en diferentes posiciones y ángulos
+que tenga más ruido. De esa manera vamos a lograr que la red aprenda
+mejor qué aspectos extraer de las imágenes.
 
 Además no siempre se puede contar con un dataset de millones de
 imágenes para entrenar nuestra red, por lo que suele ser necesario aumentar
@@ -1137,7 +1058,7 @@ aleatorios cercanos a cero. Una opción común es utilizar una
 distribución gaussiana con media cero y desviación estándar 0.01. Este
 método, si bien es bastante \textit{ad-hoc}, es bastante usado. Hay
 muchas otras maneras más sofisticadas de inicializar los pesos de una
-red, pero su análisis escapa al alcance de este trabajo final.
+red, pero su análisis escapa al alcance de este trabajo.
 
 *** Evitando el sobre-ajuste: Regularización y Dropout
 #+LaTeX: \label{sec:regular}
@@ -1149,12 +1070,22 @@ nuestro modelo ajustó sus parámetros demasiado bien al conjunto de
 datos de entrenamiento, provocando que aprendiera detalles
 insignificantes del mismo, principalmente \textit{ruido}
 aleatorio. Como consecuencia, cuando se lo aplica en un conjunto de
-datos nuevos, el modelo presenta un bajo rendimiento. En contrapartida
+datos nuevo, el modelo presenta un bajo rendimiento. En contrapartida
 al \textit{overfitting}, a veces puede pasar que nuestro modelo
 aprendió pocas características de nuestro conjunto de entrenamiento y
 termina siendo muy genérico e inflexible a la hora de ser aplicado en
-un conjunto nuevo, obteniendo también baja precisión (Figura
-\ref{fig:overfit}).
+un conjunto nuevo, obteniendo también baja precisión 
+
+A modo de ejemplo, en la Figura \ref{fig:over1} se puede observar un
+gran sesgo en el caso de \textit{underfitting}, que si bien permite
+una mayor generalización no logra distinguir el límite entre ambas
+clases, lo cual se traduce en menor precisión a la hora de evaluar el
+modelo. En la Figura \ref{fig:over3} observamos un típico caso de
+\textit{overfitting} con mucha variación y sensibilidad a los datos de
+entrenamiento, lo cual implica poca generalización a nuevos datos,
+mientras que en la Figura \ref{fig:over2} se observa un buen ajuste
+del conjunto de datos.
+
 
 #+name: overfitting
 #+begin_src python :session :exports none :results silent :cache yes :eval no-export
@@ -1284,7 +1215,7 @@ explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, widt
         \caption{\textit{Overfitting}}
         \label{fig:over3}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting} y \textit{underfitting}. Se puede observar un gran sesgo en el caso de \textit{underfitting} (\ref{fig:over1}) que si bien permite una mayor generalización no logra distinguir el límite entre ambas clases, lo cual se traduce en menor precisión a la hora de evaluar el modelo. En \ref{fig:over3} observamos un típico caso de \textit{overfitting} con mucha variación y sensibilidad a los datos de entrenamiento, lo cual implica poca generalización a nuevos datos. En \ref{fig:over2} se observa un buen ajuste del conjunto de datos.}\label{fig:overfit}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting} \ref{fig:over1}, \textit{underfitting} \ref{fig:over2} y un buen ajuste al conjunto de datos \ref{fig:over3}.}\label{fig:overfit}
 \end{figure}
 #+END_LaTeX
 
@@ -1293,8 +1224,11 @@ problemas, y eso lo podemos hacer agregando una penalidad de
 regularización \(R(W)\). Lo que buscamos con esto es poner
 preferencias para algunos conjuntos de \weights{} sobre otros.
 
-De esta manera, nuestra función de pérdida ahora cuenta con dos
-componentes: \textit{pérdida de los datos} y \textit{componente de regularización}:
+De esta manera, nuestra función de costo ahora cuenta con dos
+componentes, la función de costo propiamente dicha y la
+\textit{componente de regularización}. Sea \(\lamda\) un número real
+(\textit{término de regularización}, entonces nuestra nueva función de
+costo es:
 
 \begin{equation}
      \boldsymbol{ L =\frac{1}{N} \sum_{i} L_i + \lambda R(W)}
@@ -1306,9 +1240,9 @@ vez.
 
 Las técnicas de regularizacion más usadas son:
 
-**** L2
+**** Regularización de norma L2
 
-Para cada peso de la red se calcula \(\frac{1}{2} \lambda w^2\) donde
+Para cada peso de la red se calcula \(\frac{1}{2} \lambda \mathbf{w}^{2}_{2}\) donde
 \(\lambda\) es la tasa de regularización y se le suma a la función
 objetivo. 
 
@@ -1318,19 +1252,21 @@ clases a la hora de clasificar. De esa manera, nuestro clasificador
 final va a tomar en cuenta todas las dimensiones de entrada (algunas
 con más o menos probabilidad) sin dar prioridad a una sola.
 
-**** L1
+**** Regularización de norma L1
 
-Similar a la aterior, sólo que se le adiciona \(\lambda |w|\) a la
-función objetivo. Los pesos tienden a converger a cero bajo la
-regularización L1 y las redes tienden a usar un subconjunto de los
-datos de entrada, convirtiendose en invariantes al ruido. En general
-se prefiere la regularización L2 por obtenerse mejores resultados.
+Similar a la aterior, sólo que se le adiciona \(\lambda \mathbf{w}_{1}\)
+a la función objetivo. Los pesos tienden a converger
+a cero bajo la regularización L1 y las redes tienden a usar un
+subconjunto de los datos de entrada, convirtiendose en invariantes al
+ruido. En general se prefiere la regularización L2 por obtenerse
+mejores resultados.
 
 **** \textit{Dropout}
 
 La técnica de \textit{dropout} \cite{dropout} consiste en mantener
-activa una neurona con una probabilidad \(\boldsymbol{p}\), o
-establecer su salida a cero en caso contrario.
+activa una neurona con una probabilidad \(\boldsymbol{p}\) (a veces
+\(\boldsymbol{1 - p}\)). Esta técnica se aplica solamente durante el
+\textit{entrenamiento} de las redes neuronales.
 
 Si consideramos una red neuronal con \(L\) capas, sea \(l \in
 \{1,\dots,L\}\) el índice de cada capa oculta de la red. Sea
@@ -1377,12 +1313,15 @@ cantidad de neuronas activas, obteniendo como resultado
 \(\tilde{\boldsymbol{y}}^{(l)}\) que a su vez va a ser la entrada de
 la capa siguiente.
 
-En cada iteración del entrenamiento, \textit{dropout} elimina neuronas
-aleatoriamente y utiliza una \textit{subred} con menos neuronas que la
-original, lo cual impide a las neuronas co-adaptarse entre si. La
-co-adaptación ocurre cuando dos o más neuronas consecutivas dependen
-mucho entre ellas para detectar \textit{features}, en vez de que cada
-neurona busque un tipo particular de \textit{feature}.
+En un entrenamiento sin \textit{dropout}, la red actualiza todas sus
+neuronas en cada iteración (Figura \ref{fig:dropout}-izquierda),
+mientras que utilizando \textit{dropout} se eliminan neuronas
+aleatoriamente y se utiliza una \textit{subred} de la original, lo
+cual impide a las neuronas co-adaptarse entre si (Figura
+\ref{fig:dropout}-derecha). La co-adaptación ocurre cuando dos o más
+neuronas consecutivas dependen mucho entre ellas para detectar
+\textit{features}, en vez de que cada neurona busque un tipo
+particular de \textit{feature}.
 
 Otra manera de pensarlo es la siguiente: una red neuronal con \(n\)
 neuronas puede ser vista como una colección de \(2^n\)
@@ -1398,7 +1337,7 @@ hiperparámetros.
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:dropout
-#+caption: A la izquierda, una red neuronal normal; a la derecha, una red neuronal luego de aplicar \textit{dropout}. Los nodos punteados son las neuronas que se desactivan temporalmente durante esa iteración.
+#+caption: A la izquierda, una red neuronal normal; a la derecha, una red neuronal luego de aplicar \textit{dropout}.
 [[file:images/dropout.pdf]]
 
 *** Organización de las redes neuronales
@@ -1440,8 +1379,8 @@ nos interesa calcular el gradiente sobre \weights{} y \bias{} para
 poder actualizar sus parámetros. Ahora bien, derivar una función con
 millones de parámetros (cantidad que suelen tener las redes neuronales
 artificiales) es computacionalmente costoso, por lo que para
-actualizar \weights{} con los nuevos pesos se utiliza un algoritmo
-llamado \back{}.
+actualizar \weights{} con los nuevos pesos se utiliza el algoritmo
+\textit{retropropagación} (\back{} en inglés).
 
 *** Entrenamiento: \textit{Backpropagation}
 #+LaTeX: \label{sec:backprop}
