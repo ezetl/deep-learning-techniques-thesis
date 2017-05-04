@@ -37,7 +37,7 @@ blocks de nuevo.
 
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
-#+LATEX_HEADER: \usepackage{ifthen,figComision Por Servicio De Cuentalatex}
+#+LATEX_HEADER: \usepackage{ifthen,figlatex}
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{wrapfig}
@@ -1384,40 +1384,44 @@ actualizar \weights{} con los nuevos pesos se utiliza el algoritmo
 
 *** Entrenamiento: \textit{Backpropagation}
 #+LaTeX: \label{sec:backprop}
-El entrenamiento de las redes neuronales se basa en el algoritmo de
-\textit{descenso de gradiente} que ya vimos. Sea \(g\) una funcion de
-una dimension, entonces su derivada se expresa como:
+
+La retropropagación (o \textit{backpropagation} en inglés) es un
+algoritmo utilizado comúnmente con la técnica de optimización de
+descenso de gradiente.
+
+Para lograr una intuición del mismo empecemos por recordar la
+definición de derivada de una función. Sea \(g:\mathbb{R} \to
+\mathbb{R}\), entonces su derivada se expresa como:
 
 \begin{equation}
-     \boldsymbol{\frac{dg(x)}{dx} = \lim_{h\to 0} \frac{g(x + h) - g(x)}{h} }
+     \boldsymbol{\frac{dg(x)}{dx} = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h} }
 \end{equation}
 
-Cuando la función toma un vector de números en vez de uno solo, a las
-derivadas las llamamos derivadas parciales y el \textit{gradiente} es
-simplemente un vector de esas derivadas. Por ejemplo, sea \(g\) una
-función que toma dos parámetros \(x\) e \(y\), entonces el gradiente
-de \(g\) es \(\nabla g = [\frac{\partial g}{\partial x},
+Si el dominio de \(g\) estuviera en \(\mathbb{R}^n\), se calculan
+derivadas parciales y llamamos \textit{gradiente} es simplemente un
+vector conteniendo derivadas. Por ejemplo, sea \(n=2\) y por lo tanto
+\(g\) una función que toma dos parámetros \(x\) e \(y\), entonces el
+gradiente de \(g\) es \(\nabla g = [\frac{\partial g}{\partial x},
 \frac{\partial g}{\partial y}]\)
 
-Usualmente podemos diferenciar con métodos numéricos, asignando a
-\(h\) números muy pequeños por ejemplo, pero esto requiere de muchos
-cálculos, es lento y tan sólo una aproximación. Veremos más
-adelante que la función \loss{} de las redes neuronales suele tener
-decenas de millones de parámetros, y realizar tantas
-operaciones para una sola actualización de \weights{} no es
-conveniente. En la práctica usaremos el cálculo analítico del
-gradiente, en el cual derivamos una fórmula directa que es muy rápida
-de computar valiéndonos de la \textit{regla de la cadena}.
+Usualmente podemos derivar con métodos numéricos, pero es lento y sólo
+aproxima los resultados. Veremos más adelante que la función \loss{}
+de las redes neuronales suele tener decenas de millones de parámetros,
+y realizar tantas operaciones para una sola actualización de
+\weights{} no es conveniente. En la práctica usaremos el cálculo
+analítico del gradiente, en el cual derivamos una fórmula directa que
+es muy rápida de computar valiéndonos de la \textit{regla de la
+cadena}.
 
 La \textit{regla de la cadena} nos ayuda a descomponer el cálculo del
-gradiente de expresiones complejas en pequeños pasos. Por ejemplo,
-tomemos nuevamente una función \(g\):
+gradiente de expresiones complejas en pequeños pasos. Tomemos por
+ejemplo una función \(g:\mathbb{R}^3 \to \mathbb{R}\):
 
 \begin{equation}
     g(x,y,z) = \frac{x}{y^2} + z
 \end{equation}
 
-Si quisieramos obtener su gradiente en \(x\) de la manera tradicional,
+Si quisiéramos obtener su gradiente en \(x\) de la manera tradicional,
 calculando el cociente de \(g(x+h) - g(x)\) con \(h\) cuando \({h \to
 0}\) deberíamos realizar muchos cálculos computacionalmente
 costosos. En cambio, podemos ver a \(g\) como una composición de
@@ -1430,19 +1434,19 @@ funciones:
 Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 
 \begin{equation}
-\frac{\partial g}{\partial z} = q
+\frac{\partial g}{\partial z} = 1
 \end{equation}
 
 \begin{equation}
-\frac{\partial g}{\partial q} = z
+\frac{\partial g}{\partial q} = 1
 \end{equation}
 
 \begin{equation}
-\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = \frac{z}{y^2}
+\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = \frac{1}{y^2}
 \end{equation}
 
 \begin{equation}
-\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial y} = \frac{-2zx}{y^3}
+\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial y} = \frac{-2x}{y^3}
 \end{equation}
 
 Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
@@ -1462,26 +1466,24 @@ de los parámetros más difíciles de elegir, ya que la calidad y rapidez
 de aprendizaje dependen de él.
 
 Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
-actualizaríamos los parámetros, y repetiríamos el ciclo hasta
-conseguir un buen resultado. Sin embargo los conjuntos de datos para
-entrenar las redes neuronales suelen tener cientos de miles o incluso
-millones de imágenes, por lo cual se utiliza una técnica llamada
-\textit{Descenso de Gradiente Estocástico} o \textit{SGD} por sus
-siglas en inglés, en el cual se calcula el gradiente para una cantidad
-predeterminada de imágenes (\textit{batches}), se actualizan los
-parámetros y se vuelve a repetir el ciclo con otro subconjunto
-distinto. Esto parte de la suposición de que todas las imágenes del
-conjunto de datos estan correlacionadas entre sí. En teoría
-\textit{SGD} utiliza una sola imagen por batch, pero dada la alta
-paralelización que provee el hardware actual, conviene hacer lotes de
-imágenes de 62, 128, 512 imágenes o más dependiendo de la capacidad de
-cómputo del hardware a usar . El tamaño de los \textit{batches}
-no es estrictamente un hiperparámetro que uno pueda
-validar durante el entrenamiento, sino que más bien depende del hardware sobre
-el que se esté entrenando la red (en general se eligen potencias de
-dos por cuestiones de eficiencia). No obstante puede haber casos en los que se elija un
-tamaño de \textit{mini-batch} chico para tener más varianza en los datos de
-entrada de la red y evitar que la se caiga en un mínimo local.
+actualizaríamos los parámetros, y repetiríamos el ciclo hasta lograr
+la convergencia. Sin embargo los conjuntos de datos para entrenar las
+redes neuronales suelen tener cientos de miles o incluso millones de
+imágenes, por lo cual se utiliza una técnica llamada 
+\textit{Descenso de Gradiente Estocástico con mini-batches} o simplemente \textit{SGD}
+por sus siglas en inglés, en el cual se calcula el gradiente para una
+cantidad predeterminada de imágenes (\textit{mini-batches}), se
+actualizan los parámetros y se vuelve a repetir el ciclo con otro
+subconjunto distinto. Esto parte de la suposición de que todas las
+imágenes del conjunto de datos estan correlacionadas entre sí. El
+tamaño de los \textit{mini-batches} no es estrictamente un
+hiperparámetro que uno pueda validar durante el entrenamiento, sino
+que más bien depende del hardware sobre el que se esté entrenando la
+red (en general se eligen potencias de dos por cuestiones de
+eficiencia). No obstante puede haber casos en los que se elija un
+tamaño de \textit{mini-batch} chico para tener más varianza en los
+datos de entrada de la red y evitar que la se caiga en un mínimo
+local.
 
 **** Transferencia de aprendizaje
 
@@ -1489,13 +1491,14 @@ Entrenar un modelo con un tipo específico de problema y luego utilizar
 su \textit{conocimiento} para resolver otro problema nuevo, tal vez
 incluso en un área distinta a la que fue pensado originalmente, es lo
 que se llama transferencia de aprendizaje. Esta técnica ha cobrado
-importancia en \textit{deep learning} dado que a menudo las redes son
-muy profundas y tardan semanas en entrenarse, por lo que contar con
-modelos preentrenados sobre los cuales se puedan ajustar ligeramente
-los parámetros para resolver un nuevo problema es una ventaja. La
-mayoría de los \textit{frameworks} modernos para implementar redes
-neuronales soportan realizar transferencia de aprendizaje utilizando
-modelos pre-entrenados.
+importancia en \textit{deep learning} dado que a menudo las
+arquitecturas son muy complejas y se tardan semanas en lograr la
+convergencia deseada, por lo que contar con modelos preentrenados
+sobre los cuales se puedan ajustar ligeramente los parámetros para
+resolver un nuevo problema es una ventaja. La mayoría de los
+\textit{frameworks} modernos para implementar redes neuronales
+soportan realizar transferencia de aprendizaje utilizando modelos
+pre-entrenados.
 
 ** Redes Neuronales Convolucionales
 
