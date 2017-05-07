@@ -1502,6 +1502,149 @@ pre-entrenados.
 
 ** Redes Neuronales Convolucionales
 
+Podemos representar a una imagen como una función \(f:\mathbb{R}^2 \to \mathbb{R}^n\)
+con \(n\) igual número de canales que pueda tener una imagen
+(usualmente \(1\) ó \(3\)). Es decir, toma coordenadas en
+\(\mathbb{R}^2\) y devuelve la intensidad en ese punto.
+
+El caso general de un \textit{operador} de procesamiento de imágenes es el de
+una función que toma una o más imágenes de entrada y produce una
+imagen de salida.  Para el caso discreto en el que el dominio consiste
+de un número finito de píxeles donde representamos a cada píxel como
+su posición en la imagen, \(\boldsymbol{x} = (i, j)\), podemos
+expresar a un operador de píxeles como:
+
+\begin{equation}
+g(i,j) = h(f(i,j))
+\end{equation}
+
+Un operador muy utilizado en la visión por computadoras es el
+\textit{filtro lineal}. El mismo es un tipo de \textit{operador local}
+dado que usa el conjuto de píxeles en la vecindad de uno para
+determinar su nuevo valor. En un filtro lineal cada píxel de salida se
+determina como la suma ponderada de los valores de entrada:
+
+\begin{equation}\label{eq:corr}
+g(i,j) = \sum_{k,l} f(i+k,j+l)h(k,l)
+\end{equation}
+
+Donde las entradas en el \textit{kernel} o \textit{máscara} de pesos
+\(h(k,l)\) son los \textit{coeficientes del filtro}. El operador en la
+ecuación Ecuación \ref{eq:corr} se denonima \textit{correlación}, y
+puede ser escrito como:
+
+\begin{equation}
+g = f \bigotimes h
+\end{equation}
+
+Una variante de la Ecuación \ref{eq:corr} es invirtiendo el signo de
+los \textit{offsets}, y se denomina \textit{convolución}:
+
+\begin{equation}
+g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
+\end{equation}
+
+
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
+    \colorlet{gre}{green!40}
+    \colorlet{blu}{blue!40}
+    \node[fill=gre] at (-0.25,2.25)  {};
+    \node[fill=gre] at (-0.25,1.75)  {};
+    \node[fill=gre] at (-0.25,1.25)  {};
+    \node[fill=gre] at (0.25,2.25)  {};
+    \node[fill=gre] at (0.25,1.75)  {};
+    \node[fill=gre] at (0.25,1.25)  {};
+    \node[fill=gre] at (0.75,2.25)  {};
+    \node[fill=gre] at (0.75,1.75)  {};
+    \node[fill=gre] at (0.75,1.25)  {};
+    \draw[step=0.5cm,color=black] (-1,-1) grid (3, 3);
+    % first row
+    \node at (-0.75,2.75) {\tiny 45};
+    \node at (-0.25,2.75) {\tiny 60};
+    \node at (0.25,2.75) {\tiny 98};
+    \node at (0.75,2.75) {\tiny 127};
+    \node at (1.25,2.75) {\tiny 132};
+    \node at (1.75,2.75) {\tiny 133};
+    \node at (2.25,2.75) {\tiny 137};
+    \node at (2.75,2.75) {\tiny 133};
+    % second row
+    \node at (-0.75,2.25) {\tiny 46};
+    \node at (-0.25,2.25) {\tiny 65};
+    \node at (0.25,2.25) {\tiny 98};
+    \node at (0.75,2.25) {\tiny 123};
+    \node at (1.25,2.25) {\tiny 126};
+    \node at (1.75,2.25) {\tiny 128};
+    \node at (2.25,2.25) {\tiny 131};
+    \node at (2.75,2.25) {\tiny 133};
+    % third row
+    \node at (-0.75,1.75) {\tiny 47};
+    \node at (-0.25,1.75) {\tiny 65};
+    \node at (0.25,1.75) {\tiny 96};
+    \node at (0.75,1.75) {\tiny 115};
+    \node at (1.25,1.75) {\tiny 119};
+    \node at (1.75,1.75) {\tiny 123};
+    \node at (2.25,1.75) {\tiny 135};
+    \node at (2.75,1.75) {\tiny 137};
+    % fourth row
+    \node at (-0.75,1.25) {\tiny 47};
+    \node at (-0.25,1.25) {\tiny 63};
+    \node at (0.25,1.25) {\tiny 91};
+    \node at (0.75,1.25) {\tiny 107};
+    \node at (1.25,1.25) {\tiny 113};
+    \node at (1.75,1.25) {\tiny 122};
+    \node at (2.25,1.25) {\tiny 138};
+    \node at (2.75,1.25) {\tiny 134};
+    % fifth row
+    \node at (-0.75,0.75) {\tiny 50};
+    \node at (-0.25,0.75) {\tiny 59};
+    \node at (0.25,0.75) {\tiny 80};
+    \node at (0.75,0.75) {\tiny 97};
+    \node at (1.25,0.75) {\tiny 110};
+    \node at (1.75,0.75) {\tiny 123};
+    \node at (2.25,0.75) {\tiny 133};
+    \node at (2.75,0.75) {\tiny 134};
+    % sixth row
+    \node at (-0.75,0.25) {\tiny 49};
+    \node at (-0.25,0.25) {\tiny 53};
+    \node at (0.25,0.25) {\tiny 68};
+    \node at (0.75,0.25) {\tiny 83};
+    \node at (1.25,0.25) {\tiny 97};
+    \node at (1.75,0.25) {\tiny 113};
+    \node at (2.25,0.25) {\tiny 128};
+    \node at (2.75,0.25) {\tiny 133};
+    % seventh row
+    \node at (-0.75,-0.25) {\tiny 50};
+    \node at (-0.25,-0.25) {\tiny 50};
+    \node at (0.25,-0.25) {\tiny 58};
+    \node at (0.75,-0.25) {\tiny 70};
+    \node at (1.25,-0.25) {\tiny 84};
+    \node at (1.75,-0.25) {\tiny 102};
+    \node at (2.25,-0.25) {\tiny 116};
+    \node at (2.75,-0.25) {\tiny 126};
+    % eight row
+    \node at (-0.75,-0.75) {\tiny 50};
+    \node at (-0.25,-0.75) {\tiny 50};
+    \node at (0.25,-0.75) {\tiny 52};
+    \node at (0.75,-0.75) {\tiny 58};
+    \node at (1.25,-0.75) {\tiny 69};
+    \node at (1.75,-0.75) {\tiny 86};
+    \node at (2.25,-0.75) {\tiny 101};
+    \node at (2.75,-0.75) {\tiny 120};
+    % Convolution operator
+    \node[text width=6cm, anchor=west, right] at (3.29,1.25) {$*$};
+    % Filter
+    \draw[step=0.5cm,color=black] (6,0.5) grid (2,2);
+    \node[opacity=1,black] at (3.75,1.75) {\tiny 50};
+\end{tikzpicture}
+\caption{}\label{fig:convmatrix}
+\end{figure}
+#+END_LaTeX
+
+
+
 Antes de introducirnos en el mundo de las redes convolucionales es
 necesario definir qué es una convolución.
 
