@@ -1502,10 +1502,10 @@ pre-entrenados.
 
 ** Redes Neuronales Convolucionales
 
-Podemos representar a una imagen como una función \(f:\mathbb{R}^2 \to \mathbb{R}^n\)
-con \(n\) igual número de canales que pueda tener una imagen
-(usualmente \(1\) ó \(3\)). Es decir, toma coordenadas en
-\(\mathbb{R}^2\) y devuelve la intensidad en ese punto.
+Podemos representar a una imagen como una función \(f:\mathbb{R}^2 \to \mathbb{R}^n\) 
+con \(n\) igual número de canales que pueda tener (usualmente \(1\) ó
+\(3\)). Es decir, toma un punto en coordenadas cartesianas y devuelve la
+intensidad en ese punto.
 
 El caso general de un \textit{operador} de procesamiento de imágenes es el de
 una función que toma una o más imágenes de entrada y produce una
@@ -1540,9 +1540,19 @@ g = f \bigotimes h
 Una variante de la Ecuación \ref{eq:corr} es invirtiendo el signo de
 los \textit{offsets}, y se denomina \textit{convolución}:
 
-\begin{equation}
+\begin{equation}\label{eq:conv}
 g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
 \end{equation}
+
+Que también puede ser escrito como:
+
+\begin{equation}
+g = f * h
+\end{equation}
+
+En la Figura \ref{fig:convmatrix} se puede observar un ejemplo sobre
+el uso de este operador en una imagen de un solo canal donde la
+intensidad de cada píxel está representada con un número.
 
 
 #+BEGIN_LaTeX
@@ -1560,6 +1570,8 @@ g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
     \node[fill=gre] at (0.75,2.25)  {};
     \node[fill=gre] at (0.75,1.75)  {};
     \node[fill=gre] at (0.75,1.25)  {};
+    % result fill
+    \node[fill=blu] at (7.25, 2.25) {};
     \draw[step=0.5cm,color=black] (-1,-1) grid (3, 3);
     % first row
     \node at (-0.75,2.75) {\tiny 45};
@@ -1635,78 +1647,94 @@ g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
     \node at (2.75,-0.75) {\tiny 120};
     % Convolution operator
     \node[text width=6cm, anchor=west, right] at (3.29,1.25) {$*$};
-    % Filter
-    \draw[step=0.5cm,color=black] (6,0.5) grid (2,2);
-    \node[opacity=1,black] at (3.75,1.75) {\tiny 50};
+    % Filter (end right, end down)grid(start left, start up)
+    \draw[step=0.5cm,color=black] (5.50,0.5) grid (3.994,2);
+    % first row
+    \node at (4.25, 1.75) {\tiny 0.1};
+    \node at (4.75, 1.75) {\tiny 0.1};
+    \node at (5.25, 1.75) {\tiny 0.1};
+    % second row
+    \node at (4.25, 1.25) {\tiny 0.1};
+    \node at (4.75, 1.25) {\tiny 0.2};
+    \node at (5.25, 1.25) {\tiny 0.1};
+    % third row
+    \node at (4.25, 0.75) {\tiny 0.1};
+    \node at (4.75, 0.75) {\tiny 0.1};
+    \node at (5.25, 0.75) {\tiny 0.1};
+    % Equal
+    \node[text width=6cm, anchor=west, right] at (5.75,1.25) {$=$};
+    % Result
+    \draw[step=0.5cm,color=black] (9.50,0) grid (6.4999,3);
+    % first row
+    \node at (6.75, 2.75) {\tiny 69};
+    \node at (7.25, 2.75) {\tiny 95};
+    \node at (7.75, 2.75) {\tiny 116};
+    \node at (8.25, 2.75) {\tiny 125};
+    \node at (8.75, 2.75) {\tiny 129};
+    \node at (9.25, 2.75) {\tiny 132};
+    % second row
+    \node at (6.75, 2.25) {\tiny 68};
+    \node at (7.25, 2.25) {\tiny 92};
+    \node at (7.75, 2.25) {\tiny 110};
+    \node at (8.25, 2.25) {\tiny 120};
+    \node at (8.75, 2.25) {\tiny 126};
+    \node at (9.25, 2.25) {\tiny 132};
+    % third row
+    \node at (6.75, 1.75) {\tiny 66};
+    \node at (7.25, 1.75) {\tiny 86};
+    \node at (7.75, 1.75) {\tiny 104};
+    \node at (8.25, 1.75) {\tiny 114};
+    \node at (8.75, 1.75) {\tiny 124};
+    \node at (9.25, 1.75) {\tiny 132};
+    % fourth row
+    \node at (6.75, 1.25) {\tiny 62};
+    \node at (7.25, 1.25) {\tiny 78};
+    \node at (7.75, 1.25) {\tiny 94};
+    \node at (8.25, 1.25) {\tiny 108};
+    \node at (8.75, 1.25) {\tiny 120};
+    \node at (9.25, 1.25) {\tiny 129};
+    % fifth row
+    \node at (6.75, 0.75) {\tiny 57};
+    \node at (7.25, 0.75) {\tiny 69};
+    \node at (7.75, 0.75) {\tiny 83};
+    \node at (8.25, 0.75) {\tiny 98};
+    \node at (8.75, 0.75) {\tiny 112};
+    \node at (9.25, 0.75) {\tiny 124};
+    % sixth row
+    \node at (6.75, 0.25) {\tiny 53};
+    \node at (7.25, 0.25) {\tiny 60};
+    \node at (7.75, 0.25) {\tiny 71};
+    \node at (8.25, 0.25) {\tiny 85};
+    \node at (8.75, 0.25) {\tiny 100};
+    \node at (9.25, 0.25) {\tiny 114};
+    % Captions
+    \node[text width=6cm, anchor=west, right] at (0.25,-1.30) {\scriptsize $f(i,j)$};
+    \node[text width=6cm, anchor=west, right] at (4.30,-1.30) {\scriptsize $h(i,j)$};
+    \node[text width=6cm, anchor=west, right] at (7.50,-1.30) {\scriptsize $g(i,j)$};
 \end{tikzpicture}
-\caption{}\label{fig:convmatrix}
+\caption{\fontsize{9}{11}\selectfont Convolución. La imagen en la izquierda se convoluciona con el filtro $h$ para dar lugar a la imagen de la derecha. El píxel marcado en azul es el resultado de la combinación lineal de $h$ con el \textit{parche} verde en la imagen original.}\label{fig:convmatrix}
 \end{figure}
 #+END_LaTeX
 
+Dado que la convolución en el caso discreto es una combinación lineal,
+su resultado para cada elemento \(f(i,j) \in \mathbb{R}^n\) es un
+escalar en \(\mathbb{R}\). Notar que la Ecuación \ref{eq:conv} puede
+ser generalizada a más dimensiones, por lo que el mismo concepto
+aplica también a imágenes con \(n\) canales.
 
 
-Antes de introducirnos en el mundo de las redes convolucionales es
-necesario definir qué es una convolución.
-
-Una matriz de convolución, o \textit{kernel}, es una matriz
-generalmente cuadrada y pequeña utilizada extensamente para detectar o
-resaltar bordes y enfocar o desenfocar imágenes dependiendo de sus
-valores y tamaño. Son muy utilizadas en el mundo de la visión por
-computadoras, sobre todo en los pasos de extracción de
-\textit{features} de una imagen a la hora de aplicar algoritmos de
-aprendizaje automático.
-
-Una convolución entre un \textit{kernel} y una imagen se realiza
-sumando las multiplicaciones elemento a elemento entre \textit{kernel}
-y una región de la imagen. Por ejemplo, sea \(C\) un \textit{kernel}
-de \(3\times3\) y \(A\) un pedazo de una imagen también de dimension
-\(3\times3\), entonces la convolución entre \(C\) y \(A\) (denotada con el
-símbolo \(*\)) es:
-
-\begin{equation}
-C
-=
-\begin{bmatrix}
-    0  & 1 & 0 \\
-    1  & -4 & 1 \\
-    0  & 1 & 0 \\
-\end{bmatrix}
-\end{equation}
-
-\begin{equation}
-A
-=
-\begin{bmatrix}
-    a  & b & c \\
-    d  & e & f \\
-    g  & h & i \\
-\end{bmatrix}
-\end{equation}
-
-\begin{equation}
-A * C = (a\times0) + (b\times1) + (c\times0) + (d\times1) + (e\times-4) + (f\times1) + (g\times0) + (h\times1) + (i\times0)
-\end{equation}
-
-Observemos dos cosas: 
-\begin{enumerate}
-
-\item El resultado de la convolución entre un \textit{kernel} y su
-correspondiente pedazo en la imagen (que hasta ahora es de un canal)
-es un valor escalar, o sea un píxel correspondiente al canal de la
-imagen sobre el cual hayamos convolucionado. Es decir, si
-convolucionamos un \textit{kernel} a través de los 3 canales de una
-imagen (rojo, verde y azul) vamos a obtener como resultado 3 valores
-que se van a combinar para crear un píxel RGB (\textit{Red-Green-Blue}
-por sus siglas en inglés).
-
-\item Uno no realiza una sola convolución con un solo pedazo de la imagen,
-sino que lo hace sobre \textit{toda} la imagen. Esto significa que el
-\textit{kernel} se va ``desplazando'' a lo largo y ancho de la imagen
-para generar, en cada ocasión, un escalar que va a formar parte de la
-nueva imagen convolucionada. En la Figura \ref{fig:conv} se puede observar
-el resultado de una convolución.
-
-\end{enumerate}
+Si convolucionamos todos los píxeles de la imagen de entrada
+obtendremos una nueva imagen de un canal. Para aplicar la convolución
+a la totalidad de una imagen se deben tener en cuenta ciertas
+configuraciones espaciales. Una de ellas es el \textit{stride}, o
+cantidad de \textit{pasos} cada cuales convolucionar. Cuando se aplica
+el filtro convolucional a cada píxel de la imagen, se tiene un
+\textit{stride} igual a 1, pero también podría elegirse aplicar el
+filtro cada dos o más píxeles. Además, al aplicar el filtro
+convolucional a lo largo y alto de la imagen surgen casos en los que
+el filtro se aplica a píxeles fuera de los bordes de la misma, por lo
+que se agrega un borde artificial mediante la técnicas de
+\textit{padding}.
 
 #+BEGIN_LaTeX
 \begin{figure}
@@ -1735,16 +1763,16 @@ el resultado de una convolución.
 \end{figure}
 #+END_LaTeX
 
-Las redes convolucionales hacen uso extensivo de estos
-\textit{kernels}. De hecho, \textit{aprenden a generar}
-\textit{kernels} para encontrar diversas características en las
-imágenes, tanto de bajo nivel (bordes o colores) como de alto nivel
-(neuronas que se activan cuando una persona sonríe, por ejemplo). Si
-sumamos esto con la no linealidad propia de las redes neuronales
-artificiales, obtenemos una poderosa herramienta de clasificación de
-imágenes.
+Una buena propiedad de la convolución es que toma ventaja de la
+\textit{localidad} (vecinos) de cada píxel, que usualmente son los más
+relacionados, y produce una salida \textit{comprimiendo} esa
+información local en un escalar. De esta manera se puede utilizar una
+convolución para extraer \textit{features} de una imagen valiéndose de
+su estructura espacial. Otra buena propiedad es el principio de
+\textit{invarianza traslacional}, que básicamente significa que la
+respuesta del operador no depende explícitamente del lugar en la
+imagen donde se aplique.
 
-*** Diferencias con redes neuronales artificales convencionales
 Las redes convolucionales cuentan con los mismos artefactos que las
 redes convencionales que ya discutimos (neuronas con pesos, funciones
 de pérdida, capas completamente conectadas). Incluso los mismos
@@ -1762,31 +1790,34 @@ tenemos en cuenta que seguramente vamos a requerir más de una neurona
 (comúnmente cientos de ellas en una misma capa) podemos concluir que
 este enfoque no escala bien para el procesamiento de imágenes.
 
-Una red neuronal convolucional se aprovecha de la ventaja de que los
-datos de entrada son imágenes y organiza las neuronas en 3
-dimensiones: ancho, alto y profundidad. Tal como hicimos con las redes
-neuronales convencionales, en la siguiente sección analizaremos los
-tipos de capas de una red neuronal convolucional. Al final de la
-Sección se dará una descripción general de la arquitectura de una red
-convolucional y varios ejemplos de redes convolucionales conocidas.
+Una red neuronal convolucional utiliza capas con filtros
+convolucionales. Además de las ventajas de invarianza traslacional y
+localidad antes mencionadas, un filtro convolucional utiliza pocos
+parámetros.
+
+Tal como hicimos con las redes neuronales convencionales, en la
+siguiente sección analizaremos los tipos de capas de una red neuronal
+convolucional. Al final de la Sección se dará una descripción general
+de la arquitectura de una red convolucional y varios ejemplos de redes
+convolucionales conocidas.
 
 *** Capas de una red convolucional
 **** Capas de Entrada y Salida
 
-Las redes convolucionales se manejan con volumenes (datos en mas de
-dos dimensiones). Eso significa que para cada capa hay un volumen de
-entrada y un volumen de salida.
+Las redes convolucionales manipulan arreglos tridimensionales. Eso
+significa que para cada capa hay un volumen de entrada y un volumen de
+salida.
 
 La capa de entrada de una red es la que provee la imagen original como
 un volumen de pixeles. Notar que si una imagen tiene un alto y ancho
 de 256 pixeles y tres canales de colores (RGB) entonces el volumen de
 salida de esta capa va a ser \(256 \times 256 \times 3\).
 
-En general la capa de salida de una red suele ser una capa completamente
-conectada con los puntajes de cada clase en el caso de tareas de
-clasificacion o con un vector de numeros reales en el caso de tareas
-de regresion. Para clasificación también es muy común agregar una
-última capa con un clasificador (por ejemplo, \textit{Softmax}) que
+En general la capa de salida de una red suele ser una capa
+completamente conectada con los puntajes de cada clase en el caso de
+tareas de clasificacion o con un vector de numeros reales en el caso
+de tareas de regresion. Para clasificación también es muy común
+utilizar un clasificador (por ejemplo, \textit{Softmax}) que
 transforme los puntajes obtenidos en probabilidades normalizadas.
 
 **** Capas Convolucionales
@@ -1798,7 +1829,7 @@ profundidad del volumen de entrada (ej.: los tres canales RGB). Notar
 que el volumen de entrada puede bien ser una imagen o bien el volumen
 de salida con las activaciones de otra capa.
 
-Durante el entrenamiento o la clasificación de imagenes, estos filtros
+Como se puede observar en la Figura \ref{fig:conv-lay} estos filtros
 se convolucionan a traves del ancho y alto del volumen de entrada,
 produciendo un mapa de activaciones en 2-D para cada filtro. Si
 ``apilamos'' los mapas de activaciones de todos los filtros de una
@@ -1808,38 +1839,43 @@ como la salida de una neurona conectada a una pequeña region de los
 datos de entrada, la cual comparte parámetros (pesos) con las otras
 neuronas que corresponden al mismo filtro.
 
-Esta conexión a una pequeña región en los datos de entrada es un
-hiperparámetro de la red llamado \textit{campo receptivo}. Es
-importante notar que los \textit{campos receptivos} son locales en una
-pequeña área en cuanto al ancho y alto de la entrada, pero abarcan la
-totalidad de la profundidad del volumen de entrada.
+Esta conexión a una pequeña región en los datos de entrada es
+denominada \textit{campo receptivo}. Es importante notar que los
+\textit{campos receptivos} son locales en una pequeña área en cuanto
+al ancho y alto de la entrada, pero abarcan la totalidad de la
+profundidad del volumen de entrada.
 
 Otros hiperparámetros relacionados con las capas convolucionales son
 la cantidad de filtros (\textit{K}), el espacio en píxeles entre cada
 aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
 con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de
-1 o más ceros a la entrada de la capa. En la Figura \ref{fig:conv-lay}
-se observa un esquema del funcionamiento de una capa convolucional.
+1 o más ceros a la entrada de la capa.
 
 #+BEGIN_LaTeX
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/conv-layer.pdf}
-    \caption{Ejemplo de una capa convolucional cuyo volumen de entrada es una imagen (\(x\)) con 3 canales RGB. La capa cuenta con 6 filtros y cada uno convoluciona con la imagen a lo largo y ancho. El volumen de salida de esta capa tiene una profundidad de 6 y un ancho y largo que dependen del tamaño de los filtros y el \textit{stride}. Los recuadros más oscuros sobre \(x\) corresponden con el \textit{campo receptivo} de una neurona particular, cuyo tamaño está dado por el tamaño de los filtros.}\label{fig:conv-lay}
+    \caption{Ejemplo de una capa convolucional cuyo volumen de entrada es una imagen (\(x\)) con 3 canales RGB. La capa cuenta con 6 filtros y cada uno convoluciona con la imagen a lo largo y ancho.}\label{fig:conv-lay}
 \end{figure}
 #+END_LaTeX
 
 **** \textit{Pooling}
 
-Las capas de \textit{pooling} reducen la dimensión espacial de sus
-entradas y por ende, la cantidad de parametros en la red,
-ayudando a controlar el \textit{overfitting}. Lo más común es
-insertar capas de \textit{pooling} luego de capas convolucionales.
+Con el objetivo de reducir la cantidad de parámetros y en consecuencia
+las dimensiones de las representaciones obtenidas de la imagen de
+entrada, se suelen intercalar capas \textit{pooling} en reducen la
+dimensión espacial de sus entradas.
+
+Reducir la cantidad de parámetros no sólo favorece la rapidez del
+entrenamiento sino también ayuda a controlar el
+\textit{overfitting}. Lo más común es insertar capas de
+\textit{pooling} luego de capas convolucionales.
 
 Un método de \textit{pooling} muy usado es \textit{MAX Pooling}, en el
-cual se calcula el máximo de un área local (generalmente \(2 \times 2\) o \(3 \times 3\)) en
-el ancho y largo del volumen de entrada y a través de cada una de las
-``rodajas'' que conforman la profundidad del volumen. El área local
+cual se calcula el máximo de un área local (generalmente \(2 \times 2\) ó
+ \(3 \times 3\)) en el ancho y largo del volumen de entrada y a través
+de cada una de las ``rodajas'' que conforman la profundidad del
+volumen, como se puede ver en la Figura \ref{fig:pool2}. El área local
 está definida por el tamaño del \textit{stride}. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
 
@@ -1908,47 +1944,48 @@ convolucionales (CONV), capas de \textit{pooling} (POOL), capas
 completamente conectadas (FC por sus siglas en ingles) y funciones de
 activacion, generalmente rectificadores lineales (RELU).
 
-El patron usual en redes convolucionales es una capa CONV seguida de
-una capa RELU seguida de una capa de \textit{pooling}. Esto se repite
-una o varias veces hasta reducir espacialmente las dimensiones de la
-entrada de la red. Luego es comun utilizar capas FC hasta reducir las
+El patrón usual en redes convolucionales es generar \textit{bloques}
+con una o más capas CONV seguidas de capas RELU seguidas de capas de
+\textit{pooling}. Luego es común utilizar capas FC hasta reducir las
 dimensiones a las dimensiones de salida, que en el caso de
 clasificacion son las probabilidades de cada clase.
 
 A lo largo de los años ha habido varias arquitecturas de redes
 convolucionales que cuentan con nombre propio, como por ejemplo LeNet
 \cite{Lecun98gradient-basedlearning}, creada en los 90 por Yann LeCun
-y utilizada para el reconocimiento de digitos manuscriptos. Esta red
-fue utilizada con exito para leer codigos postales y cheques
+y utilizada para el reconocimiento de dígitos manuscriptos. Esta red
+fue utilizada con éxito para leer códigos postales y cheques
 bancarios.
 
-En 2012, el ganador del desafio ImageNet ILSVRC, Alex Krizhevsky,
+En 2012, el ganador del desafío ImageNet ILSVRC, Alex Krizhevsky,
 obtuvo un 16% de error utilizando una arquitectura llamada AlexNet
 \cite{NIPS2012_4824}. Su arquitectura es muy similar a la de LeNet,
 aunque mas profunda y fue una de las primeras en concatenar varias
-capas CONV antes de una capa de \textit{pooling}.
+capas CONV antes de una capa de \textit{pooling}. El desafío ImageNet
+consiste en varias tareas de procesamiento de imágenes, entre ellas la
+clasificación de 1000 clases distintas de objetos.
 
 Los ganadores del ISLVRC 2013 utilizaron una red llamada ZFNet
-\cite{DBLP:journals/corr/ZeilerF13}, que era basicamente una
-modificacion de AlexNet, con cambios en los hiperparametros y las
-capas convolucionales.
+\cite{DBLP:journals/corr/ZeilerF13} con un error del 11.2% en ImageNet. Su
+propuesta era básicamente una modificación en los hiperparámetros y
+capas convolucionales de AlexNet.
 
 En la misma competencia ILSVRC del 2014 se dieron a conocer dos redes,
-GoogLeNet \cite{43022} y VGGNet \cite{Simonyan14c}. Ambas demostraron
-que la profundidad de la red es una caracteristica critica a la hora
-de obtener buenos resultados.
-
-Si bien GoogLeNet fue la ganadora ese año, luego se demostro que
-VGGNet es superior en muchas tareas de transferencia de aprendizaje,
-por lo que es mas popular que GoogLeNet y se pueden encontrar muchos
-modelos ya preentrenados.
+GoogLeNet \cite{43022} con un error del 6.67% y VGGNet
+\cite{Simonyan14c} con un error del 7.32%. Ambas demostraron que la
+profundidad de la red es una característica crítica a la hora de
+obtener buenos resultados. Si bien GoogLeNet fue la ganadora ese año,
+luego se demostró que VGGNet es superior en muchas tareas de
+transferencia de aprendizaje, por lo que es más popular que GoogLeNet
+y se pueden encontrar muchos modelos ya preentrenados.
 
 Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
-cuenta con 19) y obteniendo un error de 3.57% en el top-5. A finales de 2016 
-se publicó una nueva variante de ResNet denominada DenseNet que incluye 
-conexiones entre todas las capas de la misma, obteniendo resultados de 
-estado del arte pero consumiendo menos memoria y tiempo de cómputo.
+cuenta con 19) y obteniendo un error de 3.57% en el top-5. A finales
+de 2016 se publicó una nueva variante de ResNet denominada DenseNet
+\cite{densenet} que incluye conexiones entre todas las capas de la
+misma, obteniendo resultados de estado del arte pero consumiendo menos
+memoria y tiempo de cómputo.
 
 #+LaTeX: \newpage
 
