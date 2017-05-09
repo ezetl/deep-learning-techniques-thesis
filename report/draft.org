@@ -1999,9 +1999,7 @@ arquitectura toma pares de imágenes (\(x_1\) y \(x_2\)) y las salidas
 de ambas redes son redireccionadas a una función de pérdida que
 calcula alguna métrica respecto a las dos entradas (Figura
 \ref{fig:siamese-diagram}). Las redes siamesas no difieren en más que
-eso de las redes convolucionales que ya vimos. Se pueden entrenar
-mediante \back{} y, dependiendo del problema,
-utilizando hasta las mismas funciones de pérdida.
+eso de las redes convolucionales que ya vimos.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
 verificación de huellas digitales \cite{fingerprint} y de firmas
@@ -2062,7 +2060,7 @@ humanos o un robot con giróscopos y otros sensores de movimiento, es
 posible acceder a la información visual y espacial para determinar en
 dónde se encuentra uno en el espacio.
 
-Agrawal et al. proponen en \cite{LSM2015} que se pueden aprender
+Agrawal et al. \cite{LSM2015} proponen que se pueden aprender
 representaciones visuales útiles analizando la correlación entre los
 estímulos visuales y el automovimiento. De esta manera, un agente
 móvil puede ser tratado como una cámara moviéndose, y su información
@@ -2074,36 +2072,24 @@ transformaciones sufren las imágenes a medida que el agente se mueve.
 
 Ese agente móvil es modelado con Redes Neurales Convolucionales que
 optimizan sus representaciones visuales minimizando el error entre la
-informacion de automovimiento provista por el sistema y la informacion
-de eutomovimiento predecida utilizando las imágenes de entrada
+informacion de automovimiento provista por el sistema y la información
+de automovimiento predecida utilizando las imágenes de entrada
 solamente. Este procedimiento es, según Agrawal, equivalente a
 entrenar una Red Convolucional con dos flujos de entrada (o sea, una
-Red Neural Convolucional Siamesa) en el que cada entrada toma una
-imagen y la red predice la transformacion que ocurrio entre ambas
+Red Neural Convolucional Siamesa) en el que se procesan dos imágenes
+desplazadas y la red predice la transformación que ocurrió entre ambas
 imágenes.
 
 Bajo la hipótesis de que esto forzaría al agente a aprender
 \textit{features} útiles en la identificación de elementos visuales
 que esten presentes en ambas imágenes, entrenaron diferentes versiones
 de redes siamesas con distintos conjuntos de datos y obtuvieron
-resultados comparables al estado del arte. La diferencia es que ellos
-no debieron utilizar tantas imágenes.
-
-En este trabajo final se tratará de validar la hipótesis propuesta por
-Agrawal et al. reproduciendo varios de los experimentos propuestos en
-su investigación. Para ello nos valdremos de técnicas similares a las
-mencionadas en la Sección \ref{sec:marco} de pre-entrenamiento de redes y
-transferencia de aprendizaje para validar las redes
-entrenadas.
-
-En la Sección \ref{sec:agrawal} reproduciremos los resultados del
-paper previamente citado. Primero haremos una prueba de concepto
-utilizando el conjunto de datos MNIST \cite{mnist} para luego realizar
-experimentos con el conjunto de datos KITTI \cite{Geiger2012CVPR}.
+resultados comparables al estado del arte sin utilizar conjuntos de
+datos masivos.
 
 *** Nomenclatura
 
-Vamos a seguir la misma nomenclatura que en el paper original. Cada componente de la red siamesa se denotará con BCNN por sus siglas
+Cada componente de la red siamesa se denotará con BCNN por sus siglas
 en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
 redes serán concatenadas y pasadas a otra red llamada TCNN
 (\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
