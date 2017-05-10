@@ -1992,14 +1992,27 @@ memoria y tiempo de cómputo.
 * Redes neuronales convolucionales siamesas
 #+LaTeX: \label{sec:siamesa}
 
-Un tipo particular de arquitectura de redes convolucionales es el de
-\textit{redes siamesas}. Una red siamesa está compuesta de dos copias
-exactas de la misma red cuyos parámetros son compartidos. La
-arquitectura toma pares de imágenes (\(x_1\) y \(x_2\)) y las salidas
-de ambas redes son redireccionadas a una función de pérdida que
-calcula alguna métrica respecto a las dos entradas (Figura
-\ref{fig:siamese-diagram}). Las redes siamesas no difieren en más que
-eso de las redes convolucionales que ya vimos.
+Los métodos discriminativos tradicionales generalmente requieren
+conocer las categorías del conjunto de datos de antemano y suelen
+estar limitados a un número reducido de categorías (en el orden de las
+100). Eso se convierte en una limitación para ciertas tareas donde la
+cantidad de clases es muy grande, como la verificación de rostros o
+motores de búsqueda visuales, donde se cuenta con pocos elementos por
+clase o sólo algunas clases son conocidas durante el
+entrenamiento. Generalizar bien para todas las clases se convierte
+entonces en una tarea muy cara (es necesario contar con una cantidad
+aceptable de ejemplos por clase) o prácticamente imposible.
+
+Se puede abordar el problema aprendiendo mejores representaciones
+según el dominio en el que se esté trabajando. Dentro del dominio de
+las redes neuronales, una manera de lograrlo es mediante un tipo
+particular de arquitectura denominado \textit{redes siamesas}. Una red
+siamesa consiste de dos redes \textit{gemelas} cuyos parámetros son
+compartidos. La arquitectura toma pares de imágenes (\(x_1\) y
+\(x_2\)) y las representaciones obtenidas de ambas redes son redireccionadas a una
+función de energía que calcula alguna métrica respecto a las dos
+entradas (Figura \ref{fig:siamese-diagram}). Las redes siamesas no
+difieren en más que eso de las redes convolucionales que ya vimos.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
 verificación de huellas digitales \cite{fingerprint} y de firmas
@@ -2037,17 +2050,35 @@ asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \end{figure}
 #+END_LaTeX
 
-El propósito de entrenar redes siamesas es aprender buenas features
-relacionadas al problema en cuestion.  Lo mas común es tomar los pesos
-aprendidos por la red siamesa y realizar una transferencia de
-aprendizaje a un nuevo problema.
-
-Es necesario definir qué función de similitud vamos a usar y cómo
+Es importante saber definir qué función de costo vamos a usar y cómo
 vamos a generar los pares de entrenamiento antes de entrenar redes
-siamesas. En la siguiente Sección nos vamos a adentrar en trabajo con
-redes siamesas de Agrawal et al. \cite{LSM2015}, reproduciendo y
-analizando sus resultados en lo que conforma el eje principal de este
-trabajo final.
+siamesas. Las opciones dependen del dominio del problema naturalmente,
+aunque para funciones de costo suelen elegirse ser alguna medida de
+similitud entre las representaciones aprendidas por la red y los pares
+se arman con ejemplos negativos/positivos (es decir, de imágenes no
+similares/similares). Una manera de probar que las representaciones
+obtenidas por la red siamesa pueden generalizar bien es realizar
+transferencia de aprendizaje de los parámetros aprendidos a un nuevo
+problema (clasificación, búsqueda de imágenes, detección, etc).
+
+Si bien mencionamos que en las redes siamesas se suelen comparar las
+representaciones generadas utilizando métricas de similitud, también
+podemos definir nuestra función de costo de diferente manera. Se
+podría, por ejemplo, intentar predecir cuando dos parches pertenecen o
+no a la misma imagen, o cuando dos objetos distintos pertenecen a la
+misma clase, o cuando dos fotos son la misma a pesar haber sufrido
+alguna transformación (traslacion, rotación, deformación, etc).
+Agrawal et al. \cite{LSM2015} proponen que para el último caso, las
+representaciones que se obtienen de entrenar la red siamesa son casi
+tan buenas como en el estado del arte. La información disponible para
+la red relacionada a la posición relativa de una foto y sus
+transformaciones (traslación, etc) respecto al \textit{tiempo} se
+denomina \textit{información odométrica}.
+
+En la siguiente Sección vamos a evaluar diferentes métodos de
+entrenamiento mediante información odométrica y como pueden
+generalizar las representaciones a nuevos dominios, basándonos y
+evaluando algunas propuestas de Agrawal et al. \cite{LSM2015}.
 
 ** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
 #+LaTeX: \label{sec:odometry}
