@@ -4,7 +4,7 @@
 #+EMAIL:   ret0110@famaf.unc.edu.ar
 #+CREATOR: Rubén Ezequiel Torti López
 #+LANGUAGE: es
-#+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:nil
+#+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:3
 #+STARTUP: indent hideblocks
 #+TAGS: noexport(n)
 #+EXPORT_SELECT_TAGS: export
@@ -751,7 +751,7 @@ agravarse si la tasa de aprendizaje es muy grande.
 
 Una vez que la ReLU alcanza este estado, es improbable que vuelva a
 activarse, dado que su gradiente (aproximado por lo que se llama el
-\textis{subgradiente}) en \(0\) es también \(0\), por lo que un
+\textit{subgradiente}) en \(0\) es también \(0\), por lo que un
 entrenamiendo mediante descenso de gradiente y \back{} no va a
 modificar los pesos locales, dejando a esa neurona ``muerta''.
 
@@ -1226,7 +1226,7 @@ preferencias para algunos conjuntos de \weights{} sobre otros.
 
 De esta manera, nuestra función de costo ahora cuenta con dos
 componentes, la función de costo propiamente dicha y la
-\textit{componente de regularización}. Sea \(\lamda\) un número real
+\textit{componente de regularización}. Sea \(\lambda\) un número real
 (\textit{término de regularización}, entonces nuestra nueva función de
 costo es:
 
