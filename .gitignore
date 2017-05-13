@@ -3,6 +3,9 @@
 *~
 *.out
 *.pdf
+*.lof
+*.lot
+*.toc
 *.tex
 *.bbl
 *.blg
