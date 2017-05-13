@@ -4,7 +4,7 @@
 #+EMAIL:   ret0110@famaf.unc.edu.ar
 #+CREATOR: Rubén Ezequiel Torti López
 #+LANGUAGE: es
-#+OPTIONS: H:5 title:nil creator:nil timestamp:nil skip:nil toc:3
+#+OPTIONS: f:t TeX:t LaTeX:t H:5 title:nil creator:nil timestamp:nil skip:nil toc:3
 #+STARTUP: indent hideblocks
 #+TAGS: noexport(n)
 #+EXPORT_SELECT_TAGS: export
@@ -78,7 +78,37 @@ blocks de nuevo.
 #+LATEX_HEADER: \newcommand{\cnn}{\textit{convolutional neural networks}}
 #+LATEX_HEADER: \newcommand{\CNN}{\textit{Convolutional Neural Networks}}
 
-* Introducción
+
+#+BIND: org-latex-title-command "\maketitle"
+
+#+LATEX_HEADER: \renewcommand*{\maketitle}{\begingroup
+#+LATEX_HEADER: \begin{titlepage} 
+#+LATEX_HEADER: \centering 
+#+LATEX_HEADER: \vspace*{\baselineskip} 
+#+LATEX_HEADER:  
+#+LATEX_HEADER:  
+#+LATEX_HEADER: {\LARGE Técnicas de deep learning}\\[0.2\baselineskip]
+#+LATEX_HEADER: 
+#+LATEX_HEADER:  
+#+LATEX_HEADER: \vspace*{2\baselineskip}
+#+LATEX_HEADER:  
+#+LATEX_HEADER: {\Medium Rubén Ezequiel Torti López\par}
+#+LATEX_HEADER:  
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER:  
+#+LATEX_HEADER: \end{titlepage}
+#+LATEX_HEADER: \newpage
+#+LATEX_HEADER: \endgroup}
+
+#+BEGIN_LaTeX
+\newpage
+#+END_LaTeX
+
+* Capítulo 1
+:PROPERTIES:
+:UNNUMBERED: t
+:END:
+** Introducción
 
 Para los seres humanos, percibir el mundo que nos rodea es una tarea
 fácil. Millones de años de evolución nos han dotado con un sistema
