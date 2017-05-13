@@ -1,10 +1,5 @@
-
-#+TITLE: Reconocimiento visual empleando técnicas de aprendizaje profundo
-#+AUTHOR:  Rubén Ezequiel Torti López
-#+EMAIL:   ret0110@famaf.unc.edu.ar
-#+CREATOR: Rubén Ezequiel Torti López
 #+LANGUAGE: es
-#+OPTIONS: f:t TeX:t LaTeX:t H:5 title:nil creator:nil timestamp:nil skip:nil toc:3
+#+OPTIONS: f:t TeX:t LaTeX:t H:5 title:nil num:4 creator:nil timestamp:nil skip:nil toc:3
 #+STARTUP: indent hideblocks
 #+TAGS: noexport(n)
 #+EXPORT_SELECT_TAGS: export
@@ -54,7 +49,6 @@ blocks de nuevo.
 #+LATEX_HEADER: \usepackage{caption}
 #+LATEX_HEADER: \usepackage{subcaption}
 #+LATEX_HEADER: \usepackage{babelbib}
-
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
 #+LATEX_HEADER: \newcommand{\dg}{\textit{descenso de gradiente}}
@@ -70,14 +64,12 @@ blocks de nuevo.
 #+LATEX_HEADER: \newcommand{\bias}{\(\boldsymbol{b}\)}
 #+LATEX_HEADER: \newcommand{\func}{\(\boldsymbol{f}\)}
 #+LATEX_HEADER: \newcommand{\loss}{\(\boldsymbol{L}\)}
-
 #+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
 #+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
 #+LATEX_HEADER: \newcommand{\dl}{\textit{deep learning}}
 #+LATEX_HEADER: \newcommand{\DL}{\textit{Deep Learning}}
 #+LATEX_HEADER: \newcommand{\cnn}{\textit{convolutional neural networks}}
 #+LATEX_HEADER: \newcommand{\CNN}{\textit{Convolutional Neural Networks}}
-
 
 #+BIND: org-latex-title-command "\maketitle"
 
@@ -87,7 +79,7 @@ blocks de nuevo.
 #+LATEX_HEADER: \vspace*{\baselineskip} 
 #+LATEX_HEADER:  
 #+LATEX_HEADER:  
-#+LATEX_HEADER: {\LARGE Técnicas de deep learning}\\[0.2\baselineskip]
+#+LATEX_HEADER: {\LARGE Reconocimiento visual empleando técnicas de aprendizaje profundo}\\[0.2\baselineskip]
 #+LATEX_HEADER: 
 #+LATEX_HEADER:  
 #+LATEX_HEADER: \vspace*{2\baselineskip}
@@ -100,15 +92,15 @@ blocks de nuevo.
 #+LATEX_HEADER: \newpage
 #+LATEX_HEADER: \endgroup}
 
-#+BEGIN_LaTeX
+#+begin_latex
 \newpage
-#+END_LaTeX
+#+end_latex
 
 * Capítulo 1
 :PROPERTIES:
 :UNNUMBERED: t
 :END:
-** Introducción
+* Introducción
 
 Para los seres humanos, percibir el mundo que nos rodea es una tarea
 fácil. Millones de años de evolución nos han dotado con un sistema
@@ -229,19 +221,23 @@ para lograr buena precisión. Este trabajo final tiene como objetivo
 evaluar experimentalmente las metodologías propuestas por
 \cite{LSM2015}.
 
-El trabajo está organizado como sigue: en la Sección \ref{sec:marco}
+El trabajo está organizado como sigue: en la Sección [[sec:marco]]
 se introducen conceptos del aprendizaje automático y las redes
 neuronales artificiales para concluir con redes convolucionales, en la
-Sección \ref{sec:siamesa} se presenta un método para entrenar
+Sección [[sec:siamesa]] se presenta un método para entrenar
 modelos de aprendizaje profundo mediante redes siamesas, que luego se
 utilizará para reproducir los resultados de \cite{LSM2015} en la
-Sección \ref{sec:agrawal}. Finalmente, las secciones \ref{sec:concl} y 
-\ref{sec:future} presentan una discusión final y trabajo a futuro.
+Sección [[sec:agrawal]]. Finalmente, las secciones [[sec:concl]] y 
+[[sec:future]] presentan una discusión final y trabajo a futuro.
 
 #+LaTeX: \newpage
 
+* Capítulo 2
+:PROPERTIES:
+:UNNUMBERED: t
+:END:
 * Marco Teórico
-#+LaTeX: \label{sec:marco}
+<<sec:marco>>
 ** Aprendizaje Automático
 
 Las técnicas de aprendizaje automático tienen como objetivo
@@ -332,13 +328,14 @@ dado que influencia los \scores{} de salida, pero sin interactuar con
 Para entender mejor a los clasificadores lineales, podemos verlos de
 la siguiente manera: si la imagen tiene \(32 \times 32\) píxeles y la
 representamos con un vector columna de dimensión \(D\) (en este caso
-\(D=1024=32 \times 32\)), entonces en ese espacio \textit{D-dimensional} la
-imagen es solamente un punto. Como se observa en la Figura
-\ref{fig:cl} de manera simplificada, nuestro clasificador lineal
-define una ``línea'' (un hiperplano) que separa cada clase
-dentro de ese espacio multidimensional. Notar que en realidad la
-multiplicación \(\boldsymbol{W x_i}\) está evaluado \(\boldsymbol{K}\)
-clasificadores en paralelo, donde cada uno es una fila de \weights{}.
+\(D=1024=32 \times 32\)), entonces en ese espacio
+\textit{D-dimensional} la imagen es solamente un punto. Como se
+observa en la Figura [[fig:cl]] de manera simplificada, nuestro
+clasificador lineal define una ``línea'' (un hiperplano) que separa
+cada clase dentro de ese espacio multidimensional. Notar que en
+realidad la multiplicación \(\boldsymbol{W x_i}\) está evaluado
+\(\boldsymbol{K}\) clasificadores en paralelo, donde cada uno es una
+fila de \weights{}.
 
 
 #+name: linear-classifier
@@ -434,7 +431,7 @@ aplicar a un conjunto de datos completamente nuevo (conjunto de
 pruebas). Si la precisión que obtuvo nuestro modelo sobre este
 conjunto de pruebas es muy baja, es un síntoma de que algo no anda
 bien (ver problema de \textit{sobreajuste} en la Sección
-\ref{sec:regular}).
+[[sec:regular]]).
 
 A grandes rasgos, podemos describir el proceso de entrenamiento de un
 clasificador de la siguiente manera:
@@ -503,7 +500,7 @@ Cuando tenemos una función con la forma \( \max{(0, \cdot )} \) a menudo se
 la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
 
 **** Descenso de Gradiente
-#+LaTeX: \label{sec:sgd}
+<<sec:sgd>>
 
 Ya contamos con una función para medir que tan bien o que tan mal está
 comportándose nuestro modelo, la \textit{función de pérdida}. Como se
@@ -553,7 +550,7 @@ la tasa de aprendizaje determina una fracción del gradiente a
 sustraer. En la ecuación se puede observar que se modifican los
 parámetros con respecto a la dirección opuesta al gradiente, dado que
 el mismo indica la dirección de crecimiento de una función pero
-nosotros queremos encontrar un mínimo (Figura \ref{fig:gd}).
+nosotros queremos encontrar un mínimo (Figura [[fig:gd]]).
 
 #+name: gradient-descent
 #+begin_src python :session :exports none :results silent :cache yes :eval no-export
@@ -691,7 +688,7 @@ ejemplo, agregar lo que se llama \textit{función de activación}:
 Lo que acabamos de definir es una red neuronal básica de dos capas, de
 una neurona cada una.
 
-En la Figura \ref{fig:art-neuron} vemos un modelo formal de una
+En la Figura [[fig:art-neuron]] vemos un modelo formal de una
 neurona estándar, en el que las entradas \(x_i\) interactúan
 multiplicativamente con los pesos \(w_i\). Luego, esos resultados se
 suman junto con un vector de sesgo y sobre eso se computa lo que se
@@ -770,7 +767,7 @@ Una desventaja de las \textit{ReLU} es que pueden provocar la
 ``muerte'' de neuronas durante el entrenamiento. El problema esta
 relacionado con el método más común de entrenamiento de redes
 neuronales, \back{}. El algoritmo de \back{} será explicado en la
-Sección \ref{sec:backprop}, pero por ahora pensemos que el proceso de
+Sección [[sec:backprop]], pero por ahora pensemos que el proceso de
 optimización de \weights{} implica restar un porcentaje del gradiente
 de la función de costo en \weights{}. Si el gradiente es muy grande
 entonces los pesos sobre los que se realice la actualización
@@ -885,7 +882,7 @@ plt.tight_layout()
 plt.savefig('images/relu2.pdf')
 #+end_src
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.4\textwidth}
@@ -899,9 +896,10 @@ plt.savefig('images/relu2.pdf')
         \caption{\textit{Leaky ReLU}}
         \label{fig:relu2}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont \textit{ReLU} vs. \textit{Leaky ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
+    \caption{\fontsize{9}{11}\selectfont \textit{ReLU} vs. \textit{Leaky
+     ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 ** Entrenamiento de redes neuronales artificiales
 
@@ -989,7 +987,7 @@ y3 = y2 / 2.0
 plot_norm(x3, y3, 'firebrick', '3')
 #+end_src
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -1009,9 +1007,11 @@ plot_norm(x3, y3, 'firebrick', '3')
         \caption{Normalizacion}
         \label{fig:mean3}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont Se puede observar en \ref{fig:mean2} cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
+    \caption{\fontsize{9}{11}\selectfont Se puede observar en \ref{fig:mean2}
+     cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro
+     conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 **** Normalización
 
@@ -1042,7 +1042,7 @@ nuestros datos con técnicas de \textit{data augmentation}: repetir la
 misma imagen pero con diferentes variaciones en el color, brillo,
 saturación, incluso hacer leves desplazamientos y rotaciones.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.2\textwidth}
@@ -1068,9 +1068,13 @@ saturación, incluso hacer leves desplazamientos y rotaciones.
         \caption{Traslaciones}
         \label{fig:faug2}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont Diferentes formas de aumentar datos. Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la imagen y cambios en el brillo, contraste y color son otras técnicas muy usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
+    \caption{\fontsize{9}{11}\selectfont Diferentes formas de aumentar datos.
+     Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el
+     eje que conforman los ojos [[fig:falign]]. Traslaciones, recortes en la
+     imagen y cambios en el brillo, contraste y color son otras técnicas muy
+     usadas ([[fig:faug1]] y [[fig:faug2]]).}\label{fig:augm}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 *** Inicialización de pesos
 
@@ -1091,7 +1095,7 @@ muchas otras maneras más sofisticadas de inicializar los pesos de una
 red, pero su análisis escapa al alcance de este trabajo.
 
 *** Evitando el sobre-ajuste: Regularización y Dropout
-#+LaTeX: \label{sec:regular}
+<<sec:regular>>
 
 Cuando se aprende un modelo sobre un conjunto de datos, puede surgir
 el problema del \textit{sobre-ajuste}, más conocido por su nombre en
@@ -1225,7 +1229,7 @@ explore_fitting_boundaries(model=model, n_neighbors=[23], datasets=datasets, wid
 explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, width=width, index='3')
 #+end_src
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
@@ -1245,9 +1249,11 @@ explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, widt
         \caption{\textit{Overfitting}}
         \label{fig:over3}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting} \ref{fig:over1}, \textit{underfitting} \ref{fig:over2} y un buen ajuste al conjunto de datos \ref{fig:over3}.}\label{fig:overfit}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting}
+    \ref{fig:over1}, \textit{underfitting} \ref{fig:over2} y un buen ajuste al
+    conjunto de datos \ref{fig:over3}.}\label{fig:overfit}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Queremos elegir los mejores parámetros de \weights{} para evitar estos
 problemas, y eso lo podemos hacer agregando una penalidad de
@@ -1344,11 +1350,11 @@ cantidad de neuronas activas, obteniendo como resultado
 la capa siguiente.
 
 En un entrenamiento sin \textit{dropout}, la red actualiza todas sus
-neuronas en cada iteración (Figura \ref{fig:dropout}-izquierda),
+neuronas en cada iteración (Figura [[fig:dropout]]-izquierda),
 mientras que utilizando \textit{dropout} se eliminan neuronas
 aleatoriamente y se utiliza una \textit{subred} de la original, lo
 cual impide a las neuronas co-adaptarse entre si (Figura
-\ref{fig:dropout}-derecha). La co-adaptación ocurre cuando dos o más
+[[fig:dropout]]-derecha). La co-adaptación ocurre cuando dos o más
 neuronas consecutivas dependen mucho entre ellas para detectar
 \textit{features}, en vez de que cada neurona busque un tipo
 particular de \textit{feature}.
@@ -1392,16 +1398,16 @@ clasificación) o alguna métrica (en regresión). Las redes neuronales
 suelen tener una o más capas intermedias entre la entrada y la salida,
 denominadas \textit{capas ocultas} (Figura \ref{fig:nnet}).
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/neural-net.pdf}
     \caption{\fontsize{9}{11}\selectfont Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.}\label{fig:nnet}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Las redes neuronales se entrenan partiendo del principio del descenso
-del gradiente que se explicó en la Sección \ref{sec:sgd}. Notemos que
+del gradiente que se explicó en la Sección [[sec:sgd]]. Notemos que
 \loss{} es una función que depende de las imágenes de entrada \img{},
 \weights{} y \bias{}. Sin embargo, como ya dijimos, el conjunto de
 datos de entrenamiento es algo fijo en nuestro modelo, por lo que sólo
@@ -1413,7 +1419,7 @@ actualizar \weights{} con los nuevos pesos se utiliza el algoritmo
 \textit{retropropagación} (\back{} en inglés).
 
 *** Entrenamiento: \textit{Backpropagation}
-#+LaTeX: \label{sec:backprop}
+<<sec:backprop>>
 
 La retropropagación (o \textit{backpropagation} en inglés) es un
 algoritmo utilizado comúnmente con la técnica de optimización de
@@ -1585,7 +1591,7 @@ el uso de este operador en una imagen de un solo canal donde la
 intensidad de cada píxel está representada con un número.
 
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
 \centering
 \begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
@@ -1744,7 +1750,7 @@ intensidad de cada píxel está representada con un número.
 \end{tikzpicture}
 \caption{\fontsize{9}{11}\selectfont Convolución. La imagen en la izquierda se convoluciona con el filtro $h$ para dar lugar a la imagen de la derecha. El píxel marcado en azul es el resultado de la combinación lineal de $h$ con el \textit{parche} verde en la imagen original.}\label{fig:convmatrix}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Dado que la convolución en el caso discreto es una combinación lineal,
 su resultado para cada elemento \(f(i,j) \in \mathbb{R}^n\) es un
@@ -1766,7 +1772,7 @@ el filtro se aplica a píxeles fuera de los bordes de la misma, por lo
 que se agrega un borde artificial mediante la técnicas de
 \textit{padding}.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -1791,7 +1797,7 @@ que se agrega un borde artificial mediante la técnicas de
     \end{subfigure}
     \caption{\fontsize{9}{11}\selectfont Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Una buena propiedad de la convolución es que toma ventaja de la
 \textit{localidad} (vecinos) de cada píxel, que usualmente son los más
@@ -1881,13 +1887,13 @@ aplicacion de los filtros (\textit{stride}) y por ultimo el relleno
 con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de
 1 o más ceros a la entrada de la capa.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/conv-layer.pdf}
     \caption{Ejemplo de una capa convolucional cuyo volumen de entrada es una imagen (\(x\)) con 3 canales RGB. La capa cuenta con 6 filtros y cada uno convoluciona con la imagen a lo largo y ancho.}\label{fig:conv-lay}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 **** \textit{Pooling}
 
@@ -1909,7 +1915,7 @@ volumen, como se puede ver en la Figura \ref{fig:pool2}. El área local
 está definida por el tamaño del \textit{stride}. De esta manera se
 reduce espacialmente la entrada, pero no su profundidad.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.6\textwidth}
@@ -1955,9 +1961,11 @@ reduce espacialmente la entrada, pero no su profundidad.
         \caption{}
         \label{fig:pool2}
     \end{subfigure}
-    \caption{Las capas de \textit{Pooling} reducen las dimensiones espaciales. Notar en \ref{fig:pool1} que la profundidad del volumen se mantiene intacta. En \ref{fig:pool2} observamos cómo funciona una capa \textit{MAX Pooling} con un un \textit{stride} de 2.}\label{fig:pool}
+    \caption{Las capas de \textit{Pooling} reducen las dimensiones
+     espaciales. Notar en \ref{fig:pool1} que la profundidad del volumen se
+     mantiene intacta. En \ref{fig:pool2} observamos cómo funciona una capa \textit{MAX Pooling} con un un \textit{stride} de 2.}\label{fig:pool}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 **** Capas Completamente Conectadas (Fully-Connected)
 
@@ -2019,8 +2027,12 @@ memoria y tiempo de cómputo.
 
 #+LaTeX: \newpage
 
+* Capítulo 3
+:PROPERTIES:
+:UNNUMBERED: t
+:END:
 * Redes neuronales convolucionales siamesas
-#+LaTeX: \label{sec:siamesa}
+<<sec:siamesa>>
 
 Los métodos discriminativos tradicionales generalmente requieren
 conocer las categorías del conjunto de datos de antemano y suelen
@@ -2072,13 +2084,13 @@ se valen de rotaciones, traslaciones, etc. A estos pares se les
 asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 \end{enumerate}
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
     \caption{\fontsize{9}{11}\selectfont Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Es importante saber definir qué función de costo vamos a usar y cómo
 vamos a generar los pares de entrenamiento antes de entrenar redes
@@ -2111,7 +2123,7 @@ generalizar las representaciones a nuevos dominios, basándonos y
 evaluando algunas propuestas de Agrawal et al. \cite{LSM2015}.
 
 ** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
-#+LaTeX: \label{sec:odometry}
+<<sec:odometry>>
 
 Muchos agentes móviles son conscientes de sus movimientos
 (\textit{automovimiento}) gracias a sus sistemas motores. En otras
@@ -2203,8 +2215,12 @@ imagen.
 
 #+LaTeX: \newpage
 
+* Capítulo 4
+:PROPERTIES:
+:UNNUMBERED: t
+:END:
 * Experimentos
-#+LaTeX: \label{sec:agrawal}
+<<sec:agrawal>>
 
 Todos los experimentos realizados se encuentran en Github
 [fn::https://github.com/ezetl/deep-learning-techniques-thesis].
@@ -2238,7 +2254,7 @@ En la Figura \ref{fig:mnist-sample} se pueden observar varios pares de
 imágenes generadas durante la creación de la base de datos que luego
 fue usada para entrenar la red siamesa.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -2254,7 +2270,7 @@ fue usada para entrenar la red siamesa.
 \caption{\fontsize{9}{11}\selectfont Ejemplo de transformaciones aplicadas a las imagenes de MNIST. Cada par contiene la imagen original y la transformada con traslaciones en los ejes X e Y, y con rotación en Z.}
 \label{fig:mnist-sample}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 *** Descripción de la red
 
@@ -2290,7 +2306,7 @@ imágenes de los dos métodos utilizados (automovimiento y SFA) y una
 comparación con un entrenamiento desde cero utilizando esa misma
 cantidad de imágenes.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{table*}[htb]
 \centering
 \begin{tabular}{l|rrrr}
@@ -2311,7 +2327,7 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 \end{tabular}%
 \caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).}
 \end{table*}
-#+END_LaTeX
+#+end_latex
 
 Se puede observar que entrenar mediante automovimiento presenta una
 performance claramente superior a entrenar una red desde cero con la
@@ -2363,7 +2379,7 @@ En la Figura \ref{fig:kitti-sample} se pueden observar pares de
 imágenes utilizados durante el entrenamiento de las redes siamesas.
 
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -2379,7 +2395,7 @@ imágenes utilizados durante el entrenamiento de las redes siamesas.
 \caption{\fontsize{9}{11}\selectfont Ejemplo de imágenes extraídos de KITTI. Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos. Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.}
 \label{fig:kitti-sample}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 *** Odometria 
 
@@ -2425,9 +2441,9 @@ de paisajes interiores y exteriores y además provee 10 particiones del
 dataset para hacer \textit{cross-validation}, pero debido a lo costoso
 que es entrenar redes neuronales convolucionales solo se utilizaron
 tres particiones. En la Figura \ref{fig:sun-sample} se pueden observar
-algunas de las clases que provee este conjunto de datos.
+algunas de las clases que provee este conjunto de datos. 
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -2449,14 +2465,14 @@ algunas de las clases que provee este conjunto de datos.
 \caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos SUN-397: paisajes exteriores, interiores, construcciones, etc.}
 \label{fig:sun-sample}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
 salidas de las primeras 5 capas convolucionales. Los resultados pueden
-verse en el Cuadro \ref{tab:two}
+verse en el Cuadro \ref{tab:two}.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{table*}[htb]
 \centering
 \resizebox{\textwidth}{!}{%
@@ -2488,7 +2504,7 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 }
 \caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397.}
 \end{table*}
-#+END_LaTeX
+#+end_latex
 
 Se puede observar que el pre-entrenamiento con automoviento no supera
 la performance que se obtiene al pre-entrenar la misma red con
@@ -2512,9 +2528,9 @@ contra una entrenada con \textit{SFA} y una con pesos inicializados
 aleatoriamente. Para ello se utilizó el conjunto de datos ILSVRC 2012
 utilizado en la competencia de Imagenet. Dicho conjunto de datos
 cuenta con 1000 clases de objetos. Ejemplos de clases en este conjunto
-de datos se pueden ver en la Figura \ref{fig:imagenet-sample}. 
+de datos se pueden ver en la Figura \ref{fig:imagenet-sample}.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -2536,7 +2552,7 @@ de datos se pueden ver en la Figura \ref{fig:imagenet-sample}.
 \caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos ILSVRC'12.}
 \label{fig:imagenet-sample}
 \end{figure}
-#+END_LaTeX
+#+end_latex
 
 Para el entrenamiento de las redes se utilizaron subconjuntons de
 todas las clases con 1, 5, 10, 20 y 1000 elementos por cada una.  Los
@@ -2546,7 +2562,7 @@ supera en todos los casos a los pesos inicializados aleatoriamente
 (ALEXNET), mientras que los pesos aprendidos mediante \textit{SFA}
 (KITTI-SFA) presentan un rendimiento incluso peor que el de ALEXNET.
 
-#+BEGIN_LaTeX
+#+begin_latex
 \begin{table*}[htb]
 \centering
 \begin{tabular}{l|ccccc}
@@ -2567,12 +2583,16 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 \end{tabular}%
 \caption{\fontsize{9}{11}\selectfont \label{tab:three}Exactitud de los modelos aprendidos mediante redes siamesas (KITTI-EGO corresponde a la red de automovimiento, KITTI-SFA a la que utiliza \textit{slow feature analysis}) contra una red cuyos pesos fueron inicializados aleatoriamente (ALEXNET). Se entrenaron las 3 redes utilizando el conjunto de datos ILSVRC 2012 con 1, 5, 10, 20 y 1000 imágenes por clase.}
 \end{table*}
-#+END_LaTeX
+#+end_latex
 
 #+LaTeX: \newpage
 
+* Capítulo 5
+:PROPERTIES:
+:UNNUMBERED: t
+:END:
 * Conclusiones
-#+LaTeX: \label{sec:concl}
+<<sec:concl>>
 
 Si bien actualmente se suele recurrir a la transferencia de
 aprendizaje de redes del estado del arte pre-entrenadas por otras
@@ -2600,7 +2620,7 @@ utilizando clasificación, lo cual hace al entrenamiento con
 tareas mencionados.
 
 * Trabajo a futuro
-#+LaTeX: \label{sec:future}
+<<sec:future>>
 
 Hay que destacar que todas las pruebas se hicieron con arquitecturas
 basadas en AlexNet, que ya resulta anticuada en lo que se refiere al
