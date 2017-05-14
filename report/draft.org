@@ -590,25 +590,6 @@ Notar que para el caso de un clasificador lineal los parámetros
 \(\theta\) o \weights{} indiferentemente para hablar de los parámetros
 de nuestro modelo.
 
-Un ejemplo de función de pérdida popular es la función de pérdida de
-\textit{máquinas de vectores de soporte multiclase}. Sea \(f(x_i;
-\theta)_j\) el puntaje (\textit{score}) asignado por el clasificador \(f\) a la clase
-\(j\) con \(x_i\) como dato de entrada y parámetros \(\theta\) y sea
-\(f(x_i, \theta)_{y_i}\) el puntaje asignado por \(f\) a la clase
-verdadera de \(x_i\), o sea \(y_i\), entonces la pérdida para \(x_i\)
-se calcula de la siguiente manera:
-
-\begin{equation}
-     L_i = \sum_{j \neq y_i} \max{(0, f(x_i; \theta)_j - f(x_i; \theta)_{y_{i}} + \Delta) }
-\end{equation}
-
-Se puede observar que esta función de pérdida busca que la clase
-correcta tenga un puntaje más alto que las otras por un margen
-\(\Delta\).
-
-Cuando tenemos una función con la forma \( \max{(0, \cdot )} \) a menudo se
-la llama función de pérdida bisagra (\textit{hinge loss} en inglés).
-
 **** Descenso de Gradiente
 <<sec:sgd>>
 
@@ -969,27 +950,6 @@ ax.text(-0.6,4.6, r'$+y$')
 #h.set_rotation(0)
 plt.tight_layout()
 plt.savefig('images/relu1.pdf')
-
-
-fig = plt.figure(figsize=(4, 4))
-ax = plt.subplot(111)
-#for ax in axes:
-config_ax(ax)
-ax.set_xlim([-5, 5])
-ax.set_ylim([-1, 10])
-X = np.arange(0, 10)
-Y = np.arange(0, 10)
-X2 = np.arange(-10, 0)
-Y2 = X2 *  0.1
-X = np.append(X2, X)
-Y = np.append(Y2, Y)
-ax.text(0,-0.5, "0")
-ax.text(4.7,-0.3, r'$+x$')
-ax.text(-5,-0.3, r'$-x$')
-ax.text(-0.6,4.6, r'$+y$')
-ax.plot(X, Y)
-plt.tight_layout()
-plt.savefig('images/relu2.pdf')
 #+end_src
 
 #+begin_src latex
@@ -1528,7 +1488,7 @@ artificiales) es computacionalmente costoso, por lo que para
 actualizar \weights{} con los nuevos pesos se utiliza el algoritmo
 \textit{retropropagación} (\back{} en inglés).
 
-*** Entrenamiento: \textit{Backpropagation}
+*** \textit{Backpropagation}
 <<sec:backprop>>
 
 La retropropagación (o \textit{backpropagation} en inglés) es un
@@ -1567,24 +1527,28 @@ ejemplo una función \(g:\mathbb{R}^3 \to \mathbb{R}\):
     g(x,y,z) = \frac{x}{y^2} + z
 \end{equation}
 
-Si quisiéramos obtener su gradiente en \(x\) de la manera tradicional,
+Si quisiéramos obtener su gradiente en \(x, y, z\) de la manera tradicional
 calculando el cociente de \(g(x+h) - g(x)\) con \(h\) cuando \({h \to
 0}\) deberíamos realizar muchos cálculos computacionalmente
 costosos. En cambio, podemos ver a \(g\) como una composición de
 funciones:
 
 \begin{equation}
-    g(x,y,z) = \frac{x}{y^2} + z = q + z
+    g(x,y,z) = \frac{x}{y^2} + z = \frac{x}{p} + z = q + z
 \end{equation}
 
 Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 
 \begin{equation}
-\frac{\partial g}{\partial z} = 1
+\frac{\partial g}{\partial q} = 1
 \end{equation}
 
 \begin{equation}
-\frac{\partial g}{\partial q} = 1
+\frac{\partial q}{\partial p} = \frac{-x}{p^2} = \frac{-x}{y^4}
+\end{equation}
+
+\begin{equation}
+\frac{\partial p}{\partial y} = 2y
 \end{equation}
 
 \begin{equation}
@@ -1592,16 +1556,24 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 \end{equation}
 
 \begin{equation}
-\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial y} = \frac{-2x}{y^3}
+\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial p} \frac{\partial p}{\partial y} = \frac{-2x}{y^3}
 \end{equation}
 
-Ahora podemos comenzar a estructurar nuestro algoritmo de optimización
-en dos pasos: primero, evaluamos nuestra función \loss{} en los
-parámetros actuales (\textit{forward pass}). Luego, partiendo de ese
-resultado calculamos el gradiente en cada variable utilizando la
-\textit{regla de la cadena}. De esta manera ``propagamos'' el error de la
-predicción hacia atrás (\back{}) y corregimos
-ligeramente los pesos para mejorar las futuras predicciones.
+\begin{equation}
+\frac{\partial g}{\partial z} = 1
+\end{equation}
+
+Ahora podemos estructurar nuestro algoritmo de optimización en dos
+pasos: primero, evaluamos nuestra función \loss{} en los parámetros
+actuales (\textit{forward pass}). Luego, partiendo de ese resultado
+calculamos el gradiente en cada variable utilizando la \textit{regla
+de la cadena}. En la Figura \ref{fig:backprop} se puede observar los
+valores computados para este ejemplo durante el \textit{forward pass}
+en verde y los gradientes computados mediante la regla de la cadena
+(\textit{backpropagation}) en rojo. De esta manera ``propagamos'' el
+error de la predicción hacia atrás (\back{}) para luego corregir los
+pesos mediante, por ejemplo, el algoritmo de Descenso de Gradiente
+Estocástico que ya vimos.
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
 \loss{} restándole un porcentaje del gradiente negativo calculado
@@ -1684,7 +1656,8 @@ g = f \bigotimes h
 \end{equation}
 
 Una variante de la Ecuación \ref{eq:corr} es invirtiendo el signo de
-los \textit{offsets}, y se denomina \textit{convolución}:
+los \textit{offsets}. Eso equivale a reflejar  el filtro en ambas
+dimensiones y se denomina \textit{convolución}:
 
 \begin{equation}\label{eq:conv}
 g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
