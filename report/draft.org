@@ -287,40 +287,121 @@ detalles y combinaciones a tener en cuenta como para programar cada
 caso posible manualmente, por lo que un sistema que utilice
 aprendizaje automático podría ser una mejor opción.
 
-Hay varios paradigmas o ejes dentro del aprendizaje automatico que
-definen los tipos de algoritmos, las técnicas de
-entrenamiento y las potenciales aplicaciones de esos modelos:
-
-**** Aprendizaje supervisado vs. no supervisado
-
+Hay tres áreas principales en las que podemos dividir el aprendizaje
+automático:
+**** Aprendizaje supervisado
 Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
 datos a aprender, hablamos de aprendizaje supervisado. Retomando el
 caso del verificador de rostros, las etiquetas serían el nombre o
 algún identificador de cada persona y nuestro clasificador aprendería
 a diferenciar las caras tomando como referencia las anotaciones.
 
-Por otro lado, cuando los datos no están categorizados de antemano
-hablamos de aprendizaje no supervisado. Por ejemplo, si se contara con
-una lista de casas con sus respectivos precios, su área en metros
-cúbicos y cantidad de habitaciones y quisiéramos encontrar alguna
-relación entre ellas.
+**** Aprendizaje no supervisado
 
-**** Aprendizaje pasivo vs. activo
+Cuando los datos no están categorizados de antemano hablamos de
+aprendizaje no supervisado. Por ejemplo, si se contara con una lista
+de casas con sus respectivos precios, su área en metros cúbicos y
+cantidad de habitaciones y quisiéramos encontrar alguna relación entre
+ellas. Si tomamos como ejemplo la tarea de clasificación, en la Figura
+\ref{fig:machine-learning} se puede observar la diferencia entre los
+datos utilizados en aprendizaje supervisado (dos clases de elementos)
+y los datos de aprendizaje no supervisado (no se conocen las
+categorías de antemano y el algoritmo debe encontrar los patrones en
+los datos).
 
-El aprendizaje pasivo implica utilizar solamente los datos ya
-existentes. El aprendizaje activo se refiere a interactuar con el
-ambiente para obtener información, como por ejemplo preguntar a un
-usuario si un rostro es de cierta persona y utilizar los datos
-proporcionados durante su entrenamiento.
+#+name: mean-substraction
+#+begin_src python :session :exports none :results silent :cache yes :eval no-export
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import style
+from matplotlib import gridspec
+import numpy as np
+matplotlib.use('Agg')
+style.use("ggplot")
 
-**** Aprendizaje \textit{online} vs. \textit{batch}
+def plot_norm(x, y, x2, y2, color, index='0'):
+    fig = plt.figure(figsize=(4, 4))
+    ax = plt.subplot(111)
+    ax.set_axis_bgcolor('white')
+    ax.grid(False, which='both')
+    ax.axes.get_xaxis().set_ticks([])
+    ax.axes.get_yaxis().set_ticks([])
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.plot((0, 0), (0, 5), 'grey')
+    ax.plot((0, 5), (0, 0), 'grey')
+    ax.set_xlim([0, 5])
+    ax.set_ylim([0, 5])
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.scatter(x, y, s=30, c='royalblue', marker="o")
+    ax.scatter(x2, y2, s=30, c='red', marker="o")
+    plt.tight_layout()
+    plt.savefig('images/machinelearning'+index+'.pdf')
 
-En el aprendizaje \textit{online} los datos están disponibles de
-manera secuencial, actualizando el modelo en cada paso para lograr
-mejores predicciones/clasificaciones. En el aprendizaje estadístico
-primero se analiza una gran cantidad de datos (tal vez la totalidad
-del conjunto) y solamente luego de haberlos analizado se pueden
-obtener conclusiones o un modelo final.
+def plot_norm_circle(x, y, x2, y2, color, index='0'):
+    fig = plt.figure(figsize=(4, 4))
+    ax = plt.subplot(111)
+    ax.set_axis_bgcolor('white')
+    ax.grid(False, which='both')
+    ax.axes.get_xaxis().set_ticks([])
+    ax.axes.get_yaxis().set_ticks([])
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.plot((0, 0), (0, 5), 'grey')
+    ax.plot((0, 5), (0, 0), 'grey')
+    ax.set_xlim([0, 5])
+    ax.set_ylim([0, 5])
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.scatter(x, y, s=30, c=color, marker="o")
+    ax.scatter(x2, y2, s=30, c=color, marker="o")
+    circle = plt.Circle((1.6, 1.6), 1, color='r', fill=False)
+    circle2 = plt.Circle((3.2, 3.2), 1, color='g', fill=False)
+    ax.add_artist(circle)
+    ax.add_artist(circle2)
+    plt.tight_layout()
+    plt.savefig('images/machinelearning'+index+'.pdf')
+
+N = 150
+x1 = np.random.normal(1.6, 0.3, size=N)
+y1 = np.random.normal(1.6, 0.3, size=N)
+x2 = np.random.normal(3.2, 0.3, size=N)
+y2 = np.random.normal(3.2, 0.3, size=N)
+plot_norm(x1, y1, x2, y2, 'royalblue', '1')
+plot_norm_circle(x1, y1, x2, y2, 'royalblue', '2')
+#+end_src
+
+#+begin_src latex
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/machinelearning1.pdf}
+        \caption{Aprendizaje supervisado}
+        \label{fig:machine1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/machinelearning2.pdf}
+        \caption{Aprendizaje no supervisado}
+        \label{fig:machine2}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Ejemplos simples del tipo de datos en aprendizaje supervisado vs. no supervisado.}\label{fig:machine-learning}
+\end{figure}
+#+end_src
+
+**** Aprendizaje por refuerzo
+
+Cuando el agente debe interactuar con su entorno para cumplir algún
+objetivo (por ejemplo manejar un vehículo
+\cite{DBLP:journals/corr/Shalev-ShwartzS16a} o ganar un videojuego
+\cite{DBLP:journals/corr/MnihKSGAWR13}) y debe aprender a partir de
+las recompensas y penalizaciones que surgen mientras explora el
+espacio del problema.
 
 *** Clasificadores lineales
 
