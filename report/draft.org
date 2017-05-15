@@ -49,6 +49,8 @@ blocks de nuevo.
 #+LATEX_HEADER: \usepackage{caption}
 #+LATEX_HEADER: \usepackage{subcaption}
 #+LATEX_HEADER: \usepackage{babelbib}
+#+LATEX_HEADER: \usepackage{verbatim}
+#+LATEX_HEADER: \usetikzlibrary{arrows,shapes}
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
 #+LATEX_HEADER: \newcommand{\dg}{\textit{descenso de gradiente}}
@@ -1548,6 +1550,10 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 \end{equation}
 
 \begin{equation}
+\frac{\partial q}{\partial x} = \frac{1}{y^2}
+\end{equation}
+
+\begin{equation}
 \frac{\partial p}{\partial y} = 2y
 \end{equation}
 
@@ -1574,6 +1580,48 @@ en verde y los gradientes computados mediante la regla de la cadena
 error de la predicción hacia atrás (\back{}) para luego corregir los
 pesos mediante, por ejemplo, el algoritmo de Descenso de Gradiente
 Estocástico que ya vimos.
+
+#+begin_src latex
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{\textwidth}
+\tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
+\tikzstyle{input}=[circle,draw=black,minimum size=20pt,inner sep=0pt]
+\tikzstyle{empty}=[circle,draw=white,minimum size=20pt,inner sep=0pt]
+\tikzstyle{emptyred}=[circle,draw=white,minimum size=20pt,inner sep=0pt,text=black!50!red]
+\tikzstyle{edgeup} = [draw,thick,->,above,sloped,text=black!50!green]
+\tikzstyle{edgedown} = [draw,thick,->,below,sloped,text=black!50!red]
+\begin{tikzpicture}[scale=1.8, auto,swap]
+    % vertices
+    \node[input] (x) at (-2,1) {$x$};
+    \node[vertex] (div) at (2,1) {$/$};
+    \node[vertex] (sum) at (4,1) {$+$};
+    \node[empty] (output) at (6.5,1) {};
+    \node[vertex] (pow) at (0,0) {$\_^2$};
+    \node[input] (y) at (-2,0) {$y$};
+    \node[input] (z) at (2,-1) {$z$};
+    % edges forward
+    \path[edgeup] (x) -- node[->] {$-3$} (div);
+    \path[edgeup] (div) -- node[->] {$-0.75$} (sum);
+    \path[edgeup] (pow) -- node[->] {$4$} (div);
+    \path[edgeup] (z) -- node[->] {$4$} (sum);
+    \path[edgeup] (y) -- node[->] {$2$} (pow);
+    \path[edgeup] (sum) -- node[->] {$g(-3,2,4)=3.25$} (output);
+    % edges backward
+    \path[edgedown] (x) -- node[->] {$\frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$} (div);
+    \path[edgedown] (div) -- node[->] {$\frac{\partial g}{\partial q} = 1$} (sum);
+    \path[edgedown] (pow) -- node[->] {$\frac{\partial q}{\partial p} = \frac{-x}{p^2} = -0.187$} (div);
+    \path[edgedown] (z) -- node[->] {$\frac{\partial g}{\partial z} = 1$} (sum);
+    \path[edgedown] (y) -- node[->] {$\frac{\partial p}{\partial y} = 2y = 4$} (pow);
+    % final gradients
+    \node[emptyred] (xback) at (-3.5,1) {$\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$};
+    \node[emptyred] (yback) at (-3.79,0) {$\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial p} \frac{\partial p}{\partial y} = \frac{-2x}{y^3} = -0.748$};
+    \node[emptyred] (zback) at (1.4,-1) {$\frac{\partial g}{\partial z} = 1$};
+\end{tikzpicture}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Grafo de computación durante la aplicación de \textit{backpropagation}.}\label{fig:backprop}
+\end{figure}
+#+end_src
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
 \loss{} restándole un porcentaje del gradiente negativo calculado
