@@ -33,13 +33,13 @@ blocks de nuevo.
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage{ifthen,figlatex}
+#+LATEX_HEADER: \usepackage[spanish,es-noquoting]{babel}
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{wrapfig}
 #+LATEX_HEADER: \usepackage{xspace}
 #+LATEX_HEADER: \usepackage{pgfplots}
 #+LATEZ_HEADER: \usepackage{tikz}
-#+LATEX_HEADER: \usepackage[spanish]{babel}
 #+LATEX_HEADER: \usepackage{url}\urlstyle{sf}
 #+LATEX_HEADER: \usepackage{amscd}
 #+LATEX_HEADER: \usepackage{wrapfig}
@@ -51,6 +51,7 @@ blocks de nuevo.
 #+LATEX_HEADER: \usepackage{babelbib}
 #+LATEX_HEADER: \usepackage{verbatim}
 #+LATEX_HEADER: \usetikzlibrary{arrows,shapes}
+#+LATEX_HEADER: \usetikzlibrary{babel}
 #+LATEX_HEADER: \newcommand{\cl}{\textit{clasificadores lineales}}
 #+LATEX_HEADER: \newcommand{\losss}{\textit{funciones de pérdida}}
 #+LATEX_HEADER: \newcommand{\dg}{\textit{descenso de gradiente}}
@@ -93,7 +94,6 @@ blocks de nuevo.
 #+LATEX_HEADER: \end{titlepage}
 #+LATEX_HEADER: \newpage
 #+LATEX_HEADER: \endgroup}
-
 
 #+LATEX: \titleEze
 #+LATEX: \newpage
@@ -1572,53 +1572,54 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 Ahora podemos estructurar nuestro algoritmo de optimización en dos
 pasos: primero, evaluamos nuestra función \loss{} en los parámetros
 actuales (\textit{forward pass}). Luego, partiendo de ese resultado
-calculamos el gradiente en cada variable utilizando la \textit{regla
-de la cadena}. En la Figura \ref{fig:backprop} se puede observar los
-valores computados para este ejemplo durante el \textit{forward pass}
-en verde y los gradientes computados mediante la regla de la cadena
+calculamos el gradiente en cada variable utilizando la \textit{reglade la cadena}.
+En la Figura \ref{fig:backprop} se puede observar los valores
+computados para este ejemplo durante el \textit{forward pass} en verde
+y los gradientes computados mediante la regla de la cadena
 (\textit{backpropagation}) en rojo. De esta manera ``propagamos'' el
 error de la predicción hacia atrás (\back{}) para luego corregir los
 pesos mediante, por ejemplo, el algoritmo de Descenso de Gradiente
 Estocástico que ya vimos.
 
 #+begin_src latex
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{\textwidth}
-\tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
-\tikzstyle{input}=[circle,draw=black,minimum size=20pt,inner sep=0pt]
-\tikzstyle{empty}=[circle,draw=white,minimum size=20pt,inner sep=0pt]
-\tikzstyle{emptyred}=[circle,draw=white,minimum size=20pt,inner sep=0pt,text=black!50!red]
-\tikzstyle{edgeup} = [draw,thick,->,above,sloped,text=black!50!green]
-\tikzstyle{edgedown} = [draw,thick,->,below,sloped,text=black!50!red]
-\begin{tikzpicture}[scale=1.8, auto,swap]
-    % vertices
-    \node[input] (x) at (-2,1) {$x$};
-    \node[vertex] (div) at (2,1) {$/$};
-    \node[vertex] (sum) at (4,1) {$+$};
-    \node[empty] (output) at (6.5,1) {};
-    \node[vertex] (pow) at (0,0) {$\_^2$};
-    \node[input] (y) at (-2,0) {$y$};
-    \node[input] (z) at (2,-1) {$z$};
-    % edges forward
-    \path[edgeup] (x) -- node[->] {$-3$} (div);
-    \path[edgeup] (div) -- node[->] {$-0.75$} (sum);
-    \path[edgeup] (pow) -- node[->] {$4$} (div);
-    \path[edgeup] (z) -- node[->] {$4$} (sum);
-    \path[edgeup] (y) -- node[->] {$2$} (pow);
-    \path[edgeup] (sum) -- node[->] {$g(-3,2,4)=3.25$} (output);
-    % edges backward
-    \path[edgedown] (x) -- node[->] {$\frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$} (div);
-    \path[edgedown] (div) -- node[->] {$\frac{\partial g}{\partial q} = 1$} (sum);
-    \path[edgedown] (pow) -- node[->] {$\frac{\partial q}{\partial p} = \frac{-x}{p^2} = -0.187$} (div);
-    \path[edgedown] (z) -- node[->] {$\frac{\partial g}{\partial z} = 1$} (sum);
-    \path[edgedown] (y) -- node[->] {$\frac{\partial p}{\partial y} = 2y = 4$} (pow);
-    % final gradients
-    \node[emptyred] (xback) at (-3.5,1) {$\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$};
-    \node[emptyred] (yback) at (-3.79,0) {$\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial p} \frac{\partial p}{\partial y} = \frac{-2x}{y^3} = -0.748$};
-    \node[emptyred] (zback) at (1.4,-1) {$\frac{\partial g}{\partial z} = 1$};
-\end{tikzpicture}
-    \end{subfigure}
+    \tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{input}=[circle,draw=black,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{empty}=[circle,draw=white,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{emptyred}=[circle,draw=white,minimum size=20pt,inner sep=0pt,text=black!50!red]
+    \tikzstyle{edgeup} = [draw,thick,->,above,sloped,color=black!50!green,text=black!50!green]
+    \tikzstyle{arrow} = [->]
+    \tikzstyle{edgedown} = [draw,thick,<-,below,sloped,color=black!50!red,text=black!50!red]
+    %\resizebox{\textwidth}{!}{
+        \begin{tikzpicture}[scale=1.5, auto,swap]
+            % vertices
+            \node[input] (x) at (-2,1) {$x$};
+            \node[vertex] (div) at (2,1) {$/$};
+            \node[vertex] (sum) at (4,1) {$+$};
+            \node[empty] (output) at (5.7,1) {};
+            \node[vertex] (pow) at (0,-1) {$\_^2$};
+            \node[input] (y) at (-2,-1) {$y$};
+            \node[input] (z) at (2,-1.5) {$z$};
+            % edges forward
+            \path[edgeup] (x.15) -- node[arrow] {$-3$} (div.165);
+            \path[edgeup] (div.15) -- node[arrow] {$-0.75$} (sum.165);
+            \path[edgeup] (pow.50) -- node[arrow] {$4$} (div.230);
+            \path[edgeup] (z.50) -- node[arrow] {$4$} (sum.230);
+            \path[edgeup] (y.15) -- node[arrow] {$2$} (pow.165);
+            \path[edgeup] (sum) -- node[arrow] {$3.25$} (output);
+            % edges backward
+            \path[edgedown] (x.355) -- node[arrow] {$\frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$} (div.185);
+            \path[edgedown] (div.355) -- node[arrow] {$\frac{\partial g}{\partial q} = 1$} (sum.185);
+            \path[edgedown] (pow.30) -- node[arrow] {$\frac{\partial q}{\partial p} = \frac{-x}{p^2} = -0.187$} (div.250);
+            \path[edgedown] (z.30) -- node[arrow] {$\frac{\partial g}{\partial z} = 1$} (sum.250);
+            \path[edgedown] (y.355) -- node[arrow] {$\frac{\partial p}{\partial y} = 2y = 4$} (pow.185);
+            % final gradients
+            \node[emptyred] (xback) at (-3.3,1) {$\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = 0.25$};
+            \node[emptyred] (yback) at (-3.58,-1) {$\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial p} \frac{\partial p}{\partial y} = -0.748$};
+            \node[emptyred] (zback) at (1.35,-1.5) {$\frac{\partial g}{\partial z} = 1$};
+        \end{tikzpicture}
+    %}
     \caption{\fontsize{9}{11}\selectfont Grafo de computación durante la aplicación de \textit{backpropagation}.}\label{fig:backprop}
 \end{figure}
 #+end_src
