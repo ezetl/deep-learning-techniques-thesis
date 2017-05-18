@@ -30,6 +30,7 @@ blocks de nuevo.
 #####################################################################
 #+END_COMMENT
 
+#+LATEX_HEADER: \hypersetup{colorlinks=true,linkcolor=black!60!blue}
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage{ifthen,figlatex}
@@ -98,30 +99,27 @@ blocks de nuevo.
 #+LATEX: \titleEze
 #+LATEX: \newpage
 
-
 #+BEGIN_abstract
-Dentro del campo de la IA, una clase de técnicas conocidas como Deep
-Learning (DL) han cobrado particular relevancia, ya que mediante su
-utilización se han conseguido mejoras muy significativas respecto de
-métodos tradicionales. Una desventaja de los modelos basados en DL, es
-que para su entrenamiento es necesario contar con miles o millones de
-datos anotados. En el caso particular de la clasificación de imágenes
+Dentro del campo del aprendizaje automático, una clase de técnicas
+conocidas como Deep Learning (DL) han cobrado particular relevancia,
+ya que mediante su utilización se han conseguido mejoras muy
+significativas respecto de métodos tradicionales. Una desventaja de
+los modelos basados en DL es que usualmente cuentan con más parámetros
+que cantidad de elementos en los conjuntos de datos de
+entrenamiento. En el caso particular de la clasificación de imágenes
 por contenido, si bien existen grandes conjuntos de datos anotados
-disponibles (ImageNet o LFW, entre otros), su generación para
-problemas no contemplados en los mismos es muy costosa.  Agrawal et
-al. \cite{LSM2015} proponen una manera alternativa al entrenamiento de
-esta clase de modelos inspirada en cómo los organismos vivientes
-desarrollan habilidades de percepción visual: moviéndose e
-interactuando con el mundo que los rodea. Partiendo de la hipótesis de
-que se puede usar la información del movimiento propio (rotación y
-traslación en los ejes X,Y,Z) como método de supervisión ellos
-demostraron que es posible obtener buenos resultados entrenando con
-menos imágenes anotadas que lo usual.
-
-Se propone como Trabajo Final de la Lic. en Ciencias de la Computación
-la implementación y evaluación del modelo propuesto en
-\cite{LSM2015}. Se estudiarán distintos casos de aplicación y posibles
-mejoras.
+disponibles, su generación para problemas en otros dominios es muy
+costosa. Se propone en este trabajo una manera alternativa al
+entrenamiento de esta clase de modelos inspirada en cómo los
+organismos vivientes desarrollan habilidades de percepción visual:
+moviéndose e interactuando con el mundo que los rodea. Partiendo de la
+hipótesis de que se puede usar la información del movimiento propio
+(rotación y traslación en los ejes X,Y,Z) como método de supervisión,
+Agrawal et al. \cite{LSM2015} ya han demostrado que es posible obtener
+buenos resultados entrenando con menos imágenes anotadas que lo usual.
+Se validan experimentalmente los resultados de este método de
+entrenamiento con respecto a los del estado del arte en tareas de
+clasificación en distintos dominios.
 #+END_abstract
 #+LATEX: \newpage
 #+LATEX: \tableofcontents
@@ -221,15 +219,15 @@ con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
 de las decenas de miles hasta millones de imágenes. Generalmente se
 requiere un gran esfuerzo humano para etiquetar tantas imágenes, por
 lo que los conjuntos de datos de entrenamiento lo suficientemente
-grandes suelen ser escasos, por ejemplo ImageNet \cite{imagenet},
-SUN397 \cite{sun397}.
+grandes suelen ser escasos, por ejemplo ImageNet \cite{imagenet}, COCO
+\cite{DBLP:journals/corr/LinMBHPRDZ14} o SUN397 \cite{sun397}.
 
 Actualmente contamos con una increíble cantidad de imágenes para
-etiquetar. Para 2016, Cisco estimaba que el 51\% del tráfico de
+etiquetar. Para 2016, Cisco estimaba que el 51% del tráfico de
 Internet iba a provenir de dispositivos WiFi, tales como celulares,
 \textit{tablets}, \textit{smart TVs}, etc.  Más aún, se estima que
-para el 2019 el 80\% del tráfico IP va a ser en forma de píxeles
-(multimedia), superando al 67\% que existente en 2014
+para el 2019 el 80% del tráfico IP va a ser en forma de píxeles
+(multimedia), superando al 67% que existente en 2014
 \cite{ciscostats}. Como tendencia podemos nombrar a Youtube, donde la
 mitad de los videos son subidos desde dispositivos móviles
 \cite{youtustats}. Por otro lado, las redes sociales más populares
@@ -287,7 +285,8 @@ que hay que extraer de una cara para diferenciarla de otra (arrugas,
 prominencias, etc.) \cite{faces}. Se puede ver que son demasiados
 detalles y combinaciones a tener en cuenta como para programar cada
 caso posible manualmente, por lo que un sistema que utilice
-aprendizaje automático podría ser una mejor opción.
+aprendizaje automático que aprenda a diferencias esas características
+por nosotros podría ser una mejor opción.
 
 Hay tres áreas principales en las que podemos dividir el aprendizaje
 automático:
@@ -362,8 +361,8 @@ def plot_norm_circle(x, y, x2, y2, color, index='0'):
     ax.set_ylabel('x2')
     ax.scatter(x, y, s=30, c=color, marker="o")
     ax.scatter(x2, y2, s=30, c=color, marker="o")
-    circle = plt.Circle((1.6, 1.6), 1, color='r', fill=False)
-    circle2 = plt.Circle((3.2, 3.2), 1, color='g', fill=False)
+    circle = plt.Circle((1.6, 1.6), 1, color='royalblue', fill=False)
+    circle2 = plt.Circle((3.2, 3.2), 1, color='red', fill=False)
     ax.add_artist(circle)
     ax.add_artist(circle2)
     plt.tight_layout()
@@ -375,7 +374,7 @@ y1 = np.random.normal(1.6, 0.3, size=N)
 x2 = np.random.normal(3.2, 0.3, size=N)
 y2 = np.random.normal(3.2, 0.3, size=N)
 plot_norm(x1, y1, x2, y2, 'royalblue', '1')
-plot_norm_circle(x1, y1, x2, y2, 'royalblue', '2')
+plot_norm_circle(x1, y1, x2, y2, 'lightslategrey', '2')
 #+end_src
 
 #+begin_src latex
@@ -392,7 +391,7 @@ plot_norm_circle(x1, y1, x2, y2, 'royalblue', '2')
         \caption{Aprendizaje no supervisado}
         \label{fig:machine2}
     \end{subfigure}
-    \caption{\fontsize{9}{11}\selectfont Ejemplos simples del tipo de datos en aprendizaje supervisado vs. no supervisado.}\label{fig:machine-learning}
+    \caption{\fontsize{9}{11}\selectfont Ejemplos simples de la organización de los datos en problemas de aprendizaje supervisado vs. no supervisado.}\label{fig:machine-learning}
 \end{figure}
 #+end_src
 
@@ -853,7 +852,7 @@ f(x) = \max{(0,x)}
 Se puede observar que requiere muy pocas operaciones, además está
 comprobado empíricamente que los modelos que utilizan \textit{ReLU}
 convergen hasta 6 veces más rápido \cite{NIPS2012_4824} que con otras
-funcines de activación (como la \textit{sigmoide}
+funciones de activación (como la \textit{sigmoide}
 \cite{sigmoid} y \textit{tangente hiperbólica}).
 
 Una desventaja de las \textit{ReLU} es que pueden provocar la
@@ -1144,7 +1143,7 @@ saturación, incluso hacer leves desplazamientos y rotaciones.
      Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el
      eje que conforman los ojos [[fig:falign]]. Traslaciones, recortes en la
      imagen y cambios en el brillo, contraste y color son otras técnicas muy
-     usadas ([[fig:faug1]] y [[fig:faug2]]).}\label{fig:augm}
+     usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
 \end{figure}
 #+end_src
 
@@ -1335,7 +1334,7 @@ preferencias para algunos conjuntos de \weights{} sobre otros.
 De esta manera, nuestra función de costo ahora cuenta con dos
 componentes, la función de costo propiamente dicha y la
 \textit{componente de regularización}. Sea \(\lambda\) un número real
-(\textit{término de regularización}, entonces nuestra nueva función de
+(\textit{término de regularización}), entonces nuestra nueva función de
 costo es:
 
 \begin{equation}
@@ -1350,9 +1349,15 @@ Las técnicas de regularizacion más usadas son:
 
 **** Regularización de norma L2
 
-Para cada peso de la red se calcula \(\frac{1}{2} \lambda \mathbf{w}^{2}_{2}\) donde
-\(\lambda\) es la tasa de regularización y se le suma a la función
-objetivo. 
+Sea \(\mathbf{W}\) la matriz de parámetros, podemos calcular su norma
+de Frobenius (norma L2 generalizada a matrices) como:
+
+\begin{equation}
+\mathbf{||W||}_{F} = \sqrt{ \sum_{i=1}^{n} \sum_{j=1}^{m} w_{ij}^2}
+\end{equation}
+
+Definimos la normalización L2 como \(\frac{1}{2} \lambda \mathbf{||W||}^{2}_{F}\)
+donde \(\lambda\) es la tasa de regularización.
 
 Una buena propiedad de la regularizacion es que al penalizar los pesos
 grandes, obliga a \weights{} a generalizar y contemplar todas las
@@ -1362,12 +1367,10 @@ con más o menos probabilidad) sin dar prioridad a una sola.
 
 **** Regularización de norma L1
 
-Similar a la aterior, sólo que se le adiciona \(\lambda \mathbf{w}_{1}\)
-a la función objetivo. Los pesos tienden a converger
-a cero bajo la regularización L1 y las redes tienden a usar un
-subconjunto de los datos de entrada, convirtiendose en invariantes al
-ruido. En general se prefiere la regularización L2 por obtenerse
-mejores resultados.
+Similar a la aterior, sólo que se le adiciona \(\lambda
+\mathbf{||W||}_{1}\) a la función objetivo. Los pesos tienden a
+converger a cero bajo la regularización L1. En general se prefiere la
+regularización L2 por obtenerse mejores resultados.
 
 **** \textit{Dropout}
 
@@ -2312,8 +2315,7 @@ usar las siguientes abreviaciones:
 \item Op para la capa de salida. En general nuestras capas de salida van a estar conformadar por una F\(k\) (\(k\) es el número de clases) seguidas por una capa Softmax.
 \end{itemize}
 
-Al igual que en \cite{LSM2015}, y como es usual cuando se entrenan
-CNN's, colocaremos rectificadores lineales ReLU's luego de cada capa
+Se agregan además rectificadores lineales ReLU luego de cada capa
 convolucional y cada cada FC.
 
 *** Medidas de similaridad: \textit{Slow Feature Analysis} y Automovimiento
