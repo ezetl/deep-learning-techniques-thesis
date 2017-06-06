@@ -267,6 +267,14 @@ Sección [[sec:agrawal]]. Finalmente, las secciones [[sec:concl]] y
 :END:
 * Marco Teórico
 <<sec:marco>>
+** Introducción
+
+En esta sección se presentarán conceptos introductorios del
+aprendizaje automático sobre los que definiremos diferentes algoritmos
+comunes en tareas de entrenamiento, todos ellos enfocados en redes
+neuronales. Se terminará la sección con una introducción a redes
+neuronales convolucionales.
+
 ** Aprendizaje Automático
 
 Las técnicas de aprendizaje automático tienen como objetivo
@@ -404,12 +412,12 @@ objetivo (por ejemplo manejar un vehículo
 las recompensas y penalizaciones que surgen mientras explora el
 espacio del problema.
 
-*** Clasificadores lineales
+*** El problema de clasificación
 
-Un clasificador lineal combina linealmente las características (o
-\textit{features}) de los datos de entrada para determinar a que clase
-pertenecen los mismos, usualmente entrenado mediante técnicas de
-aprendizaje supervisado.
+Supongamos que contamos con una población donde cada elemento
+pertenece a alguna clase de un conjunto de \(K\) clases en total.  En
+este contexto, la tarea de clasificación consiste en determinar a qué
+clase pertenece una observación nueva.
 
 Imaginemos que queremos clasificar imágenes, es decir, asignar una
 etiquetas a representaciones de imágenes desconocidas. Para ello vamos
@@ -423,11 +431,17 @@ píxeles. Supongamos que contamos con un conjunto de datos de imágenes
 tenemos \(\boldsymbol{N}\) imágenes y \(\boldsymbol{K}\) categorías.
 
 Definamos ahora una función \(\boldsymbol{f\colon R^{D} \mapsto
-R^{K}}\) como un mapeo lineal entre píxeles y \scores:
+R^{K}}\) como un mapeo entre píxeles y \scores:
 
 \begin{equation}
      \boldsymbol{f(x_i, W, b)= W x_i + b}
 \end{equation}
+
+Lo que acabamos de definir es un clasificador lineal. Un clasificador
+lineal combina linealmente las características (o \textit{features})
+de los datos de entrada para determinar a que clase pertenecen los
+mismos, y usualmente es entrenado mediante técnicas de aprendizaje
+supervisado.
 
 Asumimos que la imagen \img{} es un vector de una sola columna
 \([D \times 1]\), \weights{} es una matriz \([K \times D]\) y \bias{} es
@@ -1497,8 +1511,7 @@ actualizar \weights{} con los nuevos pesos se utiliza el algoritmo
 <<sec:backprop>>
 
 La retropropagación (o \textit{backpropagation} en inglés) es un
-algoritmo utilizado comúnmente con la técnica de optimización de
-descenso de gradiente.
+algoritmo utilizado para computar eficientemente el gradiente.
 
 Para lograr una intuición del mismo empecemos por recordar la
 definición de derivada de una función. Sea \(g:\mathbb{R} \to
@@ -2169,10 +2182,14 @@ memoria y tiempo de cómputo.
 * Redes neuronales convolucionales siamesas
 <<sec:siamesa>>
 
+** Introducción
+
+** Arquitecturas siamesas
+
 Los métodos discriminativos tradicionales generalmente requieren
 conocer las categorías del conjunto de datos de antemano y suelen
-estar limitados a un número reducido de categorías (en el orden de las
-100). Eso se convierte en una limitación para ciertas tareas donde la
+estar limitados a un número reducido de categorías (entre 100 y
+1000). Eso se convierte en una limitación para ciertas tareas donde la
 cantidad de clases es muy grande, como la verificación de rostros o
 motores de búsqueda visuales, donde se cuenta con pocos elementos por
 clase o sólo algunas clases son conocidas durante el
@@ -2185,11 +2202,13 @@ según el dominio en el que se esté trabajando. Dentro del dominio de
 las redes neuronales, una manera de lograrlo es mediante un tipo
 particular de arquitectura denominado \textit{redes siamesas}. Una red
 siamesa consiste de dos redes \textit{gemelas} cuyos parámetros son
-compartidos. La arquitectura toma pares de imágenes (\(x_1\) y
-\(x_2\)) y las representaciones obtenidas de ambas redes son redireccionadas a una
-función de energía que calcula alguna métrica respecto a las dos
-entradas (Figura \ref{fig:siamese-diagram}). Las redes siamesas no
-difieren en más que eso de las redes convolucionales que ya vimos.
+compartidos. Una red siamesa toma un par de imágenes (\(x_1\) y
+\(x_2\)) y computa si ambas pertenecen o no a la misma categoría o si
+son similares. Para ello, las representaciones obtenidas de ambas
+redes que componen la arquitectura siamesa son redireccionadas a una
+función de costo que calcula alguna métrica respecto a las entradas
+(Figura \ref{fig:siamese-diagram}). Las redes siamesas no difieren en
+más que eso de las redes convolucionales que ya vimos.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
 verificación de huellas digitales \cite{fingerprint} y de firmas
@@ -2356,6 +2375,11 @@ imagen.
 * Experimentos
 <<sec:agrawal>>
 
+** Introducción
+
+En esta sección se presentan todos los resultados experimentales
+realizados sobre arquitecturas siamesas con información odométrica.
+
 Todos los experimentos realizados se encuentran en Github
 [fn::https://github.com/ezetl/deep-learning-techniques-thesis].
 Dentro del repositorio se encuentra toda la documentación pertinente a
@@ -2367,21 +2391,25 @@ los el código.
 
 Los experimentos fueron desarrollados en su mayoría en el lenguaje
 Python, excepto por algunos scripts de preprocesamiento que
-originalmente fueron creados en C++.
+originalmente fueron creados en C++. Se presentará primero una prueba
+de concepto con el conjunto de datos MNIST \cite{mnist} para luego
+mostrar los resultados sobre los conjuntos de datos KITTI
+\cite{Geiger2012CVPR}, SUN397 \cite{sun397} e ILSVRC 2012
+\cite{imagenet}.
 
 ** Prueba de concepto con MNIST
 *** Conjunto de datos
 
 El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de
 caracteres numéricos manuscritos para entrenamiento, más 10000
-imágenes para evaluación. La dimensión de cada imagen es \(1 \times 28
-\times 28\).  Para el entrenamiento mediante \textit{automovimiento}
-se crearon pares de imágenes siguiendo los lineamientos del
-paper. Esto significa que cada par está compuesto de la imagen
-original y la imagen con transformaciones en los ejes X, Y, Z. Las
-transformaciones en X e Y son traslaciones de 3 píxeles, mientras que
-la rotación en Z varía entre los -30° y los 30°. Tanto las rotaciones
-como las traslaciones son números enteros. Para cada par creado las
+imágenes para evaluación. La dimensión de cada imagen es \(1 \times 28\times 28\). 
+Para el entrenamiento mediante \textit{automovimiento} se crearon
+pares de imágenes siguiendo los lineamientos de \cite{{LSM2015}. Esto
+significa que cada par está compuesto de la imagen original y la
+imagen con transformaciones en los ejes X, Y, Z. Las transformaciones
+en X e Y son traslaciones de 3 píxeles, mientras que la rotación en Z
+varía entre los -30° y los 30°. Tanto las rotaciones como las
+traslaciones son números enteros. Para cada par creado las
 transformaciones se eligen de manera aleatoria uniforme.
 
 En la Figura \ref{fig:mnist-sample} se pueden observar varios pares de
@@ -2420,12 +2448,12 @@ BCNN.
 *** Entrenamiento y evaluación
 
 Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
-tasa de aprendizaje de 0.01. Siguiendo los lineamientos del paper se
-utilizaron márgenes \(m\) de 10 y 100 para SFA por ser los que mejores
-resultados lograron. En ambas redes la tasa de aprendizaje se reduce a
-la mitad cada 10000 iteraciones. El tamaño del \textit{mini batch} fue
-de 125, lo cual equivale a procesar 5 millones de pares de imágenes
-durante las 40000 iteraciones del entrenamiento.
+tasa de aprendizaje de 0.01. Siguiendo los lineamientos de
+\cite{LSM2015} se utilizaron márgenes \(m\) de 10 y 100 para SFA por
+ser los que mejores resultados lograron. En ambas redes la tasa de
+aprendizaje se reduce a la mitad cada 10000 iteraciones. El tamaño del
+\textit{mini batch} fue de 125, lo cual equivale a procesar 5 millones
+de pares de imágenes durante las 40000 iteraciones del entrenamiento.
 
 La etapa de transferencia de aprendizaje se hizo con 4000 iteraciones
 a una tasa de aprendizaje constante de 0.01.
@@ -2483,9 +2511,10 @@ El conjunto de datos KITTI \cite{Geiger2012CVPR} consiste en 11
 secuencias que registran el movimiento de un automóvil en una
 ciudad. Además de proveer cuadros de video, se encuentra la
 información odométrica recolectada por sensores montados en el
-automóvil. Esa misma información es la que usa Agrawal et al. a la
-hora de computar las transformaciones en la cámara entre pares de
-imágenes, y es la que intentaremos reproducir en esta sección.
+automóvil. Esa misma información es la que usa Agrawal et
+al. \cite{LSM2015} a la hora de computar las transformaciones en la
+cámara entre pares de imágenes, y es la que intentaremos reproducir en
+esta sección.
 
 Se asume que la dirección a la que apunta la cámara es el eje Z y el
 plano de la imagen es el plano XY (ejes horizontales y
@@ -2660,9 +2689,10 @@ decir, reentrenar toda la red utilizando un nuevo conjunto de datos).
 Se evaluó la exactitud de una red preentrenada con automovimiento
 contra una entrenada con \textit{SFA} y una con pesos inicializados
 aleatoriamente. Para ello se utilizó el conjunto de datos ILSVRC 2012
-utilizado en la competencia de Imagenet. Dicho conjunto de datos
-cuenta con 1000 clases de objetos. Ejemplos de clases en este conjunto
-de datos se pueden ver en la Figura \ref{fig:imagenet-sample}.
+utilizado en la competencia de Imagenet \cite{imagenet}. Dicho
+conjunto de datos cuenta con 1000 clases de objetos. Ejemplos de
+clases en este conjunto de datos se pueden ver en la Figura
+\ref{fig:imagenet-sample}.
 
 #+begin_src latex
 \begin{figure}
