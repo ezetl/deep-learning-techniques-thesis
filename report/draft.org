@@ -298,14 +298,17 @@ por nosotros podría ser una mejor opción.
 
 Hay tres áreas principales en las que podemos dividir el aprendizaje
 automático:
-**** Aprendizaje supervisado
+
+#+begin_src latex
+\subparagraph{Aprendizaje supervisado}
+
 Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
 datos a aprender, hablamos de aprendizaje supervisado. Retomando el
 caso del verificador de rostros, las etiquetas serían el nombre o
 algún identificador de cada persona y nuestro clasificador aprendería
 a diferenciar las caras tomando como referencia las anotaciones.
 
-**** Aprendizaje no supervisado
+\subparagraph{Aprendizaje no supervisado}
 
 Cuando los datos no están categorizados de antemano hablamos de
 aprendizaje no supervisado. Por ejemplo, si se contara con una lista
@@ -317,6 +320,7 @@ datos utilizados en aprendizaje supervisado (dos clases de elementos)
 y los datos de aprendizaje no supervisado (no se conocen las
 categorías de antemano y el algoritmo debe encontrar los patrones en
 los datos).
+#+end_src
 
 #+name: mean-substraction
 #+begin_src python :session :exports none :results silent :cache yes :eval no-export
@@ -403,7 +407,8 @@ plot_norm_circle(x1, y1, x2, y2, 'lightslategrey', '2')
 \end{figure}
 #+end_src
 
-**** Aprendizaje por refuerzo
+#+begin_src latex
+\subparagraph{Aprendizaje por refuerzo}
 
 Cuando el agente debe interactuar con su entorno para cumplir algún
 objetivo (por ejemplo manejar un vehículo
@@ -411,6 +416,7 @@ objetivo (por ejemplo manejar un vehículo
 \cite{DBLP:journals/corr/MnihKSGAWR13}) y debe aprender a partir de
 las recompensas y penalizaciones que surgen mientras explora el
 espacio del problema.
+#+end_src
 
 *** El problema de clasificación
 
@@ -2337,12 +2343,27 @@ usar las siguientes abreviaciones:
 Se agregan además rectificadores lineales ReLU luego de cada capa
 convolucional y cada cada FC.
 
-*** Medidas de similaridad: \textit{Slow Feature Analysis} y Automovimiento
+*** Midiendo similaridad entre imágenes: \textit{Slow Feature Analysis} y Automovimiento
 
-Agrawal et al. proponen analizar el automovimiento del agente para
-aprender \textit{features} útiles y lo comparan con otro método muy
-utilizado en redes siamesas, \textit{Slow Feature Analysis} (SFA), que
-formulan de la siguiente manera:
+Agrawal et al. \cite{LSM2015} proponen analizar el automovimiento del
+agente para aprender \textit{features} útiles y lo comparan con otro
+método muy utilizado en redes siamesas, \textit{Slow Feature Analysis}
+(SFA). SFA es una técnica de aprendizaje no supervisado que se basa en
+que las características relevantes cambian poco en una ventana de
+tiempo pequeña. Aplicado a nuestro dominio donde un agente se mueve a
+través de su entorno, podemos tomar representaciones de imágenes
+\(x_{t_1}\) y \(x_{t_2}\) tomadas en tiempos \(t_1\) y \(t_2\)
+respectivamente y computar su similitud mediante alguna métrica
+\(D\). Si las imágenes están cercanas en el tiempo - es decir \(|t_1 -
+t_2| \leq T\) para algún intervalo de tiempo \(T\) - son consideradas
+similares y su distancia debería ser pequeña, caso contrario son
+consideradas diferentes y su distancia debería ser mayor a algun
+margen preestablecido. Podemos entonces establecer una función de
+costo con el objetivo de penalizar las representaciones que son
+parecidas pero estan lejanas en el espacio de representación y a su
+vez penalizar las que son distintas pero se encuentran cercanas en ese
+mismo espacio. Podemos definir entonces a la función de costo SFA
+como:
 
 \begin{equation}
 L(x_{t_1}, x_{t_2}, W) = \begin{cases}
@@ -2351,13 +2372,10 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
                          \end{cases}
 \end{equation}
 
-Donde \(x_{t_1}\) y \(x_{t_2}\) son las \textit{features} obtenidas
-por las redes siamesas en los tiempos \(t_1\) y \(t_2\), con
-parámetros compartidos \(W\), \(m\) es el margen y \(T\) es el umbral
-que determina si dos \textit{features} se consideran cercanas. La
-distancia \(D\) se eligió como la norma L2. SFA se basa en que las
-características relevantes cambian poco en una ventana de tiempo
-pequeña.
+Donde \(W\) son los parámetros compartidos de las redes siamesas y
+\(m\) es el margen mínimo que debe separar a las representaciones
+distintas. En los experimentos realizados la distancia \(D\) se eligió
+como la norma L2 de las representaciones.
 
 Por otro lado, la técnica de analizar el automovimiento se plantea
 como una tarea de clasificación en donde las redes tienen que predecir
@@ -2839,6 +2857,11 @@ dominios de problemas queda como trabajo a futuro.
 *** DONE Solucionar problema de overfitting en finetuning de kitti
 *** DONE Hacer test al finalizar entrenamiento, imprimir en pantalla log.
 *** DONE Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
+*** TODO Desarrollar SFA mas. Agregar grafico
+*** TODO Desarrollar automovimiento mas. Agregar grafico, Agregar ecuaciones de automovimiento (matriz de traslacion, etc). agregar algunas imagenes de ejemplo con las correspondientes traslaciones.
+*** TODO Desarrollar mas redes siamesas. Basarse en papers. Desarrollar tambien mas los ejemplos
+*** TODO Agregar grafico de alexnet con la notacion utilizada
+*** TODO Agregar las introducciones a cada capitulo.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
