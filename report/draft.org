@@ -2860,6 +2860,63 @@ dominios de problemas queda como trabajo a futuro.
 *** TODO Desarrollar SFA mas. Agregar grafico
 *** TODO Desarrollar automovimiento mas. Agregar grafico, Agregar ecuaciones de automovimiento (matriz de traslacion, etc). agregar algunas imagenes de ejemplo con las correspondientes traslaciones.
 *** TODO Desarrollar mas redes siamesas. Basarse en papers. Desarrollar tambien mas los ejemplos
+Cuando se cuenta con muchas clases y pocos elementos de entrenamiento
+por clase se suele resolver el problema de la clasificación mediante
+métodos basados en distancias. Dichos métodos consisten en computar
+una métrica de similaridad entre las representaciones y un conjunto de
+prototipos cuyas representaciones hayan sido previamente
+computadas. Para aplicar esta técnica es necesario contar con un
+método para obtener buenas representaciones sobre el dominio del
+problema sin necesidad de contar con la información de las categorías.
+
+Se debe buscar entonces una función que relacione el espacio de
+entrada con el de salida de tal manera que los elementos que son
+semánticamente similares en el espacio de entrada estén cercanos en el
+espacio de salida de acuerdo a alguna métrica de distancia (distancia
+euclidea por ejemplo). Sea entonces \(G_W(X)\) una familia de
+funciones con parámetros \(W\) donde \(X\) pertenece al espacio de
+entrada, entonces buscamos encontrar \(W\) tal que la medida de
+similitud \(D(G_W(X_1), G_W(X_2))\) sea pequeña si \(X_1\) y \(X_2\)
+pertenecen a la misma categoría y grande en caso contrario. El sistema
+se entrena con pares de elementos creados a partir del conjunto de
+entrenamiento, buscando minimizar una función de costo que minimice
+\(D(G_W(X_1), G_W(X_2))\) para pares cercanos semánticamente y a su
+vez maximice esa distancia para pares lejanos.
+
+Notemos que la función \(G_W\) no debe cumplir ninguna condición en
+particular más allá de que sea derivable (o su derivada pueda ser
+aproximada) en \(W\). 
+
+Lo que acabamos de definir es una \textit{arquitectura siamesa}. En
+nuestro dominio particular usaremos redes convolucionales como
+nuestras \(G_W\) para definir la arquitectura siamesa por ser capaces
+de generar buenas representaciones de imágenes a pesar de la gran
+variación en color y geometría de las mismas.
+
+**** Función de costo de contraste
+
+Queremos minimizar \(D(G_W(X_1), G_W(X_2))\) para los elementos que
+sean semánticamente similares en el espacio de entrada (\textit{pares
+genuinos}). Podríamos pensar que definiendo una función de costo que
+minimice esa distancia para los pares similares sería suficiente, sin
+embargo basta con definir \(G_W(X_1)\) como una función constante para
+que la función de costo sea cero. Por consiguiente, es necesario que
+la función de costo tenga un término de \textit{contraste} que asegure
+que no sólo se minimicen las distancias de los pares similares sino
+que se aumenten las de los pares distantes semánticamente
+(\textit{pares impostores})
+\cite{Chopra:2005:LSM:1068507.1068961}. Asignemos una etiqueta \(Y\) a
+cada par, donde \(Y=1\) para los pares impostores e \(Y=0\) para los
+pares genuinos. Definimos entonces una función de costo de contraste
+para un par \(X_1, X_2\) de la siguiente manera:
+
+\begin{equation}
+L(W, (Y, X_1, X_2)^i) = (1 - Y) L_{gen}(G_W(X_1), G_W(X_2)) + Y L_{imp}(G_W(X_1), G_W(X_2))
+\end{equation}
+
+Donde \(L_{gen}\) es la función de costo parcial para un par genuino y
+\(L_{imp}\) su correspondiente para un par impostor.
+
 *** TODO Agregar grafico de alexnet con la notacion utilizada
 *** TODO Agregar las introducciones a cada capitulo.
 ** Datasets
@@ -3149,5 +3206,4 @@ paper no explica las iteraciones ni el learning rate utilizados.
 ** Mejoras al sistema
 Probar con otras redes.
 Otros datasets (elegir datasets pequeños y ver que pasa).
-
 
