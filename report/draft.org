@@ -2896,7 +2896,7 @@ dominios de problemas queda como trabajo a futuro.
 *** DONE Solucionar problema de overfitting en finetuning de kitti
 *** DONE Hacer test al finalizar entrenamiento, imprimir en pantalla log.
 *** DONE Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
-
+*** -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 *** DONE Desarrollar SFA mas.
 *** TODO Agregar grafico SFA.
 *** TODO Desarrollar automovimiento mas. Agregar ecuaciones de automovimiento (matriz de traslacion, etc).
