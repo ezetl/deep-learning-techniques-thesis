@@ -2212,38 +2212,42 @@ computadas. Para aplicar esta técnica es necesario contar con un
 método para obtener buenas representaciones sobre el dominio del
 problema sin necesidad de contar con la información de las categorías.
 
-Se debe buscar entonces una función que relacione el espacio de
-entrada con el de salida de tal manera que los elementos que son
-semánticamente similares en el espacio de entrada estén cercanos en el
-espacio de salida de acuerdo a alguna métrica de distancia (distancia
-euclidea por ejemplo). Sea entonces \(G_W(x)\) una familia de
-funciones con parámetros \(W\) donde \(x\) pertenece al espacio de
-entrada, entonces buscamos encontrar \(W\) tal que la medida de
-similitud \(D(G_W(x_1), G_W(x_2))\) sea pequeña si \(x_1\) y \(x_2\)
-pertenecen a la misma categoría y grande en caso contrario. El sistema
-se entrena con pares de elementos creados a partir del conjunto de
-entrenamiento, buscando minimizar una función de costo que minimice
-\(D(G_W(x_1), G_W(x_2))\) para pares cercanos semánticamente y a su
-vez maximice esa distancia para pares lejanos.
+Se debe buscar entonces una función que para elementos semánticamente
+similares en el espacio de entrada produzca representaciones que
+también sean similares en el espacio de salida. Esta similaridad entre
+las representaciones puede obtenerse de acuerdo a alguna métrica de
+distancia (distancia euclidea por ejemplo).
+
+Sea entonces \(G_W(x)\) una familia de funciones con parámetros \(W\)
+donde \(x\) pertenece al espacio de entrada, entonces buscamos
+encontrar \(W\) tal que para una medida de similitud \(D\),
+\(D(G_W(x_1), G_W(x_2))\) sea pequeña si \(x_1\) y \(x_2\) pertenecen
+a la misma categoría y grande en caso contrario.
+
+El sistema se entrena con pares de elementos creados a partir del
+conjunto de entrenamiento, buscando optimizar una función de costo que
+minimice \(D(G_W(x_1), G_W(x_2))\) para pares cercanos semánticamente
+y a su vez maximice esa distancia para pares lejanos.
 
 Notemos que la función \(G_W\) no debe cumplir ninguna condición en
 particular más allá de que sea derivable (o su derivada pueda ser
 aproximada) en \(W\). 
 
 Lo que acabamos de definir es una \textit{arquitectura siamesa}. En
-nuestro dominio particular usaremos redes convolucionales como
-nuestras \(G_W\) para definir la arquitectura siamesa por ser capaces
-de generar buenas representaciones de imágenes a pesar de la gran
-variación en color y geometría de las mismas.
+nuestro dominio particular, \(G_W\) son redes convolucionales. Su
+elección radica en que son capaces de generar buenas representaciones
+de imágenes a pesar de la gran variación en color y geometría de las
+mismas.
 
-Una red siamesa entonces consiste de dos redes \textit{gemelas} cuyos
-parámetros \(W\) son compartidos. La arquitectura toma un par de
-imágenes \((x_1, x_2)\) y computa si ambas pertenecen o no a la misma
-categoría o si son similares de acuerdo a algún criterio. Para ello,
-las representaciones obtenidas de ambas redes son redireccionadas a
-una función de costo que calcula alguna métrica respecto a las
-entradas (Figura \ref{fig:siamese-diagram}). Las redes siamesas no
-difieren en más que eso de las redes convolucionales que ya vimos.
+Una red neuronal convolucional siamesa entonces consiste de dos redes
+\textit{gemelas} cuyos parámetros \(W\) son compartidos. La
+arquitectura toma un par de imágenes \((x_1, x_2)\) y computa si ambas
+pertenecen o no a la misma categoría o si son similares de acuerdo a
+algún criterio. Para ello, las representaciones obtenidas de ambas
+redes son redireccionadas a una función de costo que calcula alguna
+métrica respecto a las entradas (Figura
+\ref{fig:siamese-diagram}). Las redes siamesas no difieren en más que
+eso de las redes convolucionales que ya vimos.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
 verificación de huellas digitales \cite{fingerprint} y de firmas
@@ -2261,29 +2265,32 @@ de clasificación \cite{siamese-oneshot} y recomendación de productos
 \end{figure}
 #+end_src
 
-*** Funciones de costo en redes siamesas
+*** Funciones de costo aplicadas a redes siamesas
 
-Es importante saber definir qué función de costo vamos a usar y cómo
-vamos a generar los pares de entrenamiento antes de entrenar redes
-siamesas. Las opciones dependen del dominio del problema naturalmente,
-aunque para funciones de costo suelen elegirse ser alguna medida de
-similitud entre las representaciones aprendidas por la red y los pares
-se arman con ejemplos negativos/positivos (es decir, de imágenes no
+Qué función de costo utilizar y cómo generar los pares de
+entrenamiento para redes siamesas son opciones que dependen del
+dominio del problema.
+
+Para funciones de costo suele considerarse la penalización sobre
+alguna medida de similitud entre las representaciones aprendidas por
+la red. En ese caso los pares se arman con ejemplos
+negativos/positivos (es decir, de imágenes no
 similares/similares). Una manera de probar que las representaciones
-obtenidas por la red siamesa pueden generalizar bien es realizar
-transferencia de aprendizaje de los parámetros aprendidos a un nuevo
-problema (clasificación, búsqueda de imágenes, detección, etc).
+obtenidas por la red siamesa pueden generalizar bien a otros dominios
+es realizar transferencia de aprendizaje de los parámetros aprendidos
+a un nuevo problema (clasificación, búsqueda de imágenes, detección,
+etc).
 
-Queremos minimizar \(D(G_W(x_1), G_W(x_2))\) para los elementos que
-sean semánticamente similares en el espacio de entrada (\textit{pares genuinos}). 
-Podríamos pensar que definiendo una función de costo que minimice esa
-distancia para los pares similares sería suficiente, sin embargo basta
-con definir \(G_W(x_1)\) como una función constante para que la
-función de costo sea cero. Por consiguiente, es necesario que la
-función de costo tenga un término de \textit{contraste} que asegure
-que no sólo se minimicen las distancias de los pares similares sino
-que se aumenten las de los pares distantes semánticamente
-(\textit{pares impostores})
+Nuevamente, buscamos minimizar \(D(G_W(x_1), G_W(x_2))\) para los
+elementos que sean semánticamente similares en el espacio de entrada
+(\textit{pares genuinos}). Podríamos pensar que definiendo una
+función de costo que minimice esa distancia para los pares similares
+sería suficiente, sin embargo basta con definir \(G_W(x_1)\) como una
+función constante para que la función de costo sea cero. Por
+consiguiente, es necesario que la función de costo tenga un término de
+\textit{contraste} que asegure que no sólo se minimicen las distancias
+de los pares similares sino que se aumenten las de los pares distantes
+semánticamente (\textit{pares impostores})
 \cite{Chopra:2005:LSM:1068507.1068961}. Asignemos una etiqueta \(y\) a
 cada par, donde \(y=1\) para los pares impostores e \(y=0\) para los
 pares genuinos. Definimos entonces una \textit{función de costo de
@@ -2299,22 +2306,38 @@ L(W, (y, x_1, x_2)) = (1 - y) L_{gen}(G_W(x_1), G_W(x_2)) + \\ y L_{imp}(G_W(x_1
 Donde \(L_{gen}\) es la función de costo parcial para un par genuino y
 \(L_{imp}\) su correspondiente para un par impostor.
 
+*** Información de automovimiento como método de aprendizaje de representaciones
 
 Si bien mencionamos que en las redes siamesas se suelen comparar las
 representaciones generadas utilizando métricas de similitud, también
 podemos definir nuestra función de costo de diferente manera. Se
-podría, por ejemplo, intentar predecir cuando dos parches pertenecen o
-no a la misma imagen, o cuando dos objetos distintos pertenecen a la
-misma clase, o cuando dos fotos son la misma a pesar haber sufrido
-alguna transformación (traslacion, rotación, deformación, etc).
+podría, por ejemplo, intentar predecir cuando dos parches (secciones
+de una imagen) pertenecen o no a la misma imagen, o cuando dos objetos
+distintos pertenecen a la misma clase, o cuando dos fotos son la misma
+a pesar haber sufrido alguna transformación (traslacion, rotación,
+etc). Todos estos enfoques pueden ser pensados como tareas de
+clasificación donde el objetivo es predecir la categoría de similitud
+a la que pertenece cada par.
+
+En el caso de la predicción de las transformaciones en la imagen como
+la traslación, la información sobre el cambio de posición respecto a
+un punto inicial puede ser obtenida mediante sensores (giróscopos,
+acelerómetros, etc) y se denomina \textit{información odométrica}. TODO: esto se podria borrar->La
+información odométrica es ampliamente utilizada en robótica para
+estimar la posición relativa de un agente respecto a una posición
+inicial.
+
+TODO: inspiracion biologica de como aprender buenas representacione viendo movimiento
+TODO: como trasladar eso a nuestro dominio. Por que se eligen redes siamesas.
+
+
+
 Agrawal et al. \cite{LSM2015} proponen que para el último caso, las
 representaciones que se obtienen de entrenar la red siamesa son
 competitivas con las del estado del arte. La información disponible
 para la red relacionada a la posición relativa de una foto y sus
 transformaciones (traslación, etc) respecto al \textit{tiempo} se
 denomina \textit{información odométrica}.
-
-TODO: mas info sobre odometria
 
 En la siguiente Sección vamos a evaluar diferentes métodos de
 entrenamiento mediante información odométrica y como pueden
