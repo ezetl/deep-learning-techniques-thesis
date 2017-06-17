@@ -269,11 +269,26 @@ Sección [[sec:agrawal]]. Finalmente, las secciones [[sec:concl]] y
 <<sec:marco>>
 ** Introducción
 
-En esta sección se presentarán conceptos introductorios del
-aprendizaje automático sobre los que definiremos diferentes algoritmos
-comunes en tareas de entrenamiento, todos ellos enfocados en redes
-neuronales. Se terminará la sección con una introducción a redes
-neuronales convolucionales.
+En esta Sección se introducirán conceptos de aprendizaje automático
+sobre los que definiremos diferentes algoritmos comunes en tareas de
+entrenamiento supervisado, para luego hacer foco en redes
+neuronales. Se definirán conceptos básicos como clasificadores
+lineales y funciones de costo junto con el algoritmo más popular
+utilizado en la minimización de las mismas, el descenso de gradiente
+estocástico. Introduciremos además el algoritmo de
+\textit{retropropagación} (\textit{backpropagation} en inglés), que es
+una manera eficiente de computar los gradientes durante el
+entrenamiento de un modelo cuando la cantidad de parámetros es muy
+grande.
+
+Se presentarán además los problemas principales a la hora de entrenar
+un modelo, como el sobreajuste, y métodos para evitarlos.
+
+La Sección termina con una introducción a redes neuronales
+convolucionales y una breve mención de las arquitecturas de redes más
+conocidas, una de las cuales (\textit{AlexNet}) es la base de las
+arquitecturas utilizadas en los experimentos de la Sección
+\textit{sec:agrawal}.
 
 ** Aprendizaje Automático
 
@@ -2190,6 +2205,17 @@ memoria y tiempo de cómputo.
 
 ** Introducción
 
+Basándonos en los conceptos previamente explicados, analizaremos en
+esta Sección una alternativa mediante entrenamiento no supervisado al
+problema de clasificación con conjuntos de datos con muchas categorías
+pero pocos elementos por categoría. Dicho método es el entrenamiento
+mediante \textit{arquitecturas siamesas}. Se presentan motivaciones y
+fundaciones teóricas de los modelos siameses asi como también las
+distintas formas de definir funciones de costos para este paradigma,
+haciendo foco en las dos utilizadas en los experimentos del Capítulo
+\ref{sec:agrawal}: \textit{Slow Feature Analysis} y
+\textit{Automovimiento}.
+
 ** Arquitecturas siamesas
 
 Los métodos discriminativos tradicionales generalmente requieren
@@ -2224,10 +2250,10 @@ encontrar \(W\) tal que para una medida de similitud \(D\),
 \(D(G_W(x_1), G_W(x_2))\) sea pequeña si \(x_1\) y \(x_2\) pertenecen
 a la misma categoría y grande en caso contrario.
 
-El sistema se entrena con pares de elementos creados a partir del
-conjunto de entrenamiento, buscando optimizar una función de costo que
-minimice \(D(G_W(x_1), G_W(x_2))\) para pares cercanos semánticamente
-y a su vez maximice esa distancia para pares lejanos.
+Una manera de optimizar los parámetros \(W\) es estableciendo una
+función de costo que minimice \(D(G_W(x_1), G_W(x_2))\) para pares
+cercanos semánticamente y a su vez maximice esa distancia para pares
+lejanos.
 
 Notemos que la función \(G_W\) no debe cumplir ninguna condición en
 particular más allá de que sea derivable (o su derivada pueda ser
@@ -2322,109 +2348,98 @@ a la que pertenece cada par.
 En el caso de la predicción de las transformaciones en la imagen como
 la traslación, la información sobre el cambio de posición respecto a
 un punto inicial puede ser obtenida mediante sensores (giróscopos,
-acelerómetros, etc) y se denomina \textit{información odométrica}. TODO: esto se podria borrar->La
-información odométrica es ampliamente utilizada en robótica para
+acelerómetros, etc) y se denomina \textit{información odométrica}. 
+
+
+La información odométrica es ampliamente utilizada en robótica para
 estimar la posición relativa de un agente respecto a una posición
-inicial.
+inicial. No solamente eso, sino que agentes biológicos también
+utilizan su sistema perceptual para ubicarse en el ambiente y poder
+lograr sus objetivos. Cabe preguntarse si toda la información que el
+agente obtiene mediante su movimiento por el ambiente
+(\textit{automovimiento}) puede ser utilizada por el mismo como una
+fuente de supervisión en la tarea de aprender representaciones
+perceptuales.
 
-TODO: inspiracion biologica de como aprender buenas representacione viendo movimiento
-TODO: como trasladar eso a nuestro dominio. Por que se eligen redes siamesas.
+Nos enfocaremos en la tarea de percepción visual. En este caso, la
+pregunta se puede reformular de la siguiente manera: ¿Puede un agente
+móvil valerse de la información obtenida de su propio movimiento para
+supervisar el aprendizaje de buenas representaciones visuales de su
+entorno?
+
+Cuando hablamos de buenas representaciones hacemos hincapié en dos
+aspectos: (1) la capacidad de poder realizar múltiples tareas visuales
+y (2) la habilidad de poder aprender nuevas tareas visuales basándose
+en pocos ejemplos.
+
+Agrawal et al. \cite{LSM2015} proponen que relacionando los estímulos
+visuales con la información de automovimiento pueden aprenderse buenas
+representaciones visuales. De esa manera el agente móvil puede ser
+visto como una cámara que se mueve por el ambiente y la información
+del automovimiento es entonces la misma que la del movimiento de la
+cámara. Bajo este enfoque, el problema de relacionar los estímulos
+visuales con el automovimiento puede ser establecido como el problema
+de predecir las transformaciones de la cámara en pares de imágenes a
+lo largo del movimiento de la misma.
 
 
+De esta manera el problema puede ser implementado con una arquitectura
+de redes convolucionales siamesas cuya tarea sea la de predecir las
+transformaciones entre dos imágenes de entrada. \cite{LSM2015} prueba
+para algunos casos que las representaciones obtenidas al entrenar la
+red siamesa de manera no supervisada mediante la información de
+automovimiento son competitivas con las del estado del arte que
+utilizan métodos supervisados de clasificación cuando son entrenadas
+con pocas imágenes por categoría.
 
-Agrawal et al. \cite{LSM2015} proponen que para el último caso, las
-representaciones que se obtienen de entrenar la red siamesa son
-competitivas con las del estado del arte. La información disponible
-para la red relacionada a la posición relativa de una foto y sus
-transformaciones (traslación, etc) respecto al \textit{tiempo} se
-denomina \textit{información odométrica}.
-
-En la siguiente Sección vamos a evaluar diferentes métodos de
-entrenamiento mediante información odométrica y como pueden
-generalizar las representaciones a nuevos dominios, basándonos y
-evaluando algunas propuestas de Agrawal et al. \cite{LSM2015}.
+En la siguiente Sección explicaremos y evaluaremos diferentes métodos de
+entrenamiento mediante información odométrica.
 
 ** Entrenamiento de modelos de aprendizaje profundo utilizando información odométrica
 <<sec:odometry>>
 
-Muchos agentes móviles son conscientes de sus movimientos
-(\textit{automovimiento}) gracias a sus sistemas motores. En otras
-palabras, esa información está disponible y es accesible
-fácilmente. Ya sea un mamífero con un sistema de equilibrio como los
-humanos o un robot con giróscopos y otros sensores de movimiento, es
-posible acceder a la información visual y espacial para determinar en
-dónde se encuentra uno en el espacio.
 
-Agrawal et al. \cite{LSM2015} proponen que se pueden aprender
-representaciones visuales útiles analizando la correlación entre los
-estímulos visuales y el automovimiento. De esta manera, un agente
-móvil puede ser tratado como una cámara moviéndose, y su información
-de automovimiento se corresponde con los movimientos de la
-cámara. Establecen entonces el problema de relacionar los estímulos
-visuales con el movimiento como la tarea de predecir qué
-transformaciones sufren las imágenes a medida que el agente se mueve.
+Queremos evaluar que nuestro algoritmo no supervisado de
+automovimiento funciona mejor que un entrenamiento supervisado cuando
+se cuenta con pocas imágenes por categoría.
 
+Para evaluar la calidad de las representaciones utilizaremos el
+paradigma de transferencia de aprendizaje. Esto es, entrenaremos las
+arquitecturas siamesas y luego utilizaremos los parámetros aprendidos
+para entrenar un modelo sobre un nuevo dominio de problema.
 
-Ese agente móvil es modelado con Redes Neurales Convolucionales que
-optimizan sus representaciones visuales minimizando el error entre la
-informacion de automovimiento provista por el sistema y la información
-de automovimiento predecida utilizando las imágenes de entrada
-solamente. Este procedimiento es, según Agrawal, equivalente a
-entrenar una Red Convolucional con dos flujos de entrada (o sea, una
-Red Neural Convolucional Siamesa) en el que se procesan dos imágenes
-desplazadas y la red predice la transformación que ocurrió entre ambas
-imágenes.
+Además, compararemos las representaciones mediante automovimiento con
+otra técnica no supervisada utilizada en arquitecturas siamesas,
+\texti{Slow Feature Analysis}. Se concluye eventualmente que la
+técnica de automovimiento es superior a \textit{Slow Feature
+Analysis}.
 
-Bajo la hipótesis de que esto forzaría al agente a aprender
-\textit{features} útiles en la identificación de elementos visuales
-que esten presentes en ambas imágenes, entrenaron diferentes versiones
-de redes siamesas con distintos conjuntos de datos y obtuvieron
-resultados comparables al estado del arte sin utilizar conjuntos de
-datos masivos.
+En lo que resta del Capítulo se presentarán las dos técnicas de
+entrenamiento no supervisado que se utilizarán en los experimentos en
+\ref{sec:agrawal}.
 
-*** Nomenclatura
+*** Aprendizaje por \textit{Slow Feature Analysis}
 
-Cada componente de la red siamesa se denotará con BCNN por sus siglas
-en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
-redes serán concatenadas y pasadas a otra red llamada TCNN
-(\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
-de pérdida. Las BCNN son las redes sobre las que luego haremos
-transferencia de aprendizaje.
+Para analizar que tan bueno es aprender representaciones mediante
+automovimiento compararemos la calidad de las representaciones
+obtenidas con ese método contra las representaciones obtenidas
+mediante un tipo de función de contraste denominado \textit{Slow Feature Analysis} (SFA).
 
-Para dar una idea de las arquitecturas de cada red de manera sencilla vamos a
-usar las siguientes abreviaciones:
-
-\begin{itemize}
-\item C\(k\) para una capa convolucional con \(k\) filtros cuadrados.
-\item F\(k\) para una capa completamente conectada (FC) con salida de dimensión \(k\).
-\item P para una capa de \textit{Pooling}. A menos que se diga lo contrario, siempre usaremos \textit{MAX Pooling}.
-\item D para una capa \textit{Dropout}.
-\item Op para la capa de salida. En general nuestras capas de salida van a estar conformadar por una F\(k\) (\(k\) es el número de clases) seguidas por una capa Softmax.
-\end{itemize}
-
-Se agregan además rectificadores lineales ReLU luego de cada capa
-convolucional y cada cada FC.
-
-*** Midiendo similaridad entre imágenes: \textit{Slow Feature Analysis} y Automovimiento
-
-Agrawal et al. \cite{LSM2015} proponen analizar el automovimiento del
-agente para aprender \textit{features} útiles y lo comparan con otro
-método muy utilizado en redes siamesas, \textit{Slow Feature Analysis}
-(SFA). SFA es una técnica de aprendizaje no supervisado que se basa en
-que las características relevantes cambian poco en una ventana de
-tiempo pequeña. Aplicado a nuestro dominio donde un agente se mueve a
-través de su entorno, podemos tomar representaciones de imágenes
-\(x_{t_1}\) y \(x_{t_2}\) tomadas en tiempos \(t_1\) y \(t_2\)
-respectivamente y computar su similitud mediante alguna métrica
-\(D\). Si las imágenes están cercanas en el tiempo - es decir \(|t_1 -
-t_2| \leq T\) para algún intervalo de tiempo \(T\) - son consideradas
-similares y su distancia debería ser pequeña, caso contrario son
-consideradas diferentes y su distancia debería ser mayor a algun
-margen preestablecido. Podemos entonces establecer una función de
-costo con el objetivo de penalizar las representaciones que son
+SFA es una técnica de aprendizaje no supervisado que se basa en que
+las características relevantes (\textit{features}) cambian poco en una
+ventana de tiempo pequeña. Aplicado a nuestro dominio donde un agente
+se mueve a través de su entorno, usamos representaciones de
+imágenes \(x_{t_1}\) y \(x_{t_2}\) tomadas en tiempos \(t_1\) y
+\(t_2\) respectivamente y computamos su similitud mediante alguna
+métrica \(D\). Si las imágenes están cercanas en el tiempo - es decir
+\(|t_1 - t_2| \leq T\) para algún intervalo de tiempo \(T\) - son
+consideradas similares y su distancia debería ser pequeña, caso
+contrario son consideradas diferentes y su distancia debería ser mayor
+a algun margen preestablecido. Podemos entonces establecer una función
+de costo con el objetivo de penalizar las representaciones que son
 parecidas pero estan lejanas en el espacio de representación y a su
 vez penalizar las que son distintas pero se encuentran cercanas en ese
-mismo espacio. Podemos definir entonces a la función de costo SFA
+mismo espacio. Definimos entonces a la función de costo SFA
 como:
 
 \begin{equation}
@@ -2439,12 +2454,29 @@ Donde \(W\) son los parámetros compartidos de las redes siamesas y
 distintas. En los experimentos realizados la distancia \(D\) se eligió
 como la norma L2 de las representaciones.
 
-Por otro lado, la técnica de analizar el automovimiento se plantea
-como una tarea de clasificación en donde las redes tienen que predecir
-cuál transformación fue efectuada en cada uno de los ejes. Para ello
-agrupan todas las posibles transformaciones en clases de rangos
-iguales, y la tarea de la red es predecir a que clase pertenece la
-imagen.
+*** Aprendizaje por clasificación de transformaciones en pares de imágenes
+
+Analizar el automovimiento se plantea como una tarea de clasificación
+en donde las redes tienen que predecir qué transformación fue
+efectuada en cada uno de los ejes del ambiente del agente (\(X, Y, Z\)).
+
+Sin embargo, estas transformaciones viven en un espacio continuo, por
+lo que se discretizan las traslaciones en \(X\) y \(Z\) y las
+rotaciones en \(Y\) (el eje perpendicular a la cámara) por rangos de
+valores y se utiliza 3 clasificadores, uno para cada eje. Cada
+clasificador tiene un número determinado de categorías
+correspondientes al resultado de discretizar las transformaciones
+antes mencionadas.
+
+Para ilustrar esto, si un agente se mueve entre los valores \(L\) y
+\(U\) (medidos en metros o píxeles por ejemplo) con respecto al eje
+\(X\) y un punto de origen establecido, podemos discretizar todas las
+posibles transformaciones en \(N\) clases distintas donde cada clase
+comprende un rango de números reales \( (U - L + 1) / N\).
+
+Luego, cada clasificador computa su función de costo independiente y
+el costo total de un par de imágenes se obtiene sumando los costos de
+las predicciones para cada eje.
 
 #+LaTeX: \newpage
 
@@ -2513,6 +2545,29 @@ fue usada para entrenar la red siamesa.
 \label{fig:mnist-sample}
 \end{figure}
 #+end_src
+
+*** Nomenclatura
+
+Cada componente de la red siamesa se denotará con BCNN por sus siglas
+en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
+redes serán concatenadas y pasadas a otra red llamada TCNN
+(\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
+de costo. Las BCNN son las redes sobre las que luego haremos
+transferencia de aprendizaje.
+
+Para dar una idea de las arquitecturas de cada red de manera sencilla vamos a
+usar las siguientes abreviaciones:
+
+\begin{itemize}
+\item C\(k\) para una capa convolucional con \(k\) filtros cuadrados.
+\item F\(k\) para una capa completamente conectada (FC) con salida de dimensión \(k\).
+\item P para una capa de \textit{Pooling}. A menos que se diga lo contrario, siempre usaremos \textit{MAX Pooling}.
+\item D para una capa \textit{Dropout}.
+\item Op para la capa de salida. En general nuestras capas de salida van a estar conformadas por una F\(k\) (\(k\) es el número de clases) seguidas por una capa Softmax.
+\end{itemize}
+
+Se agregan además rectificadores lineales ReLU luego de cada capa
+convolucional y cada cada FC.
 
 *** Descripción de la red
 
@@ -2921,9 +2976,7 @@ dominios de problemas queda como trabajo a futuro.
 *** DONE Guardar logs de cada entrenamiento (o guardar pickle con los datos de loss y snapshots)
 *** -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 *** DONE Desarrollar SFA mas.
-*** TODO Agregar grafico SFA.
-*** TODO Desarrollar automovimiento mas. Agregar ecuaciones de automovimiento (matriz de traslacion, etc).
-*** TODO Agregar grafico automovimiento (la red con clasificadores on top)
+*** DONE Desarrollar automovimiento mas. Agregar ecuaciones de automovimiento (matriz de traslacion, etc).
 *** DONE Desarrollar mas redes siamesas. Basarse en papers. Desarrollar tambien mas los ejemplos
 
 Se generan artificialmente pares de imágenes que luego se usarán durante
@@ -2932,7 +2985,7 @@ se valen de rotaciones, traslaciones, etc. A estos pares se les
 asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 
 *** TODO Agregar grafico de alexnet con la notacion utilizada
-*** TODO Agregar las introducciones a cada capitulo.
+*** DONE Agregar las introducciones a cada capitulo.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
 
