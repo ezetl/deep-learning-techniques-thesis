@@ -2569,6 +2569,18 @@ usar las siguientes abreviaciones:
 Se agregan además rectificadores lineales ReLU luego de cada capa
 convolucional y cada cada FC.
 
+A modo de ejemplo, en la Figura \ref{fig:examplenotation} podemos ver
+una red definida como C96-P-C256-P-F500-F10.
+
+#+begin_src latex
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/net_example.pdf}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capla completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
+\end{figure}
+#+end_src
+
+
 *** Descripción de la red
 
 La arquitectura utilizada para las BCNN fue C96-P-C256-P, y para la
@@ -2984,7 +2996,7 @@ el entrenamiento. Esto es muy similar a la aumentación de datos, ya que
 se valen de rotaciones, traslaciones, etc. A estos pares se les
 asigna una o más etiquetas indicando el nivel de similitud entre las imágenes.
 
-*** TODO Agregar grafico de alexnet con la notacion utilizada
+*** DONE Agregar grafico de alexnet con la notacion utilizada
 *** DONE Agregar las introducciones a cada capitulo.
 ** Datasets
 1. MINST: http://yann.lecun.com/exdb/mnist/
