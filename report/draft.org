@@ -2213,7 +2213,7 @@ mediante \textit{arquitecturas siamesas}. Se presentan motivaciones y
 fundaciones teóricas de los modelos siameses asi como también las
 distintas formas de definir funciones de costos para este paradigma,
 haciendo foco en las dos utilizadas en los experimentos del Capítulo
-\ref{sec:agrawal}: \textit{Slow Feature Analysis} y
+[[sec:agrawal]]: \textit{Slow Feature Analysis} y
 \textit{Automovimiento}.
 
 ** Arquitecturas siamesas
@@ -2411,12 +2411,11 @@ para entrenar un modelo sobre un nuevo dominio de problema.
 Además, compararemos las representaciones mediante automovimiento con
 otra técnica no supervisada utilizada en arquitecturas siamesas,
 \texti{Slow Feature Analysis}. Se concluye eventualmente que la
-técnica de automovimiento es superior a \textit{Slow Feature
-Analysis}.
+técnica de automovimiento es superior a \textit{Slow Feature Analysis}.
 
 En lo que resta del Capítulo se presentarán las dos técnicas de
 entrenamiento no supervisado que se utilizarán en los experimentos en
-\ref{sec:agrawal}.
+[[sec:agrawal]].
 
 *** Aprendizaje por \textit{Slow Feature Analysis}
 
@@ -2575,11 +2574,10 @@ una red definida como C96-P-C256-P-F500-F10.
 #+begin_src latex
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{images/net_example.pdf}
+    \includegraphics[width=\textwidth]{images/net_example.pdf}
     \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capla completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
 \end{figure}
 #+end_src
-
 
 *** Descripción de la red
 
