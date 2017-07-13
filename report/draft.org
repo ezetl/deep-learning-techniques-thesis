@@ -571,21 +571,17 @@ Es muy común, cuando se cuenta con un conjunto de datos lo
 suficientemente grande, dividirlo en al menos 3 subconjuntos
 disjuntos: uno para entrenar el modelo, un segundo para validar el
 modelo durante el entrenamiento y un tercero para probar el modelo una
-vez entrenado. De esta manera se puede medir que tan bien el modelo
-aprendió características relevantes a la clasificación y las pudo
-aplicar a un conjunto de datos completamente nuevo (conjunto de
-pruebas). Si la precisión que obtuvo nuestro modelo sobre este
-conjunto de pruebas es muy baja, es un síntoma de que algo no anda
-bien (ver problema de \textit{sobreajuste} en la Sección
-[[sec:regular]]).
+vez entrenado. Es importante que esta división sea disjunta para poder
+evaluar qué tan bien generaliza nuestro modelo a nuevos datos (ver
+problema de \textit{sobreajuste} en la Sección [[sec:regular]]).
 
 A grandes rasgos, podemos describir el proceso de entrenamiento de un
 clasificador de la siguiente manera:
 
 \begin{enumerate}
 
-\item Primero se mide el error actual del modelo con el conjunto (o un
-      subconjunto) de datos de entrenamiento
+\item Primero se mide el error actual del modelo con un
+      subconjunto de datos de entrenamiento
 
 \item Luego se actualizan los parámetros del clasificador (\weights{} y
       \bias{}) para reducir ese error
@@ -755,17 +751,17 @@ La función \textit{Softmax} tiene la siguiente forma:
     \sigma(x)_j =  \frac{e^{f(x;\theta)_{j}}} {\sum_{k} e^{f(x;\theta)_{k}}}
 \end{equation}
 
-Dado que exponencia el resultado de \(f(x;\theta)\), se puede observar
-que sus resultados son siempre positivos. Además normaliza el valor de
-cada salida con respecto a todas las salidas, por lo que su resultado
-es siempre un número entre 0 y 1. Por lo tanto, \textit{Softmax}
-devuelve la \textit{probabilidad} de \(x\) de pertenecer a cada una de
-las clases \(k\).
+Se puede observar que sus resultados son siempre positivos y
+normalizados respecto a todas las salidas, por lo que su resultado es
+siempre un número entre 0 y 1. Por lo tanto, \textit{Softmax} se puede
+interpretar como la \textit{probabilidad} de \(x\) de pertenecer a
+cada una de las clases \(k\).
 
-La función de costo utilizada comúnmente con \textit{Softmax} se
-denomina en inglés \textit{log-likelihood}. Sea \(f(x_i,
-\theta)_{y_{i}}\) la probabilidad computada mediante \textit{Softmax}
-para la clas \(y_i\), entonces \textit{log-likelihood} se expresa:
+La función de costo utilizada comúnmente con \textit{Softmax} es el
+negativo de la función de verosimilitud (o \textit{log-likelihood} en
+inglés). Sea \(f(x_i, \theta)_{y_{i}}\) la probabilidad computada
+mediante \textit{Softmax} para la clase \(y_i\), entonces
+\textit{log-likelihood} se expresa:
 
 \begin{equation}
      L_i = - \log \bigg( \frac{e^{f(x_i, \theta)_{y_{i}}}} {\sum_j e^{f(x_i, \theta)_j}}\bigg)
@@ -773,8 +769,8 @@ para la clas \(y_i\), entonces \textit{log-likelihood} se expresa:
 
 Observar que si el clasificador se equivocó al predecir (o sea, asignó
 una probabilidad \(p\) muy baja a la clase correspondiente \(y_i\))
-entonces el costo será muy alto. Como \(log(p) \to -\inf\) cuando \(p
-\to 0\), intuitivamente podemos ver que \(-log(p) \to \inf\) cuando
+entonces el costo será muy alto. Como \(log(p) \to -\infty\) cuando \(p
+\to 0\), intuitivamente podemos ver que \(-log(p) \to \infty\) cuando
 \(p \to 0\). En cambio si clasificador predijo con más probabilidad la
 clase \(y_i\), significa que \(p\) es más cercano a \(1\) y por ende,
 \(-log(p)\) es más cercano a \(0\).
@@ -1143,10 +1139,11 @@ que tenga más ruido. De esa manera vamos a lograr que la red aprenda
 mejor qué aspectos extraer de las imágenes.
 
 Además no siempre se puede contar con un dataset de millones de
-imágenes para entrenar nuestra red, por lo que suele ser necesario aumentar
-nuestros datos con técnicas de \textit{data augmentation}: repetir la
-misma imagen pero con diferentes variaciones en el color, brillo,
-saturación, incluso hacer leves desplazamientos y rotaciones.
+imágenes para entrenar nuestra red, por lo que suele ser necesario
+aumentar nuestros datos con técnicas de \textit{data augmentation}:
+repetir la misma imagen pero con diferentes variaciones en el color,
+brillo, saturación, incluso hacer leves desplazamientos y rotaciones,
+como se puede observar en la Figura \ref{fig:augm}.
 
 #+begin_src latex
 \begin{figure}
@@ -1382,7 +1379,7 @@ vez.
 
 Las técnicas de regularizacion más usadas son:
 
-**** Regularización de norma L2
+**** Regularización de norma L2 (\textit{weight decay})
 
 Sea \(\mathbf{W}\) la matriz de parámetros, podemos calcular su norma
 de Frobenius (norma L2 generalizada a matrices) como:
@@ -2200,7 +2197,7 @@ memoria y tiempo de cómputo.
 :PROPERTIES:
 :UNNUMBERED: t
 :END:
-* Redes neuronales convolucionales siamesas
+* Entrenamiento mediante tareas pretexto
 <<sec:siamesa>>
 
 ** Introducción
@@ -2212,11 +2209,12 @@ pero pocos elementos por categoría. Dicho método es el entrenamiento
 mediante \textit{arquitecturas siamesas}. Se presentan motivaciones y
 fundaciones teóricas de los modelos siameses asi como también las
 distintas formas de definir funciones de costos para este paradigma,
-haciendo foco en las dos utilizadas en los experimentos del Capítulo
-[[sec:agrawal]]: \textit{Slow Feature Analysis} y
+centrándonos principalmente en tareas de pretexto. Se desarrollarán
+además las dos funciones objetivo utilizadas en los experimentos del
+Capítulo [[sec:agrawal]]: \textit{Slow Feature Analysis} y
 \textit{Automovimiento}.
 
-** Arquitecturas siamesas
+** Tareas de pretexto y autosupervisión
 
 Los métodos discriminativos tradicionales generalmente requieren
 conocer las categorías del conjunto de datos de antemano y suelen
@@ -2228,6 +2226,39 @@ clase o sólo algunas clases son conocidas durante el
 entrenamiento. Generalizar bien para todas las clases se convierte
 entonces en una tarea muy cara (es necesario contar con una cantidad
 aceptable de ejemplos por clase) o prácticamente imposible.
+
+A pesar de estas limitaciones todavía es posible aprender buenas
+representaciones mediante lo que se denomina tareas de pretexto. Las
+tareas de pretexto no son útiles en si mismas, pero sirven para
+aprender representaciones generales que puedan ser aplicadas a otro
+problema. Ejemplos de tareas de pretexto en el contexto del
+aprendizaje automático aplicado a imágenes incluyen reconstruir la
+imagen de entrada \cite{HinSal06}, predecir píxeles en una secuencia
+de video \cite{Vincent:2008:ECR:1390156.1390294}, ordenar
+temporalmente cuadros de videos \cite{DBLP:journals/corr/MisraZH16} y
+ordenar parches en imágenes estáticas
+\cite{DBLP:journals/corr/NorooziF16}. Las etiquetas para tareas de
+pretexto son fáciles de obtener e incluso de elaborar a partir del
+conjunto de datos. El desafío consta de diseñar una tarea de pretexto
+que permita aprender representaciones generales tomando en cuenta las
+características que se desea extraer de las imágenes.
+
+De esta manera, las tareas de pretexto ofrecen un método alternativo
+de aprendizaje supervisado. Más aún, es posible generar etiquetas para
+las tareas de pretexto algorítmicamente y así evitar anotar
+manualmente los ejemplos. Noroozi y Favaro
+\cite{DBLP:journals/corr/NorooziF16} crean rompecabezas de \(3 \times 3\) 
+a partir de imágenes y fuerzan a su modelo a aprender el orden de
+las piezas. Otras tareas autosupervisadas incluyen predecir colores a
+partir de la luminancia \cite{DBLP:journals/corr/LarssonMS16} o
+predecir sonidos en secuencias de videos
+\cite{DBLP:journals/corr/Owens0MFT1}.
+
+Un factor común a todos estos ejemplos es la hipótesis de que el
+modelo aprenderá características de alto nivel para poder realizar su
+tarea.
+
+** Arquitecturas siamesas
 
 Cuando se cuenta con muchas clases y pocos elementos de entrenamiento
 por cada una se suele resolver el problema de la clasificación mediante
@@ -2263,15 +2294,17 @@ convolucionales. Su elección radica en que son capaces de generar
 buenas representaciones de imágenes a pesar de la gran variación en
 color y geometría de las mismas.
 
+
 Una red neuronal convolucional siamesa entonces consiste de dos redes
 idénticas cuyos parámetros \(W\) son compartidos. La arquitectura toma
 un par de imágenes \((x_1, x_2)\) y computa si ambas pertenecen o no a
 la misma categoría o si son similares de acuerdo a algún
 criterio. Para ello, las representaciones obtenidas de ambas redes son
 redireccionadas a una función de costo que calcula alguna métrica
-respecto a las entradas (Figura \ref{fig:siamese-diagram}). Las redes
-siamesas no difieren en más que eso de las redes convolucionales que
-ya vimos.
+respecto a las entradas (Figura \ref{fig:siamese-diagram}). Observemos
+que esto puede incluso ser establecido como una tarea de pretexto en
+el cual la función objetivo puede no ser la misma que la del dominio
+final del problema.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
 verificación de huellas digitales \cite{fingerprint} y de firmas
@@ -2372,19 +2405,19 @@ visuales con la información de automovimiento pueden aprenderse buenas
 representaciones visuales. De esa manera el agente móvil puede ser
 visto como una cámara que se mueve por el ambiente y la información
 del automovimiento es entonces la misma que la del movimiento de la
-cámara. Bajo este enfoque, el problema de relacionar los estímulos
+cámara. Bajo este enfoque, \textbf{\textit{el problema de relacionar los estímulos
 visuales con el automovimiento puede ser establecido como el problema
 de predecir las transformaciones de la cámara en pares de imágenes a
-lo largo del movimiento de la misma.
+lo largo del movimiento de la misma}}.
 
-Luego, el problema puede ser implementado con una arquitectura
-de redes convolucionales siamesas cuya tarea sea la de predecir las
-transformaciones entre dos imágenes de entrada. \cite{LSM2015} prueba
-para algunos casos que las representaciones obtenidas al entrenar la
-red siamesa de manera no supervisada mediante la información de
-automovimiento son competitivas con las del estado del arte que
-utilizan métodos supervisados de clasificación cuando son entrenadas
-con pocas imágenes por categoría.
+Luego, el problema puede ser implementado con una arquitectura de
+redes convolucionales siamesas cuya tarea sea la de predecir las
+transformaciones entre dos imágenes de entrada. \cite{LSM2015} prueba para algunos casos
+que las representaciones obtenidas al entrenar la red siamesa de
+manera no supervisada mediante la información de automovimiento son
+competitivas con las del estado del arte que utilizan métodos
+supervisados de clasificación cuando son entrenadas con pocas imágenes
+por categoría.
 
 En la siguiente Sección explicaremos y evaluaremos diferentes métodos de
 entrenamiento mediante información odométrica.
@@ -2546,7 +2579,17 @@ en inglés \textit{Base CNN}. Las \textit{features} extraídas de estas
 redes serán concatenadas y pasadas a otra red llamada TCNN
 (\textit{Top CNN}). En la TCNN es donde colocaremos nuestras funciones
 de costo. Las BCNN son las redes sobre las que luego haremos
-transferencia de aprendizaje.
+transferencia de aprendizaje. Se puede observar un esquema de la
+arquitectura en la Figura \ref{fig:siamese-example}.
+
+
+#+begin_src latex
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/siamese-example.pdf}
+    \caption{\fontsize{9}{11}\selectfont Esquema de una red siamesa que tiene como objetivo aprender las transformaciones en los caracteres de MNIST.}\label{fig:siamese-example}
+\end{figure}
+#+end_src
 
 Para dar una idea de las arquitecturas de cada red de manera sencilla vamos a
 usar las siguientes abreviaciones:
