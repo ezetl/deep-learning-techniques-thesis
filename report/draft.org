@@ -83,7 +83,7 @@ blocks de nuevo.
 #+LATEX_HEADER: \vspace*{\baselineskip} 
 #+LATEX_HEADER:  
 #+LATEX_HEADER:  
-#+LATEX_HEADER: {\LARGE Reconocimiento visual empleando técnicas de aprendizaje profundo}\\[0.2\baselineskip]
+#+LATEX_HEADER: {\LARGE Entrenamiento de modelos de aprendizaje profundo mediante tareas de pretexto autosupervisadas}\\[0.2\baselineskip]
 #+LATEX_HEADER: 
 #+LATEX_HEADER:  
 #+LATEX_HEADER: \vspace*{2\baselineskip}
@@ -1552,8 +1552,7 @@ de las redes neuronales suele tener decenas de millones de parámetros,
 y realizar tantas operaciones para una sola actualización de
 \weights{} no es conveniente. En la práctica usaremos el cálculo
 analítico del gradiente, en el cual derivamos una fórmula directa que
-es muy rápida de computar valiéndonos de la \textit{regla de la
-cadena}.
+es muy rápida de computar valiéndonos de la \textit{regla de la cadena}.
 
 La \textit{regla de la cadena} nos ayuda a descomponer el cálculo del
 gradiente de expresiones complejas en pequeños pasos. Tomemos por
@@ -2251,8 +2250,7 @@ manualmente los ejemplos. Noroozi y Favaro
 a partir de imágenes y fuerzan a su modelo a aprender el orden de
 las piezas. Otras tareas autosupervisadas incluyen predecir colores a
 partir de la luminancia \cite{DBLP:journals/corr/LarssonMS16} o
-predecir sonidos en secuencias de videos
-\cite{DBLP:journals/corr/Owens0MFT1}.
+predecir sonidos en secuencias de videos \cite{DBLP:journals/corr/Owens0MFT16}.
 
 Un factor común a todos estos ejemplos es la hipótesis de que el
 modelo aprenderá características de alto nivel para poder realizar su
@@ -2288,8 +2286,7 @@ particular más allá de que sea derivable (o su derivada pueda ser
 aproximada) en \(W\). 
 
 Si creamos un modelo que tome dos entradas y optimice
-\(D(G_W(x_1),G_W(x_2))\), lo que nos queda es una \textit{arquitectura
-siamesa}. En nuestro dominio particular, \(G_W\) son redes
+\(D(G_W(x_1),G_W(x_2))\), lo que nos queda es una \textit{arquitectura siamesa}. En nuestro dominio particular, \(G_W\) son redes
 convolucionales. Su elección radica en que son capaces de generar
 buenas representaciones de imágenes a pesar de la gran variación en
 color y geometría de las mismas.
@@ -2348,8 +2345,7 @@ minimicen las distancias de los pares similares sino que se aumenten
 las de los pares distantes semánticamente (\textit{pares impostores})
 \cite{Chopra:2005:LSM:1068507.1068961}. Asignemos una etiqueta \(y\) a
 cada par, donde \(y=1\) para los pares impostores e \(y=0\) para los
-pares genuinos. Definimos entonces una \textit{función de costo de
-contraste} (\textit{contrastive loss} en inglés) para un par \(x_1,
+pares genuinos. Definimos entonces una \textit{función de costo de contraste} (\textit{contrastive loss} en inglés) para un par \(x_1,
 x_2\) de la siguiente manera:
 
 \begin{equation}
@@ -2405,10 +2401,7 @@ visuales con la información de automovimiento pueden aprenderse buenas
 representaciones visuales. De esa manera el agente móvil puede ser
 visto como una cámara que se mueve por el ambiente y la información
 del automovimiento es entonces la misma que la del movimiento de la
-cámara. Bajo este enfoque, \textbf{\textit{el problema de relacionar los estímulos
-visuales con el automovimiento puede ser establecido como el problema
-de predecir las transformaciones de la cámara en pares de imágenes a
-lo largo del movimiento de la misma}}.
+cámara. Bajo este enfoque, \textbf{el problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma}.
 
 Luego, el problema puede ser implementado con una arquitectura de
 redes convolucionales siamesas cuya tarea sea la de predecir las
