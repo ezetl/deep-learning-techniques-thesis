@@ -80,18 +80,20 @@ blocks de nuevo.
 #+LATEX_HEADER: \newcommand*{\titleEze}{\begingroup
 #+LATEX_HEADER: \begin{titlepage} 
 #+LATEX_HEADER: \centering 
-#+LATEX_HEADER: \vspace*{\baselineskip} 
-#+LATEX_HEADER:  
-#+LATEX_HEADER:  
-#+LATEX_HEADER: {\LARGE Entrenamiento de modelos de aprendizaje profundo mediante tareas de pretexto autosupervisadas}\\[0.2\baselineskip]
-#+LATEX_HEADER: 
-#+LATEX_HEADER:  
-#+LATEX_HEADER: \vspace*{2\baselineskip}
-#+LATEX_HEADER:  
-#+LATEX_HEADER: {\Medium Rubén Ezequiel Torti López\par}
-#+LATEX_HEADER:  
+#+LATEX_HEADER: \vspace*{\baselineskip}
+#+LATEX_HEADER: {\Large Facultad de Matemática, Astronomía, Física y Computación}
+#+LATEX_HEADER: {\Large Universidad Nacional de Córdoba}\\[0.4\baselineskip]
 #+LATEX_HEADER: \vfill
-#+LATEX_HEADER:  
+#+LATEX_HEADER: \centering
+#+LATEX_HEADER: \includegraphics[width=0.4\textwidth]{images/Universidad_Nacional_de_Cordoba.png}
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER: {\Medium Trabajo Especial de Licenciatura en Ciencias de la Computación}\\[0.8\baselineskip]
+#+LATEX_HEADER: {\LARGE \textbf{Entrenamiento de modelos de aprendizaje profundo mediante autosupervisión}}\\[0.2\baselineskip]
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER: {\Medium Rubén Ezequiel Torti López\par}\\[0.8\baselineskip]
+#+LATEX_HEADER: {\Medium Director: Jorge Adrián Sánchez\par}
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER: {\normalsize Agosto 2017\par}
 #+LATEX_HEADER: \end{titlepage}
 #+LATEX_HEADER: \newpage
 #+LATEX_HEADER: \endgroup}

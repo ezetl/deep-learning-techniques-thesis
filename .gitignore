@@ -29,3 +29,7 @@ results/
 snapshots/
 *.gif
 *.mp4
+*.dat
+*.ods
+*nav
+*snm
