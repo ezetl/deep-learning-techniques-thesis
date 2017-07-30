@@ -81,17 +81,17 @@ blocks de nuevo.
 #+LATEX_HEADER: \begin{titlepage} 
 #+LATEX_HEADER: \centering 
 #+LATEX_HEADER: \vspace*{\baselineskip}
-#+LATEX_HEADER: {\Large Facultad de Matemática, Astronomía, Física y Computación}
-#+LATEX_HEADER: {\Large Universidad Nacional de Córdoba}\\[0.4\baselineskip]
+#+LATEX_HEADER: {\LARGE Universidad Nacional de Córdoba}\\[1.0\baselineskip]
+#+LATEX_HEADER: {\LARGE Facultad de Matemática, Astronomía, Física y Computación}
 #+LATEX_HEADER: \vfill
 #+LATEX_HEADER: \centering
 #+LATEX_HEADER: \includegraphics[width=0.4\textwidth]{images/Universidad_Nacional_de_Cordoba.png}
 #+LATEX_HEADER: \vfill
-#+LATEX_HEADER: {\Medium Trabajo Especial de Licenciatura en Ciencias de la Computación}\\[0.8\baselineskip]
+#+LATEX_HEADER: {\Large Trabajo Especial de Licenciatura en Ciencias de la Computación}\\[1.8\baselineskip]
 #+LATEX_HEADER: {\LARGE \textbf{Entrenamiento de modelos de aprendizaje profundo mediante autosupervisión}}\\[0.2\baselineskip]
 #+LATEX_HEADER: \vfill
-#+LATEX_HEADER: {\Medium Rubén Ezequiel Torti López\par}\\[0.8\baselineskip]
-#+LATEX_HEADER: {\Medium Director: Jorge Adrián Sánchez\par}
+#+LATEX_HEADER: {\large Rubén Ezequiel Torti López\par}\\[0.8\baselineskip]
+#+LATEX_HEADER: {\large Director: Jorge Adrián Sánchez\par}
 #+LATEX_HEADER: \vfill
 #+LATEX_HEADER: {\normalsize Agosto 2017\par}
 #+LATEX_HEADER: \end{titlepage}
