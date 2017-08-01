@@ -28,6 +28,10 @@
 %End of title page configuration block
 %------------------------------------------------------------
 
+
+
+
+
 %------------------------------------------------------------
 %gets rid of bottom navigation bars
 \setbeamertemplate{footline}[frame number]{}
@@ -42,67 +46,217 @@
 %------------------------------------------------------------
 
 
+
+
+
 %------------------------------------------------------------
 %The next block of commands puts the table of contents at the 
 %beginning of each section and highlights the current section:
-
-\AtBeginSection[]
-{
-  \begin{frame}
-    \frametitle{Table of Contents}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
+%
+%\AtBeginSection[]
+%{
+%  \begin{frame}
+%    \frametitle{Table of Contents}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
 %------------------------------------------------------------
 
 
-\begin{document}
 
+
+\begin{document}
 %The next statement creates the title page.
 \frame{\titlepage}
-
-
 %---------------------------------------------------------
 %This block of code is for the table of contents after
 %the title page
-\begin{frame}
-\frametitle{Table of Contents}
-\tableofcontents
-\end{frame}
+%\begin{frame}
+%\frametitle{Table of Contents}
+%\tableofcontents
+%\end{frame}
 %---------------------------------------------------------
 
 
-\section{First section}
 
+
+\section{intro}
 %---------------------------------------------------------
-%Changing visivility of the text
 \begin{frame}
-\frametitle{Sample frame title}
-This is a text in second frame. For the sake of showing an example.
+\frametitle{Aprendizaje automático}
+Explora algoritmos cuyo objetivo es identificar patrones en conjuntos de datos.\pause
+\vfill
+
+Supera el enfoque clásico de instrucciones estáticas, tomando decisiones basadas en datos.\pause
+\vfill
+
+Tareas demasiado complejas para programarse directamente:
+\vfill
 
 \begin{itemize}
-    \item<1-> Text visible on slide 1
-    \item<2-> Text visible on slide 2
-    \item<3> Text visible on slides 3
-    \item<4-> Text visible on slide 4
+	\item Detección y verificación de caras
+	\item Autos que se manejan solos 
+        \item Reconocimiento del habla
+        \item Diagnósticos médicos 
 \end{itemize}
 \end{frame}
-
 %---------------------------------------------------------
 
 
+
+
+
 %---------------------------------------------------------
-%Example of the \pause command
 \begin{frame}
-In this slide \pause
+\frametitle{Aprendizaje automático}
+\vfill
+\begin{itemize}
+	\item<1-> Supervisado 
+	\item<2-> No Supervisado 
+        \item<3-> Por Refuerzo 
+\end{itemize}
+\vfill
+\end{frame}
 
-the text will be partially visible \pause
+%---------------------------------------------------------
 
-And finally everything will be there
+
+
+
+
+\section{marco}
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Modelos lineales}
+\begin{itemize}
+    \item Clasificación
+    \item Función de costo y SGD 
+\end{itemize}
 \end{frame}
 %---------------------------------------------------------
 
-\section{Second section}
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Modelos no lineales}
+\begin{itemize}
+    \item Redes neuronales
+    \item Regularizacion
+    \item Backpropagation
+    \item Preprocesamiento de datos
+    \item Transferencia de aprendizaje
+    \item Redes convolucionales
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+\section{pretext}
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Entrenamiento mediante tareas de pretexto}
+\begin{itemize}
+    \item Tareas de pretexto 
+    \item Autosupervisión 
+    \item Redes siamesas 
+    \item Preprocesamiento de datos
+    \item Transferencia de aprendizaje
+    \item Redes convolucionales
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Entrenamiento mediante tareas de pretexto}
+\begin{itemize}
+    \item Redes siamesas 
+    \item Funciones de costo aplicadas a modelos siameses 
+    \item Otro enfoque para entrenar redes siamesas 
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Información odométrica para entrenar redes siamesas}
+\begin{itemize}
+    \item Automovimiento 
+    \item SFA 
+    \item Clasificación de transformaciones en pares de imágenes 
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+\section{Experimentos}
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Experimentos}
+Prueba de concepto: MNIST 
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Experimentos}
+KITTI + ImageNet 
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Experimentos}
+KITTI + SUN395 
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Conclusiones}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Trabajo a Futuro}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
 
 %---------------------------------------------------------
 %Highlighting text

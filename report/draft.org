@@ -290,7 +290,7 @@ La Sección termina con una introducción a redes neuronales
 convolucionales y una breve mención de las arquitecturas de redes más
 conocidas, una de las cuales (\textit{AlexNet}) es la base de las
 arquitecturas utilizadas en los experimentos de la Sección
-\textit{sec:agrawal}.
+[[sec:agrawal]].
 
 ** Aprendizaje Automático
 
