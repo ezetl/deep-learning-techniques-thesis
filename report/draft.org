@@ -2607,7 +2607,7 @@ una red definida como C96-P-C256-P-F500-F10.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/net_example.pdf}
-    \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capla completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
 \end{figure}
 #+end_src
 
