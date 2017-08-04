@@ -223,14 +223,55 @@ Notación:
 
 
 
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{\textit{Slow Feature Analysis}}
+
+Técnica de aprendizaje no supervisado:
+\begin{itemize}
+    \item \textit{features} cambian poco en una ventana de tiempo pequeña \pause
+	\end{itemize}
+
+	Sean \(x_{t_1}\) y \(x_{t_2}\) representaciones de imágenes en tiempos \(t_1\) y \(t_2\)\\
+Sea \(D\) una medida de similitud. Podemos definir una función de costo:
+
+\begin{equation}
+L(x_{t_1}, x_{t_2}, W) = \begin{cases}
+                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
+                           1 - \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
+                         \end{cases}
+\end{equation}
+
+\(W\) son los parámetros compartidos de las redes siamesas\\
+\(m\) es el margen mínimo que debe separar a las representaciones distintas.
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Automovimiento}
+
+	
+\textbf{el problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma}.
+
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
 
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Información odométrica para entrenar redes siamesas}
 \begin{itemize}
-    \item Automovimiento 
-    \item SFA 
-    \item Clasificación de transformaciones en pares de imágenes 
+    \item Tarea de clasificación: predecir transformaciones en \(X, Y, Z\)
+    \item Transformaciones en espacio continuo 
+    \item 3 clasificadores con categorías discretizadas
 \end{itemize}
 \end{frame}
 %---------------------------------------------------------
