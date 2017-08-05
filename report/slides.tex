@@ -138,6 +138,7 @@ Tareas demasiado complejas para programarse directamente:
 
 
 
+
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Modelos no lineales}
@@ -196,11 +197,49 @@ Notación:
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Entrenamiento mediante tareas de pretexto}
+Tareas de pretexto \\\vfill
+
+No son útiles en si mismas, pero sirven para aprender representaciones generales que puedan ser aplicadas a otro problema.\\\vfill
+	
 \begin{itemize}
-    \item Tareas de pretexto 
-    \item Autosupervisión 
-    \item Redes siamesas 
-\end{itemize}
+    \item reconstrucción de la imagen de entrada
+    \item predicción de píxeles en una secuencia de video 
+    \item ordenamiento temporal de cuadros de videos
+    \item ordenamiento parches en imágenes estáticas
+\end{itemize}\\
+\vfill
+
+Anotaciones fáciles de obtener e incluso a partir del mismo conjunto de datos. \\
+\vfill
+La hipótesis es que el modelo aprenderá características de alto nivel para poder realizar su tarea.
+\vfill
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Entrenamiento mediante tareas de pretexto}
+Redes siamesas\\
+\vfill
+Sea \(G_W(x)\) una familia de funciones con parámetros \(W\)\\
+\vfill
+	
+Queremos encontrar \(W\) tal que para una medida de similitud \(D\),\\
+
+\vfill
+	
+\(D(G_W(x_1), G_W(x_2))\) sea pequeña sii \(x_1\) y \(x_2\) pertenecen a la misma categoría y
+grande en caso contrario.\pause 
+\vfill
+	
+	
+¿Cómo optimizar los parámetros \(W\)?\\\pause
+\vfill
+
+Estableciendo una función de costo que minimice \(D(G_W(x_1), G_W(x_2))\)
 \end{frame}
 %---------------------------------------------------------
 
@@ -211,11 +250,11 @@ Notación:
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Entrenamiento mediante tareas de pretexto}
-\begin{itemize}
-    \item Redes siamesas 
-    \item Funciones de costo aplicadas a modelos siameses 
-    \item Otro enfoque para entrenar redes siamesas 
-\end{itemize}
+Redes siamesas\\
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+\end{figure}
 \end{frame}
 %---------------------------------------------------------
 
@@ -255,9 +294,46 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 \begin{frame}
 \frametitle{Automovimiento}
 
-	
-\textbf{el problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma}.
+¿podemos predecir cuando dos fotos son la misma a pesar haber sufrido alguna transformación?\\
 
+\vfill
+
+\begin{itemize}
+    \item tarea de clasificación donde el objetivo es predecir la transformación 
+\end{itemize}
+
+\vfill
+
+Información Odométrica:\\
+Información sobre el cambio de posición respecto a
+un punto inicial.\\\pause
+\vfill
+
+¿Puede un agente móvil valerse de la información obtenida de su propio movimiento para
+supervisar el aprendizaje de buenas representaciones visuales de su
+entorno?
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Automovimiento}
+
+¿Como sabemos si cuando son buenas representaciones?\\\pause
+
+\vfill
+\begin{itemize}
+    \item la capacidad de poder realizar múltiples tareas visuales
+    \item la habilidad de poder aprender nuevas tareas visuales basándose en pocos ejemplos.
+\end{itemize}\pause
+\vfill
+
+\textbf{El problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma}
+\vfill
 \end{frame}
 %---------------------------------------------------------
 
