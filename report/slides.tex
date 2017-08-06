@@ -92,13 +92,14 @@ Supera el enfoque clásico de instrucciones estáticas, tomando decisiones basad
 
 Tareas demasiado complejas para programarse directamente:
 \vfill
-
+\begin{examples}{Ejemplos}
 \begin{itemize}
-	\item Detección y verificación de caras
-	\item Autos que se manejan solos 
-        \item Reconocimiento del habla
-        \item Diagnósticos médicos 
+    \item Detección y verificación de caras
+    \item Autos que se manejan solos 
+    \item Reconocimiento del habla
+    \item Diagnósticos médicos 
 \end{itemize}
+\end{examples}
 \end{frame}
 %---------------------------------------------------------
 
@@ -111,13 +112,40 @@ Tareas demasiado complejas para programarse directamente:
 \frametitle{Aprendizaje automático}
 \vfill
 \begin{itemize}
-	\item<1-> Supervisado 
-	\item<2-> No Supervisado 
-        \item<3-> Por Refuerzo 
+    \item<1-> Supervisado 
+    \item<2-> No Supervisado 
+    \item<3-> Por Refuerzo 
 \end{itemize}
 \vfill
 \end{frame}
 
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Aprendizaje Supervisado}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/machinelearning1.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Aprendizaje No Supervisado}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/machinelearning2.pdf}
+\end{figure}
+\end{frame}
 %---------------------------------------------------------
 
 
@@ -219,6 +247,7 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 
 
 
+
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Entrenamiento mediante tareas de pretexto}
@@ -264,6 +293,20 @@ Redes siamesas\\
 
 %---------------------------------------------------------
 \begin{frame}
+\frametitle{Herramientas}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/tools.png}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
 \frametitle{\textit{Slow Feature Analysis}}
 
 Técnica de aprendizaje no supervisado:
@@ -287,6 +330,16 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 %---------------------------------------------------------
 
 
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{\textit{Slow Feature Analysis}}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/example_contrastiveloss.png}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
 
 
 
@@ -294,7 +347,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 \begin{frame}
 \frametitle{Automovimiento}
 
-¿podemos predecir cuando dos fotos son la misma a pesar haber sufrido alguna transformación?\\
+¿Podemos predecir cuando dos fotos son la misma a pesar haber sufrido alguna transformación?\\
 
 \vfill
 
@@ -304,9 +357,9 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 \vfill
 
-Información Odométrica:\\
-Información sobre el cambio de posición respecto a
-un punto inicial.\\\pause
+\begin{block}{Información Odométrica}
+Información sobre el cambio de posición respecto a un punto inicial.
+\end{block}
 \vfill
 
 ¿Puede un agente móvil valerse de la información obtenida de su propio movimiento para
@@ -326,13 +379,15 @@ entorno?
 ¿Como sabemos si cuando son buenas representaciones?\\\pause
 
 \vfill
-\begin{itemize}
+\begin{enumerate}
     \item la capacidad de poder realizar múltiples tareas visuales
     \item la habilidad de poder aprender nuevas tareas visuales basándose en pocos ejemplos.
-\end{itemize}\pause
+\end{enumerate}\pause
 \vfill
 
-\textbf{El problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma}
+\begin{block}{}
+El problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma
+\end{block}
 \vfill
 \end{frame}
 %---------------------------------------------------------
@@ -359,7 +414,28 @@ entorno?
 \section{Experimentos}
 %---------------------------------------------------------
 \begin{frame}
+\frametitle{Experimentos - Diseño}
+\begin{itemize}
+    \item Particionado del conjunto de entrenamiento
+    \item Hiperparámetros
+    \item Preentrenamiento inicial
+    \item Transferencia de aprendizaje
+    \item Chequeo de métricas
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
 \frametitle{Experimentos - Prueba de concepto: MNIST}
+Conjunto de datos de dígitos manuscritos
+\vfill
+Pares artificiales con traslaciones en X e Y, rotaciones en Z
+\vfill
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -374,9 +450,11 @@ entorno?
 }
 \label{fig:mnist-sample}
 \end{figure}
+\vfill
 
 \end{frame}
 %---------------------------------------------------------
+
 
 
 
@@ -388,6 +466,28 @@ entorno?
     \centering
     \includegraphics[width=0.9\textwidth]{images/siamese-example.pdf}
 \end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Experimentos - Prueba de concepto: MNIST}
+\begin{itemize}
+    \item BCNN: C96-P-C256-P, TCNN: F1000-D-Op.
+    \item 40K iteraciones, lr inicial: 0.01, márgenes 10 y 100 para SFA
+    \item mini-batch: 125, total de 5 millones de pares de imágenes
+    \item \textit{cross-validation}: partición en entrenamiento-validación
+    \item Transferencia de aprendizaje: BCNN + F500-D-F10-Softmax. lr: 0 en capas convolucionales
+\end{itemize}
+\vfill
+\begin{block}{Métricas}
+Accuracy, Función de costo durante entrenamiento
+\end{block}
 \end{frame}
 %---------------------------------------------------------
 
@@ -427,6 +527,31 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Experimentos - KITTI}
+\vfill
+11 secuencias que registran el movimiento de un automóvil en una ciudad\vfill
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\includegraphics[width = 1.5in]{./images/kitti/original.png} &
+}
+\end{figure}
+\vfill
+\begin{itemize}
+    \item matrices de rotación Las transformaciones en X, Y y Z en base a las matrices de rotación provistas por los creadores del conjunto de datos.
+    \item Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.
+    \item Discretización de traslaciones y rotaciones en categorías
+\end{itemize}
+\vfill
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{KITTI - Pares de entrenamiento}
 \begin{figure}
 \centering
 \resizebox{.9\linewidth}{!}{
@@ -441,10 +566,37 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 }
 \label{fig:kitti-sample}
 \end{figure}
+\vfill
 \begin{itemize}
-    \item Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos.
-    \item Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.
+    \item Clasificación, 20 clases por eje
+    \item Automovimiento: cuadros separados a lo sumo por 7 cuadros intermedios.
+    \item SFA: ±7 cuadros considerados cercanos
+    \item Se extrayeron parches aleatorios de \(227 \times 227\)
 \end{itemize}
+\vfill
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}[plain]
+\frametitle{KITTI - Entrenamiento}
+\vfill
+\begin{itemize}
+    \item BCCN: C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D-Op
+    \item Pre-entrenamiento 60K iteraciones con \textit{mini batch} de 125 imágenes,
+    \item tasa de aprendizaje inicial de \(0.001\), reducida en un factor de 2 cada 20K iteraciones.
+    \item transferencia de aprendizaje: 10K iteraciones, lr constante 0.001. Para diferenciar los distintos
+\end{itemize}\pause
+\vfill
+\begin{block}{Baseline}
+Se entrenó AlexNet con el conjunto de datos ILSVRC'12 desde cero utilizando 20 y 1000 imágenes por clase (ALEX-20 y ALEX-1000)\\
+Las redes siamesas fueron entrenadas con aproximadamente 20K pares de imágenes.
+\end{block}\pause
+\vfill
 \end{frame}
 %---------------------------------------------------------
 
@@ -455,6 +607,8 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Experimentos - KITTI + SUN395}
+397 categorías de paisajes interiores y exteriores\vfill
+\textit{Cross-validation} con 3 particiones\vfill
 \begin{figure}
 \centering
 \resizebox{.7\linewidth}{!}{
@@ -467,10 +621,6 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 \includegraphics[width = 1.5in]{./images/sun397/kennel.jpg} &
 \includegraphics[width = 1.5in]{./images/sun397/pilothouse.jpg} &
 \includegraphics[width = 1.5in]{./images/sun397/abbey.jpg} \\
-\includegraphics[width = 1.5in]{./images/sun397/vegetable_garden.jpg} &
-\includegraphics[width = 1.5in]{./images/sun397/music_studio.jpg} &
-\includegraphics[width = 1.5in]{./images/sun397/waterfall.jpg} &
-\includegraphics[width = 1.5in]{./images/sun397/building.jpg}\\
 \end{tabular}
 }
 \end{figure}
@@ -484,6 +634,12 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Experimentos - KITTI + SUN395}
+Preentrenamiento: automovimiento, SFA y pesos aleatorios.
+\vfill
+Transferencia de aprendizaje con SUN395 con 5 y 20 elementos por categoría.
+\vfill
+Calidad de las representaciones: \textit{Softmax} para cada capa\pause
+\vfill
 Accuracy:
 \begin{table}
 \centering
@@ -515,6 +671,7 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \end{tabular}
 }
 \end{table}
+\vfill
 \end{frame}
 %---------------------------------------------------------
 
@@ -525,6 +682,7 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Experimentos - KITTI + ImageNet}
+Conjunto de datos ILSVRC'12, 1000 categorías
 \begin{figure}
 \centering
 \resizebox{.75\linewidth}{!}{
@@ -537,13 +695,12 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \includegraphics[width = 1.5in]{./images/imagenet/n03000134_789.JPEG} &
 \includegraphics[width = 1.5in]{./images/imagenet/n03017168_743.JPEG} &
 \includegraphics[width = 1.5in]{./images/imagenet/n03085013_2149.JPEG} \\
-\includegraphics[width = 1.5in]{./images/imagenet/n03089624_632.JPEG} &
-\includegraphics[width = 1.5in]{./images/imagenet/n03207941_946.JPEG} &
-\includegraphics[width = 1.5in]{./images/imagenet/n03218198_298.JPEG} &
-\includegraphics[width = 1.5in]{./images/imagenet/n04154565_5799.JPEG} \\
 \end{tabular}
 }
 \end{figure}
+\vfill
+Se crearon conjuntos de datos con 1 5, 10, 20 y 1000 imágenes por categoría
+\vfill
 \end{frame}
 %---------------------------------------------------------
 
@@ -554,6 +711,12 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Experimentos - KITTI + ImageNet}
+
+Preentrenamiento con automovimiento, SFA y pesos aleatorios.\pause
+\vfill
+Transferencia de aprendizaje con ImageNet.\pause
+\vfill
+
 Accuracy:
 \begin{table}
 \centering
@@ -584,6 +747,11 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Conclusiones}
+\begin{itemize}
+    \item \textit{automovimiento} permite obtener  resultados equiparables al estado del arte.
+    \item Anotaciones de automovimiento fáciles de obtener. 
+    \item Bajo la misma cantidad de imágenes de preentrenamiento, \textit{automovimiento} equipara a técnicas supervisadas de clasificación.
+\end{itemize}
 \end{frame}
 %---------------------------------------------------------
 
@@ -594,59 +762,37 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Trabajo a Futuro}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-%Highlighting text
-\begin{frame}
-\frametitle{Sample frame title}
-
-In this slide, some important text will be
-\alert{highlighted} beause it's important.
-Please, don't abuse it.
-
-\begin{block}{Remark}
-Sample text
-\end{block}
-
-\begin{alertblock}{Important theorem}
-Sample text in red box
-\end{alertblock}
-
-\begin{examples}
-Sample text in green box. "Examples" is fixed as block title.
-\end{examples}
-\end{frame}
-%---------------------------------------------------------
-
-
-%---------------------------------------------------------
-%Two columns
-\begin{frame}
-\frametitle{Two-column slide}
-
-\begin{columns}
-
-\column{0.5\textwidth}
-This is a text in first column.
-$$E=mc^2$$
 \begin{itemize}
-\item First item
-\item Second item
+    \item Probar otras variantes: arquitecturas de redes, conjuntos de datos
+    \item ¿Puede el \textit{automovimiento} aplicarse a otros dominios?
+    \item Evaluar la utilidad de otras tareas de pretexto
 \end{itemize}
-
-\column{0.5\textwidth}
-This text will be in the second column
-and on a second tought this is a nice looking
-layout in some cases.
-\end{columns}
 \end{frame}
 %---------------------------------------------------------
 
 
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{}
+\vfill
+	¿Preguntas?
+\vfill
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{}
+\vfill
+    Gracias!
+\vfill
+\end{frame}
+%---------------------------------------------------------
 \end{document}
