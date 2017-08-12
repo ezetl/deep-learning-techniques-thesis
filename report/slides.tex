@@ -113,24 +113,16 @@ Tareas demasiado complejas para programarse directamente:
 
 %---------------------------------------------------------
 \begin{frame}
-\frametitle{Aprendizaje Supervisado}
+\frametitle{Aprendizaje Supervisado - No Supervisado}
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{images/machinelearning1.pdf}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Aprendizaje No Supervisado}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{images/machinelearning2.pdf}
+    \begin{subfigure}
+        \includegraphics[width=0.4\textwidth]{images/machinelearning1.pdf}
+    \end{subfigure}
+\quad
+    \begin{subfigure}
+        \includegraphics[width=0.4\textwidth]{images/machinelearning2.pdf}
+    \end{subfigure}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -140,6 +132,37 @@ Tareas demasiado complejas para programarse directamente:
 
 
 \section{marco}
+%---------------------------------------------------------
+\begin{frame}[plain]
+\frametitle{Visión por Computadoras}
+Busca describir y reconstruir propiedades del entorno a partir de imágenes.\pause
+\vfill
+\textit{Problema inverso}.\pause
+\vfill
+Es necesario recurrir a modelos físicos y/o probabilísticos\pause
+\vfill
+\begin{figure}
+    \centering
+    \begin{subfigure}
+        \includegraphics[width=0.3\textwidth]{images/computer_vision3.png}
+    \end{subfigure}
+
+\quad
+    \begin{subfigure}
+        \includegraphics[width=0.3\textwidth]{images/computer_vision2.png}
+    \end{subfigure}
+\quad
+    \centering
+    \begin{subfigure}
+        \includegraphics[width=0.5\textwidth]{images/computer_vision1.png}
+    \end{subfigure}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Clasificación de imágenes}
@@ -153,98 +176,67 @@ Tareas demasiado complejas para programarse directamente:
 
 
 
+%---------------------------------------------------------
+\begin{frame}[plain]
+\frametitle{Representación de imágenes}
+¿Qué es una imagen?
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/image_representation.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}[plain]
+\frametitle{Representación de imágenes}
+Extracción de información de la imagen.
+\vfill
+Dependiente del dominio del problema.
+\vfill
+\begin{itemize}
+    \item Textura
+    \item Color
+    \item Descriptores locales
+\end{itemize}
+\vfill
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/descriptors.pdf}
+\end{figure}
+\vfill
+Podemos obtener representaciones de imágenes, \(\boldsymbol{x} \in \boldsymbol{R^{D}}\)
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
 
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Clasificación de imágenes}
-Conjunto de clases \(K\)\vfill
-Conjunto de datos de \(N\) elementos, cada uno asociado a una clase.\vfill
 
-Elementos: \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), \(\boldsymbol{i =1\cdots N}\)\vfill
+Conjunto de entrenamiento: \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\)
 Anotaciones asociadas: \(\boldsymbol{y_i = 1\cdots K}\)\vfill
-
-
-\begin{equation}
-    \boldsymbol{f\colon R^{D} \mapsto R^{K}}
-\end{equation}
 
 \vfill
 
 \begin{equation}
     \boldsymbol{f(x_i, W)} = y \in \boldsymbol{1 \cdots K}
-\end{equation}
+\end{equation}\pause
 
 \vfill
 
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Clasificación de imágenes}
-¿Cómo generar buenas representaciones de imágenes \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\)?\vfill
-
-\begin{itemize}
-    \item Color
-    \item Textura 
-    \item Descriptores locales: SIFT, ORB, etc.
-\end{itemize}
-
-¿Cómo aprender buenos modelos en base a esas representaciones?
 \begin{itemize}
     \item SVM 
     \item Árboles de decisión 
     \item \textit{Bag of Words}
 \end{itemize}
-\end{frame}
-%---------------------------------------------------------
 
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Clasificación de imágenes}
-
-Todos ampliamente superados por CNN
-
-Pueden aprender representaciones de la imagen por si mismas.
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/net_example.pdf}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Redes Neuronales}[plain]
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/artificial-neuron.pdf}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Redes Neuronales}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/neural-net.pdf}
-\end{figure}
 \end{frame}
 %---------------------------------------------------------
 
@@ -324,6 +316,56 @@ Descenso de Gradiente por \textit{mini-batch}
 
 %---------------------------------------------------------
 \begin{frame}
+\frametitle{Clasificación de imágenes}
+
+Todos ampliamente superados por CNN
+
+Pueden aprender representaciones \emph{Y} el modelo .
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/net_example.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}[plain]
+\frametitle{Redes Neuronales}
+Unidades (neuronas) conectadas entre sí.
+\vfill
+Típicamente organizadas en capas.
+\vfill
+Neuronas de una capa interactúan con neuronas de la capa anterior.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/artificial-neuron.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Redes Neuronales}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/neural-net.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
 \frametitle{Retropropagación}
 \vfill
 Algoritmo utilizado para computar eficientemente el gradiente.
@@ -384,29 +426,6 @@ Ejemplo:
 \end{frame}
 %---------------------------------------------------------
 
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{\textit{Softmax}}
-\vfill
-
-\begin{equation}
-    \sigma(x)_j =  \frac{e^{f(x;\theta)_{j}}} {\sum_{k} e^{f(x;\theta)_{k}}}
-\end{equation}
-\vfill
-
-Se puede interpretar como la \textit{probabilidad} de \(x\) de pertenecer a cada una de las clases \(k\).
-\vfill
-
-Función de costo:
-\begin{equation}
-     L_i = - \log \bigg( \frac{e^{f(x_i, \theta)_{y_{i}}}} {\sum_j e^{f(x_i, \theta)_j}}\bigg)
-\end{equation}
-\vfill
-
-\end{frame}
-%---------------------------------------------------------
 
 
 
@@ -649,6 +668,19 @@ Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa 
 
 
 
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{(Algunos) problemas de Redes Convolucionales}
+\begin{itemize}
+    \item Requieren grandes conjuntos de datos
+    \item Conjuntos de datos específicos a un dominio
+    \item Anotaciones manuales son muy costosas
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------
+
+
+
 
 \section{pretext}
 %---------------------------------------------------------
@@ -677,46 +709,6 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 
 
 
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Entrenamiento mediante tareas de pretexto}
-Redes siamesas\\
-\vfill
-Sea \(G_W(x)\) una familia de funciones con parámetros \(W\)\\
-\vfill
-	
-Queremos encontrar \(W\) tal que para una medida de similitud \(D\),\\
-
-\vfill
-	
-\(D(G_W(x_1), G_W(x_2))\) sea pequeña sii \(x_1\) y \(x_2\) pertenecen a la misma categoría y
-grande en caso contrario.\pause 
-\vfill
-	
-	
-¿Cómo optimizar los parámetros \(W\)?\\\pause
-\vfill
-
-Estableciendo una función de costo que minimice \(D(G_W(x_1), G_W(x_2))\)
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Entrenamiento mediante tareas de pretexto}
-Redes siamesas\\
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
 
 
 
@@ -726,45 +718,6 @@ Redes siamesas\\
 \begin{figure}
     \centering
     \includegraphics[width=0.6\textwidth]{images/tools.png}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{\textit{Slow Feature Analysis}}
-
-Técnica de aprendizaje no supervisado:
-\begin{itemize}
-    \item \textit{features} cambian poco en una ventana de tiempo pequeña \pause
-	\end{itemize}
-
-	Sean \(x_{t_1}\) y \(x_{t_2}\) representaciones de imágenes en tiempos \(t_1\) y \(t_2\)\\
-Sea \(D\) una medida de similitud. Podemos definir una función de costo:
-
-\begin{equation}
-L(x_{t_1}, x_{t_2}, W) = \begin{cases}
-                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
-                           1 - \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
-                         \end{cases}
-\end{equation}
-
-\(W\) son los parámetros compartidos de las redes siamesas\\
-\(m\) es el margen mínimo que debe separar a las representaciones distintas.
-\end{frame}
-%---------------------------------------------------------
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{\textit{Slow Feature Analysis}}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/example_contrastiveloss.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -818,6 +771,86 @@ entorno?
 El problema de relacionar los estímulos visuales con el automovimiento puede ser establecido como el problema de predecir las transformaciones de la cámara en pares de imágenes a lo largo del movimiento de la misma
 \end{block}
 \vfill
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Automovimiento}
+El problema puede ser planteado con redes siamesas\\
+\vfill
+Sea \(G_W(x)\) una familia de funciones con parámetros \(W\)\\
+\vfill
+	
+Queremos encontrar \(W\) tal que para una medida de similitud \(D\),\\
+
+\vfill
+	
+\(D(G_W(x_1), G_W(x_2))\) sea pequeña sii \(x_1\) y \(x_2\) pertenecen a la misma categoría y
+grande en caso contrario.\pause 
+\vfill
+	
+	
+¿Cómo optimizar los parámetros \(W\)?\\\pause
+\vfill
+
+Estableciendo una función de costo que minimice \(D(G_W(x_1), G_W(x_2))\)
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Automovimiento}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{\textit{Slow Feature Analysis}}
+
+Técnica de aprendizaje no supervisado:
+\begin{itemize}
+    \item \textit{features} cambian poco en una ventana de tiempo pequeña \pause
+	\end{itemize}
+
+	Sean \(x_{t_1}\) y \(x_{t_2}\) representaciones de imágenes en tiempos \(t_1\) y \(t_2\)\\
+Sea \(D\) una medida de similitud. Podemos definir una función de costo:
+
+\begin{equation}
+L(x_{t_1}, x_{t_2}, W) = \begin{cases}
+                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
+                           \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
+                         \end{cases}
+\end{equation}
+
+\(W\) son los parámetros compartidos de las redes siamesas\\
+\(m\) es el margen mínimo que debe separar a las representaciones distintas.
+\end{frame}
+%---------------------------------------------------------
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{\textit{Slow Feature Analysis}}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/example_contrastiveloss.png}
+\end{figure}
 \end{frame}
 %---------------------------------------------------------
 
