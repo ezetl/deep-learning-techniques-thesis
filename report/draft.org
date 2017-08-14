@@ -221,8 +221,11 @@ con un conjunto de datos anotados muy grande, cuyos tamaños pueden ir
 de las decenas de miles hasta millones de imágenes. Generalmente se
 requiere un gran esfuerzo humano para etiquetar tantas imágenes, por
 lo que los conjuntos de datos de entrenamiento lo suficientemente
-grandes suelen ser escasos, por ejemplo ImageNet \cite{imagenet}, COCO
-\cite{DBLP:journals/corr/LinMBHPRDZ14} o SUN397 \cite{sun397}.
+grandes suelen ser escasos, por ejemplo ImageNet ILSVRC'12
+\cite{imagenet} (1 millón de imágenes distribuidas en 1000 clases),
+COCO (300 mil imágenes con 2.5 millones de objetos segmentados
+manualmente) \cite{DBLP:journals/corr/LinMBHPRDZ14} o SUN397
+\cite{sun397} (130 mil imágenes distribuidas en 397 clases).
 
 Actualmente contamos con una increíble cantidad de imágenes para
 etiquetar. Para 2016, Cisco estimaba que el 51% del tráfico de
@@ -249,17 +252,16 @@ modelos de redes neuronales profundas, y luego realizar una
 transferencia de aprendizaje sobre un conjunto de datos anotados que
 se desee, obteniendo la ventaja de no necesitar un conjunto tan grande
 para lograr buena precisión. Este trabajo final tiene como objetivo
-evaluar experimentalmente las metodologías propuestas por
-\cite{LSM2015}.
+evaluar experimentalmente las metodologías propuestas en Ref. \cite{LSM2015}.
 
-El trabajo está organizado como sigue: en la Sección [[sec:marco]]
-se introducen conceptos del aprendizaje automático y las redes
-neuronales artificiales para concluir con redes convolucionales, en la
-Sección [[sec:siamesa]] se presenta un método para entrenar
-modelos de aprendizaje profundo mediante redes siamesas, que luego se
-utilizará para reproducir los resultados de \cite{LSM2015} en la
-Sección [[sec:agrawal]]. Finalmente, las secciones [[sec:concl]] y 
-[[sec:future]] presentan una discusión final y trabajo a futuro.
+El trabajo está organizado como sigue: en la Sección [[sec:marco]] se
+introducen conceptos del aprendizaje automático y las redes neuronales
+artificiales para concluir con redes convolucionales, en la Sección
+[[sec:siamesa]] se presenta un método para entrenar modelos de aprendizaje
+profundo mediante redes siamesas, que luego se aplicará a los
+experimentos en la Sección [[sec:agrawal]]. Finalmente, las secciones
+[[sec:concl]] y [[sec:future]] presentan una discusión final y trabajo a
+futuro.
 
 #+LaTeX: \newpage
 
@@ -286,7 +288,7 @@ grande.
 Se presentarán además los problemas principales a la hora de entrenar
 un modelo, como el sobreajuste, y métodos para evitarlos.
 
-La Sección termina con una introducción a redes neuronales
+Este Capítulo concluye con una introducción a redes neuronales
 convolucionales y una breve mención de las arquitecturas de redes más
 conocidas, una de las cuales (\textit{AlexNet}) es la base de las
 arquitecturas utilizadas en los experimentos de la Sección
@@ -479,11 +481,8 @@ representamos con un vector columna de dimensión \(D\) (en este caso
 \(D=1024=32 \times 32\)), entonces en ese espacio
 \textit{D-dimensional} la imagen es solamente un punto. Como se
 observa en la Figura [[fig:cl]] de manera simplificada, nuestro
-clasificador lineal define una ``línea'' (un hiperplano) que separa
-cada clase dentro de ese espacio multidimensional. Notar que en
-realidad la multiplicación \(\boldsymbol{W x_i}\) está evaluado
-\(\boldsymbol{K}\) clasificadores en paralelo, donde cada uno es una
-fila de \weights{}.
+clasificador lineal define un hiperplano que separa
+cada clase dentro de ese espacio multidimensional.
 
 
 #+name: linear-classifier
@@ -557,7 +556,7 @@ plt.savefig('images/linear-classifier.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:cl
-#+caption: \fontsize{9}{11}\selectfont Clasificador lineal. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. La tarea del clasificador es establecer un hiperplano entre las dos clases de datos, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
+#+caption: \fontsize{9}{11}\selectfont Visualización de un clasificador lineal binario. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. En este ejemplo el objetivo es establecer un hiperplano que defina un límite entre ambas clases, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
 Más adelante veremos cómo definir \weights{} y \bias{} para obtener un
@@ -610,19 +609,14 @@ si la tasa de error del clasificador es muy alta, el costo o la
 \textit{pérdida} será muy alta y viceversa. 
 
 Sea \(L\) la función de costo de la predicción la clase de \(x_i\)
-cuando la respuesta esperada es \(y_i\) utilizando la función \(f\)
-con parámetros \(\theta\), y supongamos que se cuenta con \(m\) datos
-de entrenamiento. Entonces el costo total de \(f(x_i;\theta)\) para
+cuando su etiqueta de clase asociada es \(y_i\) utilizando la función \(f\)
+con parámetros \(W\), y supongamos que se cuenta con \(m\) datos
+de entrenamiento. Entonces el costo total de \(f(x_i;W)\) para
 todo el conjunto de datos es:
 
 \begin{equation}
-\boldsymbol{L}(\theta) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;\theta), y_i)
+\boldsymbol{L}(W) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;W), y_i)
 \end{equation}
-
-Notar que para el caso de un clasificador lineal los parámetros
-\(\theta\) son \weights{} y \bias{}. De ahora en adelante utilizaremos
-\(\theta\) o \weights{} indiferentemente para hablar de los parámetros
-de nuestro modelo.
 
 **** Descenso de Gradiente
 <<sec:sgd>>
@@ -661,12 +655,12 @@ respecto a \weights{}. Dado que queremos minimizar la función de costo
 \loss{}, lo que vamos a hacer es calcular su gradiente
 \(\boldsymbol{\nabla L}\) respecto a cada parámetro y luego modificar
 cada uno ligeramente con el objetivo de acercarlo al mínimo en la
-función. Entonces, si \(\theta_{n}\) son nuestros parámetros en el
-paso \(n\) del entrenamiento, calculamos \(\theta_{n+1}\) de la
+función. Entonces, si \(W_{n}\) son nuestros parámetros en el
+paso \(n\) del entrenamiento, calculamos \(W_{n+1}\) de la
 siguiente manera:
 
 \begin{equation}
-    \theta_{n+1} = \theta_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta_{n}} L(f(x_i; \theta_n), y_i)
+    W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{W_{n}} L(f(x_i; W_n), y_i)
 \end{equation}
 
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
@@ -750,7 +744,7 @@ mismas, el clasificador \textit{Softmax}.
 La función \textit{Softmax} tiene la siguiente forma:
 
 \begin{equation}
-    \sigma(x)_j =  \frac{e^{f(x;\theta)_{j}}} {\sum_{k} e^{f(x;\theta)_{k}}}
+    \sigma(x)_j =  \frac{e^{f(x;W)_{j}}} {\sum_{k} e^{f(x;W)_{k}}}
 \end{equation}
 
 Se puede observar que sus resultados son siempre positivos y
@@ -759,14 +753,29 @@ siempre un número entre 0 y 1. Por lo tanto, \textit{Softmax} se puede
 interpretar como la \textit{probabilidad} de \(x\) de pertenecer a
 cada una de las clases \(k\).
 
-La función de costo utilizada comúnmente con \textit{Softmax} es el
+
+Si nuestro problema de clasificación cuenta con \(K\) clases, podemos
+codificar cada anotacion \(y_i\) de nuestro conjunto de datos como un
+vector de longitud \(K\) donde todos los elementos son 0 y el elemento
+del índice correspondiente a la clase de \(x_i\) es 1. Esta
+representación de las etiquetas se denomina \textit{one-hot encoding}.
+
+Ahora bien, si queremos obtener la probabilidad de \(y_i\) a partir
+del resultado de \textit{Softmax}, simplemente debemos computar el
+producto interno entre ambos vectores:
+
+\begin{equation}
+\sigma(f(x_i, W)_{y_{i}}) = \langle\,f(x_i, W), y_{\text{encoded}}\rangle
+\end{equation}
+
+La función de costo utilizada comunmente con \textit{Softmax} es el
 negativo de la función de verosimilitud (o \textit{log-likelihood} en
-inglés). Sea \(f(x_i, \theta)_{y_{i}}\) la probabilidad computada
+inglés). Sea \(\sigma(f(x_i, W)_{y_{i}})\) la probabilidad computada
 mediante \textit{Softmax} para la clase \(y_i\), entonces
 \textit{log-likelihood} se expresa:
 
 \begin{equation}
-     L_i = - \log \bigg( \frac{e^{f(x_i, \theta)_{y_{i}}}} {\sum_j e^{f(x_i, \theta)_j}}\bigg)
+     L_i = - \log \bigg( \frac{e^{\sigma(f(x_i, W)_{y_{i}})}} {\sum_j e^{\sigma(f(x_i, W)_j)}}\bigg)
 \end{equation}
 
 Observar que si el clasificador se equivocó al predecir (o sea, asignó
@@ -867,7 +876,7 @@ plt.savefig('images/artificial-neuron.pdf')
 
 Se han propuesto varias funciones de activación a lo largo de los
 años. Nos concentraremos en las unidades \textit{ReLU}
-(\textit{Rectifier Liner Unit} en inglés), actualmente muy populares
+(\textit{Rectifier Linear Unit} en inglés), actualmente muy populares
 en las redes convolucionales.
 
 Hay tres tipos de rectificadores lineales:
@@ -916,7 +925,16 @@ conoce como \textit{Leaky ReLU} \cite{zhang2014improving} (Figura
 \ref{fig:relu}.b):
 
 \begin{equation}
-f(x) = 1(x<0)(\alpha x) + 1(x >= 0)(x)
+L(x_{t_1}, x_{t_2}, W) = \begin{cases}
+                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
+                           1 - \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
+                         \end{cases}
+\end{equation}
+\begin{equation}
+f(x) =  \begin{cases}
+                \alpha x,& \text{si} x < 0\\
+                x,& \text{si} x >= 0
+        \end{cases}
 \end{equation}
 
 De esta manera nos aseguramos que al menos un pequeño gradiente fluya
@@ -1260,8 +1278,8 @@ def plot_decision_boundary(panel, dimension, boundary, colors=['paleturquoise', 
 
 
 def plot_dataset(panel, X, y, colors=["darkorange","darkcyan"], markers=["s", "o"]):
-    panel.scatter(X[y == 1, 0], X[y == 1, 1], color=colors[0], marker=markers[0])
-    panel.scatter(X[y == 0, 0], X[y == 0, 1], color=colors[1], marker=markers[1])
+    panel.scatter(X[y == 1, 0], X[y == 1, 1], s=500, color=colors[0], marker=markers[0])
+    panel.scatter(X[y == 0, 0], X[y == 0, 1], s=500, color=colors[1], marker=markers[1])
 
 
 def calculate_prediction_error(model, X, y):
@@ -1400,11 +1418,16 @@ final va a tomar en cuenta todas las dimensiones de entrada (algunas
 con más o menos probabilidad) sin dar prioridad a una sola.
 
 **** Regularización de norma L1
+Similar a la anterior, sólo que se le adiciona \(\lambda
+\mathbf{||W||}_{1}\) a la función objetivo, donde \(\mathbf{||W||}_{1}\) es la norma L1 de una matriz:
 
-Similar a la aterior, sólo que se le adiciona \(\lambda
-\mathbf{||W||}_{1}\) a la función objetivo. Los pesos tienden a
-converger a cero bajo la regularización L1. En general se prefiere la
-regularización L2 por obtenerse mejores resultados.
+\begin{equation}
+\mathbf{||W||}_{1} = \sum_{i=1}^{n} \sum_{j=1}^{m} |w_{ij}|
+\end{equation}
+
+Los pesos tienden a converger a cero bajo la regularización L1. En
+general se prefiere la regularización L2 por obtenerse mejores
+resultados.
 
 **** \textit{Dropout}
 
@@ -1607,9 +1630,10 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 Ahora podemos estructurar nuestro algoritmo de optimización en dos
 pasos: primero, evaluamos nuestra función \loss{} en los parámetros
 actuales (\textit{forward pass}). Luego, partiendo de ese resultado
-calculamos el gradiente en cada variable utilizando la \textit{reglade la cadena}.
-En la Figura \ref{fig:backprop} se puede observar los valores
-computados para este ejemplo durante el \textit{forward pass} en verde
+calculamos el gradiente en cada variable utilizando la \textit{reglade
+la cadena}.  En la Figura \ref{fig:backprop} se pueden observar los
+valores computados para este ejemplo, en el caso particular de
+\(x=-3\), \(y=2\), \(z=4\). El \textit{forward pass} se marca en verde
 y los gradientes computados mediante la regla de la cadena
 (\textit{backpropagation}) en rojo. De esta manera ``propagamos'' el
 error de la predicción hacia atrás (\back{}) para luego corregir los
@@ -1666,6 +1690,22 @@ función, o sea, ir a su mínimo). Ese porcentaje es llamado
 \textit{tasa de aprendizaje} (\textit{learning rate}) y suele ser uno
 de los parámetros más difíciles de elegir, ya que la calidad y rapidez
 de aprendizaje dependen de él.
+
+Notemos que el algoritmo \textit{backpropagation} requiere que la
+función a optimizar sea derivable. Esto incluye a las funciones de
+activación previamente mencionadas, como las unidades ReLU. Si bien la
+derivada de una unidad ReLU no está definida en 0, puede ser
+aproximada mediante:
+
+\begin{equation}
+f'(x) = \begin{cases}
+                0,& \text{si} x <= 0\\
+                1,& \text{si} x > 0
+        \end{cases}
+\end{equation}
+
+Lo cual implica que es posible utilizar \textit{backpropagation} en
+redes neuronales con activaciones ReLU.
 
 Idealmente computaríamos el gradiente sobre todo el conjunto de datos,
 actualizaríamos los parámetros, y repetiríamos el ciclo hasta lograr
@@ -1727,7 +1767,7 @@ determinar su nuevo valor. En un filtro lineal cada píxel de salida se
 determina como la suma ponderada de los valores de entrada:
 
 \begin{equation}\label{eq:corr}
-g(i,j) = \sum_{k,l} f(i+k,j+l)h(k,l)
+g(i,j) = \sum_{k=-m}^{k=m} \sum_{l=-m}^{l=m} f(i+k,j+l)h(k,l)
 \end{equation}
 
 Donde las entradas en el \textit{kernel} o \textit{máscara} de pesos
@@ -1744,7 +1784,7 @@ los \textit{offsets}. Eso equivale a reflejar  el filtro en ambas
 dimensiones y se denomina \textit{convolución}:
 
 \begin{equation}\label{eq:conv}
-g(i,j) = \sum_{k,l} f(i-k,j-l)h(k,l) = \sum_{k,l} f(k,l)h(i-k,j-l)
+g(i,j) = \sum_{k=-m}^{k=m} \sum_{l=-m}^{l=m} f(i-k,j-l)h(k,l)
 \end{equation}
 
 Que también puede ser escrito como:
@@ -2407,12 +2447,12 @@ cámara. Bajo este enfoque, \textbf{el problema de relacionar los estímulos vis
 
 Luego, el problema puede ser implementado con una arquitectura de
 redes convolucionales siamesas cuya tarea sea la de predecir las
-transformaciones entre dos imágenes de entrada. \cite{LSM2015} prueba para algunos casos
-que las representaciones obtenidas al entrenar la red siamesa de
-manera no supervisada mediante la información de automovimiento son
-competitivas con las del estado del arte que utilizan métodos
-supervisados de clasificación cuando son entrenadas con pocas imágenes
-por categoría.
+transformaciones entre dos imágenes de entrada. En Ref. \cite{LSM2015}
+se prueba para algunos casos que las representaciones obtenidas al
+entrenar la red siamesa de manera no supervisada mediante la
+información de automovimiento son competitivas con las del estado del
+arte que utilizan métodos supervisados de clasificación cuando son
+entrenadas con pocas imágenes por categoría.
 
 En la siguiente Sección explicaremos y evaluaremos diferentes métodos de
 entrenamiento mediante información odométrica.
@@ -2432,7 +2472,7 @@ para entrenar un modelo sobre un nuevo dominio de problema.
 
 Además, compararemos las representaciones mediante automovimiento con
 otra técnica no supervisada utilizada en arquitecturas siamesas,
-\texti{Slow Feature Analysis}. Se concluye eventualmente que la
+\textit{Slow Feature Analysis}. Se concluye eventualmente que la
 técnica de automovimiento es superior a \textit{Slow Feature Analysis}.
 
 En lo que resta del Capítulo se presentarán las dos técnicas de
@@ -2440,6 +2480,7 @@ entrenamiento no supervisado que se utilizarán en los experimentos en
 [[sec:agrawal]].
 
 *** Aprendizaje por \textit{Slow Feature Analysis}
+<<sec:sfa>>
 
 Para analizar que tan bueno es aprender representaciones mediante
 automovimiento compararemos la calidad de las representaciones
@@ -2449,9 +2490,9 @@ mediante un tipo de función de contraste denominado \textit{Slow Feature Analys
 SFA es una técnica de aprendizaje no supervisado que se basa en que
 las características relevantes (\textit{features}) cambian poco en una
 ventana de tiempo pequeña. Aplicado a nuestro dominio donde un agente
-se mueve a través de su entorno, usamos representaciones de
-imágenes \(x_{t_1}\) y \(x_{t_2}\) tomadas en tiempos \(t_1\) y
-\(t_2\) respectivamente y computamos su similitud mediante alguna
+se mueve a través de su entorno, sean
+\(x_{t_1}\) y \(x_{t_2}\) imágenes tomadas en tiempos \(t_1\) y
+\(t_2\) respectivamente. Computamos su similitud mediante alguna
 métrica \(D\). Si las imágenes están cercanas en el tiempo - es decir
 \(|t_1 - t_2| \leq T\) para algún intervalo de tiempo \(T\) - son
 consideradas similares y su distancia debería ser pequeña, caso
@@ -2465,8 +2506,8 @@ como:
 
 \begin{equation}
 L(x_{t_1}, x_{t_2}, W) = \begin{cases}
-                           D(x_{t_1}, x_{t_2}),& \text{si} |t_1 - t_2| \leq T \\ 
-                           1 - \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
+                           D(f(x_{t_1}, W), f(x_{t_2}, W),& \text{si} |t_1 - t_2| \leq T \\ 
+                           \max{(0, m - D(f(x_{t_1}, W), f(x_{t_2}, W)))},& \text{si} |t_1 - t_2| > T
                          \end{cases}
 \end{equation}
 
@@ -2482,8 +2523,7 @@ en donde las redes tienen que predecir qué transformación fue
 efectuada en cada uno de los ejes del ambiente del agente (\(X, Y, Z\)).
 
 Sin embargo, estas transformaciones viven en un espacio continuo, por
-lo que se discretizan las traslaciones en \(X\) y \(Z\) y las
-rotaciones en \(Y\) (el eje perpendicular a la cámara) por rangos de
+lo que se discretizan las traslaciones y rotaciones por rangos de
 valores y se utiliza 3 clasificadores, uno para cada eje. Cada
 clasificador tiene un número determinado de categorías
 correspondientes al resultado de discretizar las transformaciones
@@ -2513,14 +2553,13 @@ las predicciones para cada eje.
 En esta sección se presentan todos los resultados experimentales
 realizados sobre arquitecturas siamesas con información odométrica.
 
-Todos los experimentos realizados se encuentran en Github
-[fn::https://github.com/ezetl/deep-learning-techniques-thesis].
-Dentro del repositorio se encuentra toda la documentación pertinente a
-la descarga de los conjuntos de datos y la reproducción de los
-experimentos. Parte del tiempo fue dedicado a tratar de que los
-experimentos sean reproducibles por otras personas, por lo que se
-trató de seguir buenas prácticas a la hora de modularizar y organizar
-los el código.
+Todos los experimentos realizados se encuentran en el repositorio
+GitHub del autor \cite{github}. Dentro del repositorio se encuentra
+toda la documentación pertinente a la descarga de los conjuntos de
+datos y la reproducción de los experimentos. Parte del tiempo fue
+dedicado a tratar de que los experimentos sean reproducibles por otras
+personas, por lo que se trató de seguir buenas prácticas a la hora de
+modularizar y organizar los el código.
 
 Los experimentos fueron desarrollados en su mayoría en el lenguaje
 Python, excepto por algunos scripts de preprocesamiento que
@@ -2537,13 +2576,18 @@ El conjunto de datos MNIST \cite{mnist} cuenta con 60000 imágenes de
 caracteres numéricos manuscritos para entrenamiento, más 10000
 imágenes para evaluación. La dimensión de cada imagen es \(1 \times 28\times 28\). 
 Para el entrenamiento mediante \textit{automovimiento} se crearon
-pares de imágenes siguiendo los lineamientos de \cite{LSM2015}. Esto
-significa que cada par está compuesto de la imagen original y la
+pares de imágenes compuestos de la imagen original y la
 imagen con transformaciones en los ejes X, Y, Z. Las transformaciones
 en X e Y son traslaciones de 3 píxeles, mientras que la rotación en Z
 varía entre los -30° y los 30°. Tanto las rotaciones como las
 traslaciones son números enteros. Para cada par creado las
-transformaciones se eligen de manera aleatoria uniforme.
+transformaciones se eligen de manera aleatoria uniforme. 
+
+Dado que el objetivo de este experimento es obtener resultados
+preliminares que validen la técnica de \textit{automovimiento}, no se
+realizarán pruebas utilizando la técnica SFA definida en la Sección
+[[sec:sfa]]. Más aún, no es sencillo establecer una característica de
+\textit{temporalidad} que permita diferenciar caracteres manuscritos.
 
 En la Figura \ref{fig:mnist-sample} se pueden observar varios pares de
 imágenes generadas durante la creación de la base de datos que luego
@@ -2625,19 +2669,21 @@ BCNN.
 *** Entrenamiento y evaluación
 
 Las redes siamesas se pre-entrenaron durante 40000 iteraciones con una
-tasa de aprendizaje de 0.01. Siguiendo los lineamientos de
-\cite{LSM2015} se utilizaron márgenes \(m\) de 10 y 100 para SFA por
-ser los que mejores resultados lograron. En ambas redes la tasa de
-aprendizaje se reduce a la mitad cada 10000 iteraciones. El tamaño del
-\textit{mini batch} fue de 125, lo cual equivale a procesar 5 millones
-de pares de imágenes durante las 40000 iteraciones del entrenamiento.
+tasa de aprendizaje de 0.01. Se utilizaron márgenes \(m\) de 10 y 100
+para SFA por ser los que mejores resultados lograron. En ambas redes
+la tasa de aprendizaje se reduce a la mitad cada 10000 iteraciones. El
+tamaño del \textit{mini batch} fue de 125, lo cual equivale a procesar
+5 millones de pares de imágenes durante las 40000 iteraciones del
+entrenamiento.
 
 La etapa de transferencia de aprendizaje se hizo con 4000 iteraciones
 a una tasa de aprendizaje constante de 0.01.
 
-Para evaluar la calidad de las \textit{features} aprendidas por las
-redes siamesas se estableció la tasa de aprendizaje de las capas
-convolucionales a cero.
+Durante la transferencia de aprendizaje se estableció a cero la tasa
+de aprendizaje de las capas convolucionales. De esa manera se evita
+que se modifiquen los parámetros aprendidos mediante automovimiento y
+así poder evaluar la caliidad de las representaciones mediante un
+clasificador.
 
 En el Cuadro \ref{tab:one} se puede observar la exactitud obtenida
 mediante la transferencia de aprendizaje con 100, 300, 1000 y 10000
@@ -2658,13 +2704,13 @@ cantidad de imágenes.
 & \multicolumn{1}{r}{1000}
 & \multicolumn{1}{r}{10000} \\ \cline{1-5}
 \hline
-Desde cero & 0.42 & 0.70 & 0.82 & 0.97\\
-SFA(m=10) & 0.52 & 0.71 & 0.77 & 0.82\\
-SFA(m=100) & 0.58 & 0.73 & 0.80 & 0.88\\
-Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
+Desde cero & 42 & 70 & 82 & 97\\
+SFA(m=10) & 52 & 71 & 77 & 82\\
+SFA(m=100) & 58 & 73 & 80 & 88\\
+Automovimiento & 75 & 90 & 92 & 99\\
 \hline
 \end{tabular}%
-\caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento).}
+\caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud porcentual de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento) de acuerdo a la cantidad de elementos de entrenamiento: 100, 300, 1000 y 10000.}
 \end{table*}
 #+end_src
 
@@ -2809,8 +2855,19 @@ algunas de las clases que provee este conjunto de datos.
 
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
-salidas de las primeras 5 capas convolucionales. Los resultados pueden
-verse en el Cuadro \ref{tab:two}.
+salidas de las primeras 5 capas convolucionales (nombradas L1-L5). Los
+resultados pueden verse en el Cuadro \ref{tab:two}. En todos los casos
+de estudio, a medida que se utilizan más capas para extraer
+representaciones se observa que aumenta la exactitud de los
+modelos. Esto es porque la capacidad de las redes de aprender
+representaciones de las imágenes a varios niveles de abstracción
+aumenta mientras más capas y no linealidades contiene
+\cite{DBLP:journals/corr/ZeilerF13}. Como consecuencia, una red que
+sólo utilice representaciones de la primer capa convolucional será muy
+buena en la detección de características de bajo nivel (colores,
+bordes) mientras que una red que extraiga representaciones de la
+última capa convolucional será capaz de detectar variaciones más
+específicas a las clases de alto nivel con las que se haya entrenado.
 
 #+begin_src latex
 \begin{table*}[htb]
@@ -2842,19 +2899,29 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \hline
 \end{tabular}%
 }
-\caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397.}
+\caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397. La columna \textit{finet} indica la cantidad de elementos por clase que se utilizaron de SUN397 para realizar la transferencia de aprendizaje de los pesos previamente optimizados.}
 \end{table*}
 #+end_src
 
-Se puede observar que el pre-entrenamiento con automoviento no supera
-la performance que se obtiene al pre-entrenar la misma red con
-ILSVRC'12 con 1000 imagenes por clase. Sin embargo, sí supera la
-performance de pre-entrenar la red con 20 imágenes por clase en
-ILSVRC'12. No solamente eso sino que también supera la performance de
-la red siamesa entrenada con SFA. Esto nos indica que cuando se tiene
-un conjunto acotado de datos de entrenamiento, se puede lograr
+Del Cuadro \ref{tab:two} también concluimos que el pre-entrenamiento
+con automoviento no supera la performance que se obtiene al
+pre-entrenar la misma red con ILSVRC'12 con 1000 imagenes por
+clase. Sin embargo, sí equipara la performance de pre-entrenar la red
+con 20 imágenes por clase en ILSVRC'12. Además supera la performance
+de la red siamesa entrenada con SFA. Esto nos indica que cuando se
+tiene un conjunto acotado de datos de entrenamiento, se puede lograr
 entrenar un modelo que logre resultados similares al estado del arte
 si utilizamos redes siamesas entrenadas con automovimiento.
+
+Cabe destacar que hay un decaimiento en la exactitud reportada para
+algunas capas consecutivas, en particular para la última capa
+convolucional (L5) en KITTI-SFA y KITTI-EGO. La hipótesis es que
+durante el pre-entrenamiento se generó una co-adaptación frágil
+\cite{DBLP:journals/corr/YosinskiCBL14} entre esa capa convolucional y
+la siguiente, lo que derivó en representaciones menos precisas a la
+hora del \textit{finetuning}. Cómo evitar la co-adaptación de capas o
+si eso es un problema inherente a la arquitectura o método de
+entrenamiento utilizados escapa al objetivo del experimento.
 
 **** Evaluacion utilizando el conjunto de imagenes Imagenet ILSVRC 2012
 
@@ -2872,7 +2939,7 @@ clases en este conjunto de datos se pueden ver en la Figura
 \ref{fig:imagenet-sample}.
 
 #+begin_src latex
-\begin{figure}
+\begin{figure}[H]
 \centering
 \resizebox{.9\linewidth}{!}{
 \begin{tabular}{cccc}

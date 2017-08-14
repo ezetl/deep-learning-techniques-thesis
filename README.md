@@ -1,8 +1,11 @@
-# Reconocimiento visual empleando técnicas de deep learning
+# Entrenamiento de modelos de aprendizaje profundo mediante autosupervisión 
 
-Trabajo final de grado para la obtencion del titulo Licenciatura en Ciencias de la Computacion
+Trabajo final de grado para la obtencion del título Licenciatura en Ciencias de la Computacion de la Facultad de Matemática, Astronomía, Física y Computación, Universidad Nacional de Córdoba.
+
 
 Este repositorio cuenta con todo el codigo necesario para reproducir los resultados de mi tesis de Licenciatura.
+
+Este repositorio está bajo licencia [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
 
 ## Resumen
  En los últimos años ha habido un resurgimiento en el campo de la Inteligencia Artificial (IA) tanto en la academia como en la industria. Esto se debe, por un lado, al abaratamiento de hardware con gran poder de cómputo y, por el otro, al incremento en el volumen de datos disponible. A su vez, Grandes empresas como Google, Facebook o Microsoft han creado sus propios equipos de investigación en IA obteniendo resultados de vanguardia.
