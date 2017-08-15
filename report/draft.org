@@ -117,7 +117,7 @@ organismos vivientes desarrollan habilidades de percepción visual:
 moviéndose e interactuando con el mundo que los rodea. Partiendo de la
 hipótesis de que se puede usar la información del movimiento propio
 (rotación y traslación en los ejes X,Y,Z) como método de supervisión,
-Agrawal et al. \cite{LSM2015} ya han demostrado que es posible obtener
+Agrawal et al. \cite{DBLP:journals/corr/AgrawalCM15} ya han demostrado que es posible obtener
 buenos resultados entrenando con menos imágenes anotadas que lo usual.
 Se validan experimentalmente los resultados de este método de
 entrenamiento con respecto a los del estado del arte en tareas de
@@ -146,7 +146,7 @@ no es tal el caso para las computadoras.
 Richard Szeliski caracteriza a la visión por computadoras como un
 \textit{problema inverso}, es decir, se busca describir el mundo que
 uno ve en una o más imágenes y reconstruir sus propiedades tales como
-forma, iluminación y distribuciones de color \cite{szeliski}
+forma, iluminación y distribuciones de color \cite{Szeliski:2010:CVA:1941882}
 
 Una de las áreas principales de de la visión por computadoras es la
 clasificación de imágenes. Es decir, dada una imagen y un conjunto de
@@ -175,10 +175,14 @@ posiciones diferentes (\textit{deformación}), o ser exactamente
 iguales, pero variar en colores y pequeños detalles (\textit{variaciónintraclase}).
 
 Hay mejores métodos para representar imágenes: representaciones
-basadas en color \cite{Color1} \cite{Color2} \cite{Color3}
-\cite{Color4}, textura \cite{Texture1} \cite{Texture2} y
-descriptores locales \cite{Lowe-SIFT} \cite{ORB} \cite{FREAK}
-\cite{SURF} \cite{HOG} entre otros. Todos ellos fueron pensados para
+basadas en color \cite{Park:2013:CIR:2517500.2517507}
+  \cite{Flickner:1995:QIV:619001.620306} \cite{Pass:1996:HRC:524178.836717}
+\cite{Huang:1997:IIU:794189.794514}, textura
+  \cite{Manjunath:1996:TFB:236262.236272}
+  \cite{Grigorescu:2002:CTF:2319013.2320324} y
+descriptores locales \cite{Lowe:1999:ORL:850924.851523}
+  \cite{Rublee:2011:OEA:2355573.2356268} \cite{Ortiz:2012:FFR:2354409.2354903}
+\cite{Bay:2008:SRF:1370312.1370556} \cite{Dalal:2005:HOG:1068507.1069007} entre otros. Todos ellos fueron pensados para
 atacar problemas puntuales en diversas áreas del procesamiento de
 imágenes, lo que significa que utilizarlos para generar una
 representacion de una imagen requiere un diseño manual y adaptado al
@@ -186,8 +190,9 @@ dominio de cada problema en particular.
 
 Una vez se tiene una representación adecuada de la imagen, podemos
 encarar el problema antes mencionado de clasificación. Numerosos
-métodos se han utilizado a lo largo de la historia: \textit{máquinas vectores de soporte} \cite{SVM}, árboles de decisión \cite{Tree},
-\textit{bolsas de palabras} \cite{BOW} entre otros. Comúnmente el
+métodos se han utilizado a lo largo de la historia: \textit{máquinas vectores
+  de soporte} \cite{Osuna:1997:SVM:889148}, árboles de decisión \cite{DMWG09},
+\textit{bolsas de palabras} \cite{Csurka04visualcategorization} entre otros. Comúnmente el
 proceso consiste en obtener buenas representaciones mediante los
 métodos manuales previamente mencionados y luego entrenar los
 algoritmos.
@@ -205,12 +210,12 @@ más útiles al dominio del problema.
 
 A pesar de haber tenido su golpe de popularidad en los últimos años,
 los primeros esbozos de modelar redes neuronales artificiales datan de
-1958, cuando Frank Rosenblatt ideó el \textit{perceptron}, un
+1958, cuando Frank Rosenblatt ideó el \textit{Rosenblatt58theperceptron:}, un
 algoritmo para reconocimiento de patrones basado en una red de dos
-capas de aprendizaje \cite{perceptron}. Sin embargo, en 1969 se
+capas de aprendizaje \cite{Rosenblatt58theperceptron:}. Sin embargo, en 1969 se
 estableció que el poder de cómputo disponible en ese entonces no
 bastaba para poder entrenar y correr grandes redes neuronales,
-implicando que el área se estancara durante años \cite{minsky}. Tan
+implicando que el área se estancara durante años \cite{mycielski1972}. Tan
 así es, que recién en 2006, con el abaratamiento de costos en hardware
 de alto desempeño se pudieron implementar arquitecturas más complejas
 (no necesariamente nuevas) y redes neuronales más profundas, algo que
@@ -225,7 +230,7 @@ grandes suelen ser escasos, por ejemplo ImageNet ILSVRC'12
 \cite{imagenet} (1 millón de imágenes distribuidas en 1000 clases),
 COCO (300 mil imágenes con 2.5 millones de objetos segmentados
 manualmente) \cite{DBLP:journals/corr/LinMBHPRDZ14} o SUN397
-\cite{sun397} (130 mil imágenes distribuidas en 397 clases).
+\cite{Xiao:2016:SDE:2963034.2963064} (130 mil imágenes distribuidas en 397 clases).
 
 Actualmente contamos con una increíble cantidad de imágenes para
 etiquetar. Para 2016, Cisco estimaba que el 51% del tráfico de
@@ -245,14 +250,15 @@ anotar tantos videos, imágenes y demás contenido multimedia.
 
 Una posible solución al entrenamiento de redes profundas cuando no se
 puede anotar una gran cantidad de datos es la propuesta por Agrawal et
-al. \cite{LSM2015}. En la misma proponen utilizar información
+al. \cite{DBLP:journals/corr/AgrawalCM15}. En la misma proponen utilizar información
 odométrica -inclinación, movimiento, rotación- disponible en agentes
 móviles (giróscopos, acelerómetros, etc.) para \textit{preparar} los
 modelos de redes neuronales profundas, y luego realizar una
 transferencia de aprendizaje sobre un conjunto de datos anotados que
 se desee, obteniendo la ventaja de no necesitar un conjunto tan grande
 para lograr buena precisión. Este trabajo final tiene como objetivo
-evaluar experimentalmente las metodologías propuestas en Ref. \cite{LSM2015}.
+evaluar experimentalmente las metodologías propuestas en Ref.
+  \cite{DBLP:journals/corr/AgrawalCM15}.
 
 El trabajo está organizado como sigue: en la Sección [[sec:marco]] se
 introducen conceptos del aprendizaje automático y las redes neuronales
@@ -309,7 +315,7 @@ representaciones de imágenes de caras para luego diferenciarlas. El
 sistema debe tener en cuenta detalles como variaciones en sombra,
 color, orientación, por no mencionar las diferentes características
 que hay que extraer de una cara para diferenciarla de otra (arrugas,
-prominencias, etc.) \cite{faces}. Se puede ver que son demasiados
+prominencias, etc.) \cite{Taigman:2014:DCG:2679600.2680208}. Se puede ver que son demasiados
 detalles y combinaciones a tener en cuenta como para programar cada
 caso posible manualmente, por lo que un sistema que utilice
 aprendizaje automático que aprenda a diferencias esas características
@@ -734,7 +740,8 @@ el gradiente de un subconjunto del total de datos (llamado
 iteración. Esto es muy útil dado que es computacionalmente costoso
 calcular el gradiente de todo un conjunto de datos con miles de
 imágenes a la vez y calcular el gradiente de un \textit{batch}
-aproxima bastante bien el gradiente del total \cite{minibatch}.
+aproxima bastante bien el gradiente del total
+     \cite{DBLP:journals/corr/abs-1012-1367}.
 
 **** Clasificador \textit{Softmax}
 Antes de saltar de lleno a las redes neuronales artificiales vamos a
@@ -893,9 +900,9 @@ f(x) = \max{(0,x)}
 
 Se puede observar que requiere muy pocas operaciones, además está
 comprobado empíricamente que los modelos que utilizan \textit{ReLU}
-convergen hasta 6 veces más rápido \cite{NIPS2012_4824} que con otras
+convergen hasta 6 veces más rápido \cite{Krizhevsky:2012:ICD:2999134.2999257} que con otras
 funciones de activación (como la \textit{sigmoide}
-\cite{sigmoid} y \textit{tangente hiperbólica}).
+\cite{Han:1995:ISF:646366.689307} y \textit{tangente hiperbólica}).
 
 Una desventaja de las \textit{ReLU} es que pueden provocar la
 ``muerte'' de neuronas durante el entrenamiento. El problema esta
@@ -921,7 +928,7 @@ modificar los pesos locales, dejando a esa neurona ``muerta''.
 Se puede solucionar el problema de la muerte de neuronas agregando
 una pequeña pendiente negativa (de 0.01 por ejemplo) en los valores
 negativos de la \textit{ReLU}. Esta función de activación es la que se
-conoce como \textit{Leaky ReLU} \cite{zhang2014improving} (Figura
+conoce como \textit{Leaky ReLU} \cite{Cheng:2015:DNN:2827035.2827188} (Figura
 \ref{fig:relu}.b):
 
 \begin{equation}
@@ -950,7 +957,7 @@ mejora sustancial en el entrenamiento de las redes, por lo que las
 f(x) = \max{(w^{T}_{1} x + b_{1}, w^{T}_{2} x + b_{2})}
 \end{equation}
 
-\textit{Maxout} \cite{Maxout} es una generalización de las funciones
+\textit{Maxout} \cite{pmlr-v28-goodfellow13} es una generalización de las funciones
 \textit{ReLU}, y obtiene lo mejor de los dos mundos: por un lado la
 forma lineal y no saturante de las \textit{ReLUs} y por el otro evita
 el problema de la muerte de neuronas. A pesar de ello tiene la
@@ -1431,7 +1438,7 @@ resultados.
 
 **** \textit{Dropout}
 
-La técnica de \textit{dropout} \cite{dropout} consiste en mantener
+La técnica de \textit{dropout} \cite{JMLR:v15:srivastava14a} consiste en mantener
 activa una neurona con una probabilidad \(\boldsymbol{p}\) (a veces
 \(\boldsymbol{1 - p}\)). Esta técnica se aplica solamente durante el
 \textit{entrenamiento} de las redes neuronales.
@@ -2197,14 +2204,14 @@ clasificacion son las probabilidades de cada clase.
 
 A lo largo de los años ha habido varias arquitecturas de redes
 convolucionales que cuentan con nombre propio, como por ejemplo LeNet
-\cite{Lecun98gradient-basedlearning}, creada en los 90 por Yann LeCun
+\cite{lecun-01a}, creada en los 90 por Yann LeCun
 y utilizada para el reconocimiento de dígitos manuscriptos. Esta red
 fue utilizada con éxito para leer códigos postales y cheques
 bancarios.
 
 En 2012, el ganador del desafío ImageNet ILSVRC, Alex Krizhevsky,
 obtuvo un 16% de error utilizando una arquitectura llamada AlexNet
-\cite{NIPS2012_4824}. Su arquitectura es muy similar a la de LeNet,
+\cite{Krizhevsky:2012:ICD:2999134.2999257}. Su arquitectura es muy similar a la de LeNet,
 aunque mas profunda y fue una de las primeras en concatenar varias
 capas CONV antes de una capa de \textit{pooling}. El desafío ImageNet
 consiste en varias tareas de procesamiento de imágenes, entre ellas la
@@ -2216,19 +2223,19 @@ propuesta era básicamente una modificación en los hiperparámetros y
 capas convolucionales de AlexNet.
 
 En la misma competencia ILSVRC del 2014 se dieron a conocer dos redes,
-GoogLeNet \cite{43022} con un error del 6.67% y VGGNet
-\cite{Simonyan14c} con un error del 7.32%. Ambas demostraron que la
+GoogLeNet \cite{DBLP:journals/corr/SzegedyLJSRAEVR14} con un error del 6.67% y VGGNet
+\cite{DBLP:journals/corr/SimonyanZ14a} con un error del 7.32%. Ambas demostraron que la
 profundidad de la red es una característica crítica a la hora de
 obtener buenos resultados. Si bien GoogLeNet fue la ganadora ese año,
 luego se demostró que VGGNet es superior en muchas tareas de
 transferencia de aprendizaje, por lo que es más popular que GoogLeNet
 y se pueden encontrar muchos modelos ya preentrenados.
 
-Finalmente, ResNet (Residual Network) \cite{he15deepresidual}, la red
+Finalmente, ResNet (Residual Network) \cite{DBLP:journals/corr/HeZRS15}, la red
 ganadora del ILSRVC 2015, cuenta con nada menos que 152 capas (VGGNet
 cuenta con 19) y obteniendo un error de 3.57% en el top-5. A finales
 de 2016 se publicó una nueva variante de ResNet denominada DenseNet
-\cite{densenet} que incluye conexiones entre todas las capas de la
+\cite{DBLP:journals/corr/HuangLW16a} que incluye conexiones entre todas las capas de la
 misma, obteniendo resultados de estado del arte pero consumiendo menos
 memoria y tiempo de cómputo.
 
@@ -2274,7 +2281,7 @@ tareas de pretexto no son útiles en si mismas, pero sirven para
 aprender representaciones generales que puedan ser aplicadas a otro
 problema. Ejemplos de tareas de pretexto en el contexto del
 aprendizaje automático aplicado a imágenes incluyen reconstruir la
-imagen de entrada \cite{HinSal06}, predecir píxeles en una secuencia
+imagen de entrada \cite{HintonSalakhutdinov2006b}, predecir píxeles en una secuencia
 de video \cite{Vincent:2008:ECR:1390156.1390294}, ordenar
 temporalmente cuadros de videos \cite{DBLP:journals/corr/MisraZH16} y
 ordenar parches en imágenes estáticas
@@ -2346,12 +2353,12 @@ el cual la función objetivo puede no ser la misma que la del dominio
 final del problema.
 
 Las redes siamesas fueron utilizadas por primera vez con éxito para la
-verificación de huellas digitales \cite{fingerprint} y de firmas
-\cite{Bromley94signatureverification}. Se han logrado también buenos
+verificación de huellas digitales \cite{Arrieta2009} y de firmas
+\cite{Bromley:1993:SVU:2987189.2987282}. Se han logrado también buenos
 resultados en verificación de rostros
 \cite{Chopra:2005:LSM:1068507.1068961} y más recientemente en tareas
-de clasificación \cite{siamese-oneshot} y recomendación de productos
-\cite{ProductNet}.
+de clasificación \cite{Koch2015SiameseNN} y recomendación de productos
+\cite{Bell:2015:LVS:2809654.2766959}.
 
 #+begin_src latex
 \begin{figure}
@@ -2438,7 +2445,7 @@ aspectos: (1) la capacidad de poder realizar múltiples tareas visuales
 y (2) la habilidad de poder aprender nuevas tareas visuales basándose
 en pocos ejemplos.
 
-Agrawal et al. \cite{LSM2015} proponen que relacionando los estímulos
+Agrawal et al. \cite{DBLP:journals/corr/AgrawalCM15} proponen que relacionando los estímulos
 visuales con la información de automovimiento pueden aprenderse buenas
 representaciones visuales. De esa manera el agente móvil puede ser
 visto como una cámara que se mueve por el ambiente y la información
@@ -2447,7 +2454,8 @@ cámara. Bajo este enfoque, \textbf{el problema de relacionar los estímulos vis
 
 Luego, el problema puede ser implementado con una arquitectura de
 redes convolucionales siamesas cuya tarea sea la de predecir las
-transformaciones entre dos imágenes de entrada. En Ref. \cite{LSM2015}
+transformaciones entre dos imágenes de entrada. En Ref.
+    \cite{DBLP:journals/corr/AgrawalCM15}
 se prueba para algunos casos que las representaciones obtenidas al
 entrenar la red siamesa de manera no supervisada mediante la
 información de automovimiento son competitivas con las del estado del
@@ -2566,7 +2574,8 @@ Python, excepto por algunos scripts de preprocesamiento que
 originalmente fueron creados en C++. Se presentará primero una prueba
 de concepto con el conjunto de datos MNIST \cite{mnist} para luego
 mostrar los resultados sobre los conjuntos de datos KITTI
-\cite{Geiger2012CVPR}, SUN397 \cite{sun397} e ILSVRC 2012
+\cite{Geiger:2012:WRA:2354409.2354978}, SUN397
+   \cite{Xiao:2016:SDE:2963034.2963064} e ILSVRC 2012
 \cite{imagenet}.
 
 ** Prueba de concepto con MNIST
@@ -2730,12 +2739,12 @@ generalizables.
 ** Pruebas con KITTI
 *** Conjunto de datos
 
-El conjunto de datos KITTI \cite{Geiger2012CVPR} consiste en 11
+El conjunto de datos KITTI \cite{Geiger:2012:WRA:2354409.2354978} consiste en 11
 secuencias que registran el movimiento de un automóvil en una
 ciudad. Además de proveer cuadros de video, se encuentra la
 información odométrica recolectada por sensores montados en el
 automóvil. Esa misma información es la que usa Agrawal et
-al. \cite{LSM2015} a la hora de computar las transformaciones en la
+al. \cite{DBLP:journals/corr/AgrawalCM15} a la hora de computar las transformaciones en la
 cámara entre pares de imágenes, y es la que intentaremos reproducir en
 esta sección.
 
@@ -2796,7 +2805,7 @@ asumimos que el primer bloque \(3 \times 3\) es una matriz de rotación
 *** Descripción de la red
 
 La red utilizada como base de las BCNN está inspirada en las primeras
-5 capas convolucionales de AlexNet \cite{alexnet}, es decir,
+5 capas convolucionales de AlexNet \cite{Krizhevsky:2012:ICD:2999134.2999257}, es decir,
 C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como
 C256-C128-F500-D-Op, con filtros convolucionales de \(3 \times 3\).
 
@@ -2822,7 +2831,7 @@ imágenes.
 
 **** Evaluación utilizando el conjunto de datos SUN-397
 
-El conjunto de datos SUN-397 \cite{sun397} consiste de 397 categorías
+El conjunto de datos SUN-397 \cite{Xiao:2016:SDE:2963034.2963064} consiste de 397 categorías
 de paisajes interiores y exteriores y además provee 10 particiones del
 dataset para hacer \textit{cross-validation}, pero debido a lo costoso
 que es entrenar redes neuronales convolucionales solo se utilizaron
@@ -3012,7 +3021,7 @@ como para obtener buenos resultados con redes convolucionales
 profundas.
 
 En este trabajo se propuso reproducir algunos de los resultados de
-Agrawal et al. \cite{LSM2015}.  Se logró demostrar la hipótesis
+Agrawal et al. \cite{DBLP:journals/corr/AgrawalCM15}.  Se logró demostrar la hipótesis
 principal de ese trabajo en cada uno de los experimentos: que
 utilizando información de \textit{automovimiento} libremente
 disponible se puede entrenar una red neuronal convolucional profunda y
@@ -3039,7 +3048,7 @@ característica de los datos, etc. Queda como trabajo a futuro probar
 nuevas arquitecturas con la metodología propuesta.
 
 Además sólo se probó la técnica propuesta en Agrawal et
-al. \cite{LSM2015} con pocos conjuntos de datos por cuestión de tiempo
+al. \cite{DBLP:journals/corr/AgrawalCM15} con pocos conjuntos de datos por cuestión de tiempo
 (ILSVRC'12, SUN-397, MNIST, KITTI). Probar esta técnica en otros
 dominios de problemas queda como trabajo a futuro.
 
