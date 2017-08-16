@@ -2592,11 +2592,9 @@ varía entre los -30° y los 30°. Tanto las rotaciones como las
 traslaciones son números enteros. Para cada par creado las
 transformaciones se eligen de manera aleatoria uniforme. 
 
-Dado que el objetivo de este experimento es obtener resultados
-preliminares que validen la técnica de \textit{automovimiento}, no se
-realizarán pruebas utilizando la técnica SFA definida en la Sección
-[[sec:sfa]]. Más aún, no es sencillo establecer una característica de
-\textit{temporalidad} que permita diferenciar caracteres manuscritos.
+Para SFA, se consideran \textit{temporalmente cercanos} a los pares
+cuyas transformaciones en X e Y estuvieran en el rango de -1 y 1
+píxeles y en Z estuvieran entre -3° y 3°.
 
 En la Figura \ref{fig:mnist-sample} se pueden observar varios pares de
 imágenes generadas durante la creación de la base de datos que luego

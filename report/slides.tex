@@ -226,7 +226,7 @@ Anotaciones asociadas: \(\boldsymbol{y_i = 1\cdots K}\)\vfill
 \vfill
 
 \begin{equation}
-    \boldsymbol{f(x_i, W)} = y \in \boldsymbol{1 \cdots K}
+    \boldsymbol{f(x_i, W)} = y_i \in \boldsymbol{1 \cdots K}
 \end{equation}\pause
 
 \vfill
@@ -249,12 +249,13 @@ Anotaciones asociadas: \(\boldsymbol{y_i = 1\cdots K}\)\vfill
 ¿Cómo optimizar los parámetros \(W\)?
 \vfill
 \begin{equation}
-    \boldsymbol{f(x_i, W)} = y \in \boldsymbol{1 \cdots K}
+    \boldsymbol{f(x_i, W)} = y_i \in \boldsymbol{1 \cdots K}
 \end{equation}\pause
 \vfill
+Proceso iterativo:
 \begin{itemize}
     \item Definir función de costo
-    \item Optimizar \(W\) para reducir el costo
+    \item Minimizar la función de costo
 \end{itemize}
 \vfill
 \end{frame}
@@ -267,10 +268,10 @@ Anotaciones asociadas: \(\boldsymbol{y_i = 1\cdots K}\)\vfill
 \begin{frame}
 \frametitle{Función de Costo}
 Define un criterio de optimalidad que nos ayuda a
-saber que tan bien o mal está actuando nuestro clasificador.
+cuantificar cómo está actuando nuestro clasificador.
 \vfill
 \begin{equation}
-\boldsymbol{L}(\theta) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;\theta), y_i)
+\boldsymbol{L}(W) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;W), y_i)
 \end{equation}
 \vfill
 \end{frame}
@@ -281,7 +282,7 @@ saber que tan bien o mal está actuando nuestro clasificador.
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Descenso de Gradiente Estocástico}
-No tenemos control sobre nuestro conjunto de datos de entrenamiento, pero sí podemos modificar \(W\) para disminuir el error.
+No tenemos control sobre nuestro conjunto de datos de entrenamiento, pero sí podemos modificar \(W\) para minimizar el costo.
 \vfill
 \begin{figure}
     \centering
@@ -298,14 +299,13 @@ No tenemos control sobre nuestro conjunto de datos de entrenamiento, pero sí po
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Descenso de Gradiente Estocástico}
-Sea \(\theta\) los parámetros libres de un modelo:
+Actualización de los pesos mediante el cómputo del costo en \textit{mini-batches}
 \vfill
 \begin{equation}
-    \theta_{n+1} = \theta_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\theta_{n}} L(f(x_i; \theta_n), y_i)
+    W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{W_{n}} L(f(x_i; W_n), y_i)
 \end{equation}
 \vfill
 
-Descenso de Gradiente por \textit{mini-batch}
 \vfill
 \end{frame}
 %---------------------------------------------------------
@@ -335,6 +335,7 @@ Pueden aprender representaciones \emph{Y} el modelo .
 %---------------------------------------------------------
 \begin{frame}[plain]
 \frametitle{Redes Neuronales}
+\vfill
 Unidades (neuronas) conectadas entre sí.
 \vfill
 Típicamente organizadas en capas.
@@ -366,24 +367,21 @@ Neuronas de una capa interactúan con neuronas de la capa anterior.
 
 %---------------------------------------------------------
 \begin{frame}
-\frametitle{Retropropagación}
+\frametitle{Optimización: Retropropagación}
 \vfill
 Algoritmo utilizado para computar eficientemente el gradiente.
 \vfill
-
-Ejemplo:
+\begin{enumerate}
+    \item \textit{Forward pass}: cómputo del error
+    \item \textit{Backward pass}: propagación del error a cada parámetro
+\end{enumerate}
 \vfill
-\begin{equation}
-    g(x,y,z) = \frac{x}{y^2} + z
-\end{equation}
+Aplicación recursiva de la \textit{regla de la cadena}:
 \vfill
 \begin{equation}
     g(x,y,z) = \frac{x}{y^2} + z = \frac{x}{p} + z = q + z
 \end{equation}
-
-
 \vfill
-
 \begin{figure}[H]
     \centering
     \tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
@@ -625,13 +623,12 @@ g(i,j) = h(f(i,j))
 \frametitle{Redes Convolucionales}
 Convolución: localidad, reducción de parámetros, invarianza traslacional
 
-Notación:
+Capas:
 \begin{itemize}
-    \item C\(k\): capa convolucional con \(k\) filtros cuadrados
-    \item F\(k\): capa completamente conectada (FC) con salida de dimensión \(k\)
-    \item P: \textit{Pooling}. Usualmente \textit{MAX Pooling}
-    \item D: \textit{Dropout}
-    \item Op para la capa de salida
+    \item Convolucional
+    \item Completamente conectada (FC)
+    \item \textit{Pooling}. Usualmente \textit{MAX Pooling}
+    \item \textit{Dropout}, ReLU, Softmax
 \end{itemize}
 
 \begin{figure}
@@ -660,7 +657,7 @@ Ejemplo: C96-P-C256-F500-Op.
     \includegraphics[width=\textwidth]{images/net_example.pdf}
 \end{figure}
 \vfill
-Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa completamente conectada se agrega una capa de \textit{Dropout}.
+Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa completamente conectada se agrega una capa de \textit{Dropout} para prevenir sobreajuste de los datos.
 \vfill
 \end{frame}
 %---------------------------------------------------------
@@ -710,25 +707,14 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 
 
 
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Herramientas}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/tools.png}
-\end{figure}
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
 %---------------------------------------------------------
 \begin{frame}
 \frametitle{Automovimiento}
-
+\vfill
+un agente móvil puede valerse de la información obtenida de su propio movimiento para
+supervisar el aprendizaje de buenas representaciones visuales de su
+entorno.
+\vfill
 ¿Podemos predecir cuando dos fotos son la misma a pesar haber sufrido alguna transformación?\\
 
 \vfill
@@ -743,10 +729,6 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 Información sobre el cambio de posición respecto a un punto inicial.
 \end{block}
 \vfill
-
-¿Puede un agente móvil valerse de la información obtenida de su propio movimiento para
-supervisar el aprendizaje de buenas representaciones visuales de su
-entorno?
 \end{frame}
 %---------------------------------------------------------
 
@@ -778,42 +760,19 @@ El problema de relacionar los estímulos visuales con el automovimiento puede se
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Automovimiento}
 El problema puede ser planteado con redes siamesas\\
 \vfill
-Sea \(G_W(x)\) una familia de funciones con parámetros \(W\)\\
-\vfill
-	
-Queremos encontrar \(W\) tal que para una medida de similitud \(D\),\\
-
-\vfill
-	
-\(D(G_W(x_1), G_W(x_2))\) sea pequeña sii \(x_1\) y \(x_2\) pertenecen a la misma categoría y
-grande en caso contrario.\pause 
-\vfill
-	
-	
-¿Cómo optimizar los parámetros \(W\)?\\\pause
-\vfill
-
-Estableciendo una función de costo que minimice \(D(G_W(x_1), G_W(x_2))\)
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Automovimiento}
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+    \includegraphics[width=\textwidth]{images/siamese-example_kitti.pdf}
 \end{figure}
+\vfill
 \end{frame}
 %---------------------------------------------------------
+
+
 
 
 
@@ -842,6 +801,23 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 \(m\) es el margen mínimo que debe separar a las representaciones distintas.
 \end{frame}
 %---------------------------------------------------------
+
+
+
+
+
+%---------------------------------------------------------
+\begin{frame}
+\frametitle{Automovimiento}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+\end{figure}
+\end{frame}
+%---------------------------------------------------------
+
+
+
 
 
 %---------------------------------------------------------
@@ -913,6 +889,11 @@ Pares artificiales con traslaciones en X e Y, rotaciones en Z
 \label{fig:mnist-sample}
 \end{figure}
 \vfill
+\begin{itemize}
+	\item Traslaciones de [-3, 3] píxeles en X, Y
+	\item Rotaciones de [-30, 30] grados en Z
+	\item Para SFA, se consideran cercanos las imágenes en [-1,1], [-3, 3] grados  
+\end{itemize}
 
 \end{frame}
 %---------------------------------------------------------
@@ -940,11 +921,11 @@ Pares artificiales con traslaciones en X e Y, rotaciones en Z
 \begin{frame}
 \frametitle{Experimentos - Prueba de concepto: MNIST}
 \begin{itemize}
-    \item BCNN: C96-P-C256-P, TCNN: F1000-D-Op.
-    \item 40K iteraciones, lr inicial: 0.01, márgenes 10 y 100 para SFA
-    \item mini-batch: 125, total de 5 millones de pares de imágenes
-    \item \textit{cross-validation}: partición en entrenamiento-validación
-    \item Transferencia de aprendizaje: BCNN + F500-D-F10-Softmax. lr: 0 en capas convolucionales
+    \item Componentes siameses: C96-P-C256-P, Concatenación de representaciones: F1000-D-Op.
+    \item 40K iteraciones, márgenes 10 y 100 para SFA
+    \item 5 millones de pares de imágenes
+    \item Partición en entrenamiento-validación
+    \item Transferencia de aprendizaje: se congelaron las capas convolucionales.
 \end{itemize}
 \vfill
 \begin{block}{Métricas}
@@ -999,8 +980,8 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 \end{figure}
 \vfill
 \begin{itemize}
-    \item matrices de rotación Las transformaciones en X, Y y Z en base a las matrices de rotación provistas por los creadores del conjunto de datos.
-    \item Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.
+    \item Matrices de rotación Las transformaciones en X, Y y Z en base a las matrices de rotación provistas por los creadores del conjunto de datos.
+    \item Para las rotaciones en el eje Y se calculó el ángulo correspondiente al cambio entre dos \textit{frames}.
     \item Discretización de traslaciones y rotaciones en categorías
 \end{itemize}
 \vfill
@@ -1048,10 +1029,9 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 \frametitle{KITTI - Entrenamiento}
 \vfill
 \begin{itemize}
-    \item BCCN: C96-P-C256-P-C384-C384-C256-P. La TCNN fue definida como C256-C128-F500-D-Op
-    \item Pre-entrenamiento 60K iteraciones con \textit{mini batch} de 125 imágenes,
-    \item tasa de aprendizaje inicial de \(0.001\), reducida en un factor de 2 cada 20K iteraciones.
-    \item transferencia de aprendizaje: 10K iteraciones, lr constante 0.001. Para diferenciar los distintos
+    \item Red: AlexNet
+    \item Pre-entrenamiento 60K iteraciones
+    \item Transferencia de aprendizaje: 10K iteraciones
 \end{itemize}\pause
 \vfill
 \begin{block}{Baseline}
@@ -1068,9 +1048,9 @@ Las redes siamesas fueron entrenadas con aproximadamente 20K pares de imágenes.
 
 %---------------------------------------------------------
 \begin{frame}
-\frametitle{Experimentos - KITTI + SUN395}
+\frametitle{Experimentos - KITTI + SUN397}
 397 categorías de paisajes interiores y exteriores\vfill
-\textit{Cross-validation} con 3 particiones\vfill
+3 particiones con datos de entrenamiento-validación\vfill
 \begin{figure}
 \centering
 \resizebox{.7\linewidth}{!}{
@@ -1095,10 +1075,10 @@ Las redes siamesas fueron entrenadas con aproximadamente 20K pares de imágenes.
 
 %---------------------------------------------------------
 \begin{frame}
-\frametitle{Experimentos - KITTI + SUN395}
+\frametitle{Experimentos - KITTI + SUN397}
 Preentrenamiento: automovimiento, SFA y pesos aleatorios.
 \vfill
-Transferencia de aprendizaje con SUN395 con 5 y 20 elementos por categoría.
+Transferencia de aprendizaje con SUN397 con 5 y 20 elementos por categoría.
 \vfill
 Calidad de las representaciones: \textit{Softmax} para cada capa\pause
 \vfill
@@ -1127,7 +1107,7 @@ Accuracy:
 ALEX-1000 & 1M & 5 & 3.73 & 5.07 & 5.07 & 8.53 & 10.40 & 20 & 9.07 & 12.53 & 16.27 & 17.60 & 10.67\\
 ALEX-20 & 20K & 5 & 2.93 & 1.87 & 3.73 & 5.07 & 3.20 & 20 & 6.13 & 5.33 & 5.33 & 4.53 & 5.07\\
 KITTI-SFA & 20.7K & 5 & 2.13 & 3.20 & 2.40 & 1.60 & 1.87 & 20 & 4.53 & 3.73 & 2.13 & 2.40 & 2.93\\
-KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.87 & 9.33 & 4.00\\
+KITTI-AUT & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.87 & 9.33 & 4.00\\
 
 \hline
 \end{tabular}
@@ -1192,7 +1172,7 @@ Accuracy:
 & \multicolumn{1}{c}{1000} \\ \cline{1-6}
 \hline
 
-KITTI-EGO & 0.49 & 1.27 & 2.14 & 4.13 & 20.8\\
+KITTI-AUT & 0.49 & 1.27 & 2.14 & 4.13 & 20.8\\
 KITTI-SFA & 0.35 & 0.75 & 1.34 & 2.64 & 11.83\\
 ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 
@@ -1212,7 +1192,7 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 \begin{itemize}
     \item \textit{automovimiento} permite obtener  resultados equiparables al estado del arte.
     \item Anotaciones de automovimiento fáciles de obtener. 
-    \item Bajo la misma cantidad de imágenes de preentrenamiento, \textit{automovimiento} equipara a técnicas supervisadas de clasificación.
+    \item Bajo la misma cantidad de imágenes de entrenamiento, \textit{automovimiento} equipara a técnicas supervisadas de clasificación.
 \end{itemize}
 \end{frame}
 %---------------------------------------------------------
@@ -1240,6 +1220,7 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 \begin{frame}
 \frametitle{}
 \vfill
+\centering
 	¿Preguntas?
 \vfill
 \end{frame}
@@ -1253,6 +1234,7 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 \begin{frame}
 \frametitle{}
 \vfill
+\centering
     Gracias!
 \vfill
 \end{frame}
