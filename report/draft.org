@@ -66,8 +66,8 @@ blocks de nuevo.
 #+LATEX_HEADER: \newcommand{\weights}{\(\boldsymbol{W}\)}
 #+LATEX_HEADER: \newcommand{\img}{\(\boldsymbol{x_i}\)}
 #+LATEX_HEADER: \newcommand{\bias}{\(\boldsymbol{b}\)}
-#+LATEX_HEADER: \newcommand{\func}{\(\boldsymbol{f}\)}
-#+LATEX_HEADER: \newcommand{\loss}{\(\boldsymbol{L}\)}
+#+LATEX_HEADER: \newcommand{\func}{\(f\)}
+#+LATEX_HEADER: \newcommand{\loss}{\(L\)}
 #+LATEX_HEADER: \newcommand{\ml}{\textit{machine learning}}
 #+LATEX_HEADER: \newcommand{\ML}{\textit{Machine Learning}}
 #+LATEX_HEADER: \newcommand{\dl}{\textit{deep learning}}
@@ -190,8 +190,8 @@ dominio de cada problema en particular.
 
 Una vez se tiene una representación adecuada de la imagen, podemos
 encarar el problema antes mencionado de clasificación. Numerosos
-métodos se han utilizado a lo largo de la historia: \textit{máquinas vectores
-  de soporte} \cite{Osuna:1997:SVM:889148}, árboles de decisión \cite{DMWG09},
+métodos se han utilizado a lo largo de la historia: 
+\textit{máquinas vectores de soporte} \cite{Osuna:1997:SVM:889148}, árboles de decisión \cite{DMWG09},
 \textit{bolsas de palabras} \cite{Csurka04visualcategorization} entre otros. Comúnmente el
 proceso consiste en obtener buenas representaciones mediante los
 métodos manuales previamente mencionados y luego entrenar los
@@ -456,16 +456,16 @@ a definir una función \func{} que mapee estas representaciones
 \(\boldsymbol{x}\) a puntajes (\textit{scores}) para cada
 etiqueta. Tomemos por ahora como representación de una imagen a sus
 píxeles. Supongamos que contamos con un conjunto de datos de imágenes
-\(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\), donde \(\boldsymbol{i =1\cdots N}\), \(\boldsymbol{D}\) es la dimensión de cada
-representación de una imagen y \(\boldsymbol{y_i = 1\cdots K}\) es la
-etiqueta asociada. Es decir, tenemos \(\boldsymbol{N}\) imágenes y
-\(\boldsymbol{K}\) categorías.
+\(\boldsymbol{x_i} \in R^{D}\), donde \(i = 1\cdots N\), \(D\) es la dimensión de cada
+representación de una imagen y \(y_i = 1\cdots K\) es la
+etiqueta asociada. Es decir, tenemos \(N\) imágenes y
+\(K\) categorías.
 
-Definamos ahora una función \(\boldsymbol{f\colon R^{D} \mapsto
-R^{K}}\) como un mapeo entre píxeles y \scores:
+Definamos ahora una función \(f\colon R^{D} \mapsto
+R^{K}\) como un mapeo entre píxeles y \scores:
 
 \begin{equation}
-     \boldsymbol{f(x_i, W, b)= W x_i + b}
+     f(\boldsymbol{x_i},\boldsymbol{W}, \boldsymbol{b}) = \boldsymbol{W x_i} + \boldsymbol{b}
 \end{equation}
 
 Lo que acabamos de definir es un clasificador lineal. Un clasificador
@@ -551,9 +551,9 @@ yy = a * xx - linear_clf.intercept_[0] / coef[1]
 yy2 = a * xx - linear_clf.intercept_[0] / coef[1] + 1
 yy3 = a * xx - linear_clf.intercept_[0] / coef[1] - 1
 
-ax1.plot(xx, yy, 'k-',  c='orchid', label=r'$Wx + b$')
-ax1.plot(xx, yy2, '--',  c='mediumaquamarine', label=r'$Wx + (b + m)$')
-ax1.plot(xx, yy3, '--',  c='sandybrown', label=r'$Wx + (b - m)$')
+ax1.plot(xx, yy, 'k-',  c='orchid', label=r'$Wx + b$ = 0')
+ax1.plot(xx, yy2, '--',  c='mediumaquamarine', label=r'$Wx + (b + m) = 0$')
+ax1.plot(xx, yy3, '--',  c='sandybrown', label=r'$Wx + (b - m) = 0$')
 
 plt.legend(frameon=False)
 
@@ -562,7 +562,7 @@ plt.savefig('images/linear-classifier.pdf')
 
 #+attr_latex: width=0.8\textwidth,placement=[p]
 #+label: fig:cl
-#+caption: \fontsize{9}{11}\selectfont Visualización de un clasificador lineal binario. Cada punto representa una muestra en un espacio de dimensión \(\boldsymbol{D}=2\) con \(\boldsymbol{K}=2\) categorías. En este ejemplo el objetivo es establecer un hiperplano que defina un límite entre ambas clases, definido por la ecuación \(f(x_i, W, b)= W x_i + b\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
+#+caption: \fontsize{9}{11}\selectfont Visualización de un clasificador lineal binario. Cada punto representa una muestra en un espacio de dimensión \(D=2\) con \(K=2\) categorías. En este ejemplo el objetivo es establecer un hiperplano que defina un límite entre ambas clases, definido por la ecuación \(f(\boldsymbol{x_i}, \boldsymbol{W}, \boldsymbol{b})= \boldsymbol{W x_i} + \boldsymbol{b}\). A modo de ejemplo están graficados dos clasificadores lineales más con el \textit{vector de sesgo} ligeramente modificado. Se puede observar que \bias{} no afecta al clasificador sino que simplemente lo traslada a lo largo de las dimensiones.
 [[file:images/linear-classifier.pdf]]
 
 Más adelante veremos cómo definir \weights{} y \bias{} para obtener un
@@ -621,7 +621,7 @@ de entrenamiento. Entonces el costo total de \(f(x_i;W)\) para
 todo el conjunto de datos es:
 
 \begin{equation}
-\boldsymbol{L}(W) = \frac{1}{m} \sum^{m}_{i} L(f(x_i;W), y_i)
+L(\boldsymbol{W}) = \frac{1}{m} \sum^{m}_{i} L(f(\boldsymbol{x_i};\boldsymbol{W}), y_i)
 \end{equation}
 
 **** Descenso de Gradiente
@@ -659,14 +659,14 @@ utiliza para optimizar los pesos partiendo de la premisa que el modelo
 es diferenciable localmente (o se puede aproximar su derivada) con
 respecto a \weights{}. Dado que queremos minimizar la función de costo
 \loss{}, lo que vamos a hacer es calcular su gradiente
-\(\boldsymbol{\nabla L}\) respecto a cada parámetro y luego modificar
+\(\nabla L\) respecto a cada parámetro y luego modificar
 cada uno ligeramente con el objetivo de acercarlo al mínimo en la
 función. Entonces, si \(W_{n}\) son nuestros parámetros en el
 paso \(n\) del entrenamiento, calculamos \(W_{n+1}\) de la
 siguiente manera:
 
 \begin{equation}
-    W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{W_{n}} L(f(x_i; W_n), y_i)
+    \boldsymbol{W_{n+1}} = \boldsymbol{W_n} - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{\boldsymbol{W_{n}}} L(f(\boldsymbol{x_i}; \boldsymbol{W_n}), y_i)
 \end{equation}
 
 Donde \(\epsilon\) es conocido como la \textit{tasa de aprendizaje} y
@@ -751,7 +751,7 @@ mismas, el clasificador \textit{Softmax}.
 La función \textit{Softmax} tiene la siguiente forma:
 
 \begin{equation}
-    \sigma(x)_j =  \frac{e^{f(x;W)_{j}}} {\sum_{k} e^{f(x;W)_{k}}}
+    \sigma(\boldsymbol{x})_j =  \frac{e^{f(\boldsymbol{x};\boldsymbol{W})_{j}}} {\sum_{k} e^{f(\boldsymbol{x};\boldsymbol{W})_{k}}}
 \end{equation}
 
 Se puede observar que sus resultados son siempre positivos y
@@ -764,7 +764,7 @@ cada una de las clases \(k\).
 Si nuestro problema de clasificación cuenta con \(K\) clases, podemos
 codificar cada anotacion \(y_i\) de nuestro conjunto de datos como un
 vector de longitud \(K\) donde todos los elementos son 0 y el elemento
-del índice correspondiente a la clase de \(x_i\) es 1. Esta
+del índice correspondiente a la clase de \(\boldsymbol{x_i}\) es 1. Esta
 representación de las etiquetas se denomina \textit{one-hot encoding}.
 
 Ahora bien, si queremos obtener la probabilidad de \(y_i\) a partir
@@ -772,17 +772,17 @@ del resultado de \textit{Softmax}, simplemente debemos computar el
 producto interno entre ambos vectores:
 
 \begin{equation}
-\sigma(f(x_i, W)_{y_{i}}) = \langle\,f(x_i, W), y_{\text{encoded}}\rangle
+\sigma(f(\boldsymbol{x_i}, \boldsymbol{W})_{y_{i}}) = \langle\,f(\boldsymbol{x_i}, \boldsymbol{W}), y_{\text{codificado}}\rangle
 \end{equation}
 
 La función de costo utilizada comunmente con \textit{Softmax} es el
 negativo de la función de verosimilitud (o \textit{log-likelihood} en
-inglés). Sea \(\sigma(f(x_i, W)_{y_{i}})\) la probabilidad computada
+inglés). Sea \(\sigma(f(\boldsymbol{x_i}, \boldsymbol{W})_{y_{i}})\) la probabilidad computada
 mediante \textit{Softmax} para la clase \(y_i\), entonces
 \textit{log-likelihood} se expresa:
 
 \begin{equation}
-     L_i = - \log \bigg( \frac{e^{\sigma(f(x_i, W)_{y_{i}})}} {\sum_j e^{\sigma(f(x_i, W)_j)}}\bigg)
+     L_i = - \log \bigg( \frac{e^{\sigma(f(\boldsymbol{x_i}, \boldsymbol{W})_{y_{i}})}} {\sum_j e^{\sigma(f(\boldsymbol{x_i}, \boldsymbol{W})_j)}}\bigg)
 \end{equation}
 
 Observar que si el clasificador se equivocó al predecir (o sea, asignó
@@ -801,19 +801,19 @@ de cada elemento del conjunto.
 
 Hasta ahora analizamos clasificadores lineales y un tipo particular
 llamado softmax. Si conectáramos la salida de un clasificador lineal
-\(s_1=W_1x+b_1\) con la entrada de otro clasificador \(s_2=W_2y+b_2\),
+\(\boldsymbol{s_1=W_1x+b_1}\) con la entrada de otro clasificador \(\boldsymbol{s_2=W_2y+b_2}\),
 entonces obtendríamos un tercero:
 
 \begin{equation}
-s_3 = W_2 (W_1x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1) + b_2
+\boldsymbol{s_3 = W_2 (W_1x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1) + b_2}
 \end{equation}
 
 \begin{equation}
-s_3 = W_3 x + b_3
+\boldsymbol{s_3 = W_3 x + b_3}
 \end{equation}
 
 Es fácil hacer un chequeo de dimensiones para ver que efectivamente
-podemos ``colapsar'' las matrices \(W_2\) y \(W_1\) en una sola, por lo
+podemos ``colapsar'' las matrices \(\boldsymbol{W_2}\) y \(\boldsymbol{W_1}\) en una sola, por lo
 cual terminamos con otro clasificador lineal.
 
 Notemos que por más que combinemos miles de clasificadores lineales
@@ -822,7 +822,7 @@ romper la linealidad de estas ``capas'' de clasificadores es, por
 ejemplo, agregar lo que se llama \textit{función de activación}:
  
 \begin{equation}
-    s = W_2 \max{(0, W_1 x + b_1)} + b_2
+    s = \boldsymbol{W_2} \max{(0, \boldsymbol{W_1} \boldsymbol{x} + \boldsymbol{b_1})} + \boldsymbol{b_2}
 \end{equation}
  
  
@@ -831,7 +831,7 @@ una neurona cada una.
 
 En la Figura [[fig:art-neuron]] vemos un modelo formal de una
 neurona estándar, en el que las entradas \(x_i\) interactúan
-multiplicativamente con los pesos \(w_i\). Luego, esos resultados se
+multiplicativamente con los pesos \(\w_i\). Luego, esos resultados se
 suman junto con un vector de sesgo y sobre eso se computa lo que se
 llama \textit{función de activación} que decide si transmitir o no la
 salida.
@@ -1200,7 +1200,7 @@ como se puede observar en la Figura \ref{fig:augm}.
     \end{subfigure}
     \caption{\fontsize{9}{11}\selectfont Diferentes formas de aumentar datos.
      Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el
-     eje que conforman los ojos [[fig:falign]]. Traslaciones, recortes en la
+     eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la
      imagen y cambios en el brillo, contraste y color son otras técnicas muy
      usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
 \end{figure}
@@ -1397,7 +1397,7 @@ componentes, la función de costo propiamente dicha y la
 costo es:
 
 \begin{equation}
-     \boldsymbol{ L =\frac{1}{N} \sum_{i} L_i + \lambda R(W)}
+      L =\frac{1}{N} \sum_{i} L_i + \lambda R(W)
 \end{equation}
 
 Notar que la pérdida total es el promedio de las pérdidas de cada
@@ -1439,8 +1439,8 @@ resultados.
 **** \textit{Dropout}
 
 La técnica de \textit{dropout} \cite{JMLR:v15:srivastava14a} consiste en mantener
-activa una neurona con una probabilidad \(\boldsymbol{p}\) (a veces
-\(\boldsymbol{1 - p}\)). Esta técnica se aplica solamente durante el
+activa una neurona con una probabilidad \(p\) (a veces
+\(1 - p\)). Esta técnica se aplica solamente durante el
 \textit{entrenamiento} de las redes neuronales.
 
 Si consideramos una red neuronal con \(L\) capas, sea \(l \in
@@ -1568,7 +1568,7 @@ definición de derivada de una función. Sea \(g:\mathbb{R} \to
 \mathbb{R}\), entonces su derivada se expresa como:
 
 \begin{equation}
-     \boldsymbol{\frac{dg(x)}{dx} = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h} }
+     \frac{dg(x)}{dx} = \lim_{h \to 0} \frac{g(x + h) - g(x)}{h}
 \end{equation}
 
 Si el dominio de \(g\) estuviera en \(\mathbb{R}^n\), se calculan
@@ -1637,8 +1637,7 @@ Y calcular su gradiente valiéndonos de la \textit{regla de la cadena}:
 Ahora podemos estructurar nuestro algoritmo de optimización en dos
 pasos: primero, evaluamos nuestra función \loss{} en los parámetros
 actuales (\textit{forward pass}). Luego, partiendo de ese resultado
-calculamos el gradiente en cada variable utilizando la \textit{reglade
-la cadena}.  En la Figura \ref{fig:backprop} se pueden observar los
+calculamos el gradiente en cada variable utilizando la \textit{regla de la cadena}.  En la Figura \ref{fig:backprop} se pueden observar los
 valores computados para este ejemplo, en el caso particular de
 \(x=-3\), \(y=2\), \(z=4\). El \textit{forward pass} se marca en verde
 y los gradientes computados mediante la regla de la cadena
@@ -1706,8 +1705,8 @@ aproximada mediante:
 
 \begin{equation}
 f'(x) = \begin{cases}
-                0,& \text{si} x <= 0\\
-                1,& \text{si} x > 0
+                0,& \text{si } x \leq 0\\
+                1,& \text{si } x \ge 0
         \end{cases}
 \end{equation}
 
