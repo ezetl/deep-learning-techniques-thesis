@@ -112,7 +112,7 @@ Tareas demasiado complejas para programarse directamente:
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Aprendizaje Supervisado - No Supervisado}
 \begin{figure}
     \centering
@@ -164,7 +164,7 @@ Es necesario recurrir a modelos físicos y/o probabilísticos\pause
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain] 
 \frametitle{Clasificación de imágenes}
 \begin{figure}
     \centering
@@ -217,7 +217,7 @@ Podemos obtener representaciones de imágenes, \(\boldsymbol{x} \in \boldsymbol{
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Clasificación de imágenes}
 
 Conjunto de entrenamiento: \(\boldsymbol{x_i} \in \boldsymbol{R^{D}}\)
@@ -244,7 +244,7 @@ Anotaciones asociadas: \(\boldsymbol{y_i = 1\cdots K}\)\vfill
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Entrenamiento}
 ¿Cómo optimizar los parámetros \(W\)?
 \vfill
@@ -265,7 +265,7 @@ Proceso iterativo:
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Función de Costo}
 Define un criterio de optimalidad que nos ayuda a
 cuantificar cómo está actuando nuestro clasificador.
@@ -280,33 +280,19 @@ cuantificar cómo está actuando nuestro clasificador.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Descenso de Gradiente Estocástico}
-No tenemos control sobre nuestro conjunto de datos de entrenamiento, pero sí podemos modificar \(W\) para minimizar el costo.
 \vfill
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/gradient-descent.pdf}
-\end{figure}
-\vfill
-\end{frame}
-%---------------------------------------------------------
-
-
-
-
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Descenso de Gradiente Estocástico}
 Actualización de los pesos mediante el cómputo del costo en \textit{mini-batches}
 \vfill
 \begin{equation}
     W_{n+1} = W_n - \epsilon \frac{1}{m} \sum^{m}_{i} \nabla_{W_{n}} L(f(x_i; W_n), y_i)
 \end{equation}
 \vfill
-
-\vfill
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/gradient-descent.pdf}
+\end{figure}
 \end{frame}
 %---------------------------------------------------------
 
@@ -315,7 +301,7 @@ Actualización de los pesos mediante el cómputo del costo en \textit{mini-batch
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Clasificación de imágenes}
 
 Todos ampliamente superados por CNN
@@ -335,7 +321,6 @@ Pueden aprender representaciones \emph{Y} el modelo .
 %---------------------------------------------------------
 \begin{frame}[plain]
 \frametitle{Redes Neuronales}
-\vfill
 Unidades (neuronas) conectadas entre sí.
 \vfill
 Típicamente organizadas en capas.
@@ -353,7 +338,7 @@ Neuronas de una capa interactúan con neuronas de la capa anterior.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Redes Neuronales}
 \begin{figure}
     \centering
@@ -366,7 +351,7 @@ Neuronas de una capa interactúan con neuronas de la capa anterior.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Optimización: Retropropagación}
 \vfill
 Algoritmo utilizado para computar eficientemente el gradiente.
@@ -429,7 +414,7 @@ Aplicación recursiva de la \textit{regla de la cadena}:
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Redes Convolucionales}
 Imagen como una función \(f:\mathbb{R}^2 \to \mathbb{R}^n\) 
 \vfill
@@ -446,13 +431,13 @@ Operador de píxeles:
 g(i,j) = h(f(i,j))
 \end{equation}
 \vfill
-\textit{filtro lineal} \textrightarrow \textit{operador local}
+\textit{filtro lineal}: \textit{operador local}
 \end{frame}
 %---------------------------------------------------------
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Redes Convolucionales}
 \begin{figure}
 \centering
@@ -619,7 +604,7 @@ g(i,j) = h(f(i,j))
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Redes Convolucionales}
 Convolución: localidad, reducción de parámetros, invarianza traslacional
 
@@ -648,7 +633,7 @@ Capas:
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Redes Convolucionales}
 Ejemplo: C96-P-C256-F500-Op.
 \vfill
@@ -666,7 +651,7 @@ Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa 
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{(Algunos) problemas de Redes Convolucionales}
 \begin{itemize}
     \item Requieren grandes conjuntos de datos
@@ -681,7 +666,7 @@ Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa 
 
 \section{pretext}
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Entrenamiento mediante tareas de pretexto}
 Tareas de pretexto \\\vfill
 
@@ -708,7 +693,7 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Automovimiento}
 \vfill
 un agente móvil puede valerse de la información obtenida de su propio movimiento para
@@ -737,7 +722,7 @@ Información sobre el cambio de posición respecto a un punto inicial.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Automovimiento}
 
 ¿Como sabemos si cuando son buenas representaciones?\\\pause
@@ -779,7 +764,7 @@ El problema puede ser planteado con redes siamesas\\
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{\textit{Slow Feature Analysis}}
 
 Técnica de aprendizaje no supervisado:
@@ -807,8 +792,8 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 
 %---------------------------------------------------------
-\begin{frame}
-\frametitle{Automovimiento}
+\begin{frame}[plain]
+\frametitle{\textit{Slow Feature Analysis}}
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
@@ -821,7 +806,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{\textit{Slow Feature Analysis}}
 \begin{figure}
     \centering
@@ -835,7 +820,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Información odométrica para entrenar redes siamesas}
 \begin{itemize}
     \item Tarea de clasificación: predecir transformaciones en \(X, Y, Z\)
@@ -851,7 +836,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 \section{Experimentos}
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - Diseño}
 \begin{enumerate}
     \item Particionado del conjunto de entrenamiento
@@ -868,7 +853,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - Prueba de concepto: MNIST}
 Conjunto de datos de dígitos manuscritos
 \vfill
@@ -918,7 +903,7 @@ Pares artificiales con traslaciones en X e Y, rotaciones en Z
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - Prueba de concepto: MNIST}
 \begin{itemize}
     \item Componentes siameses: C96-P-C256-P, Concatenación de representaciones: F1000-D-Op.
@@ -939,7 +924,7 @@ Accuracy, Función de costo durante entrenamiento
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - Prueba de concepto: MNIST}
 \begin{table}
 \centering
@@ -968,7 +953,7 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - KITTI}
 \vfill
 11 secuencias que registran el movimiento de un automóvil en una ciudad\vfill
@@ -993,7 +978,7 @@ Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{KITTI - Pares de entrenamiento}
 \begin{figure}
 \centering
@@ -1047,7 +1032,7 @@ Las redes siamesas fueron entrenadas con aproximadamente 20K pares de imágenes.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - KITTI + SUN397}
 397 categorías de paisajes interiores y exteriores\vfill
 3 particiones con datos de entrenamiento-validación\vfill
@@ -1074,7 +1059,7 @@ Las redes siamesas fueron entrenadas con aproximadamente 20K pares de imágenes.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - KITTI + SUN397}
 Preentrenamiento: automovimiento, SFA y pesos aleatorios.
 \vfill
@@ -1122,7 +1107,7 @@ KITTI-AUT & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - KITTI + ImageNet}
 Conjunto de datos ILSVRC'12, 1000 categorías
 \begin{figure}
@@ -1151,7 +1136,7 @@ Se crearon conjuntos de datos con 1 5, 10, 20 y 1000 imágenes por categoría
 
 
 %---------------------------------------------------------
-\begin{frame}
+\begin{frame}[plain]
 \frametitle{Experimentos - KITTI + ImageNet}
 
 Preentrenamiento con automovimiento, SFA y pesos aleatorios.\pause
