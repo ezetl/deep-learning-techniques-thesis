@@ -1,9 +1,29 @@
 \documentclass{beamer}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz}
 \usepackage{verbatim}
-\usetikzlibrary{arrows,shapes}
 
+\usepackage[table]{xcolor}
+
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
+
+\usepackage{lmodern}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{etoolbox}
+\sisetup{detect-weight,mode=text}
+% for avoiding siunitx using bold extended
+\renewrobustcmd{\bfseries}{\fontseries{b}\selectfont}
+\renewrobustcmd{\boldmath}{}
+% abbreviation
+\newrobustcmd{\B}{\bfseries}
+
+
+
+
+\usetikzlibrary{arrows,shapes}
 
 \usepackage{utopia} %font utopia imported
 
@@ -423,9 +443,6 @@ Un \textit{operador} toma una o más imágenes de entrada y produce una
 imagen de salida.  
 \vfill
 	
-Representamos a cada píxel como su posición en la imagen, \(\boldsymbol{x} = (i, j)\)
-\vfill
-	
 Operador de píxeles:
 \begin{equation}
 g(i,j) = h(f(i,j))
@@ -668,10 +685,7 @@ Luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa 
 %---------------------------------------------------------
 \begin{frame}[plain]
 \frametitle{Entrenamiento mediante tareas de pretexto}
-Tareas de pretexto \\\vfill
 
-No son útiles en si mismas, pero sirven para aprender representaciones generales que puedan ser aplicadas a otro problema.\\\vfill
-	
 \begin{itemize}
     \item reconstrucción de la imagen de entrada
     \item predicción de píxeles en una secuencia de video 
@@ -680,9 +694,9 @@ No son útiles en si mismas, pero sirven para aprender representaciones generale
 \end{itemize}\\
 \vfill
 
-Anotaciones fáciles de obtener e incluso a partir del mismo conjunto de datos. \\
+Anotaciones fáciles de obtener\\
 \vfill
-La hipótesis es que el modelo aprenderá características de alto nivel para poder realizar su tarea.
+Hipótesis: el modelo aprenderá características de alto nivel para poder realizar su tarea.
 \vfill
 \end{frame}
 %---------------------------------------------------------
@@ -696,23 +710,16 @@ La hipótesis es que el modelo aprenderá características de alto nivel para po
 \begin{frame}[plain]
 \frametitle{Automovimiento}
 \vfill
-un agente móvil puede valerse de la información obtenida de su propio movimiento para
-supervisar el aprendizaje de buenas representaciones visuales de su
-entorno.
+Supervisar aprendizaje mediante información odométrica
 \vfill
 ¿Podemos predecir cuando dos fotos son la misma a pesar haber sufrido alguna transformación?\\
 
 \vfill
 
 \begin{itemize}
-    \item tarea de clasificación donde el objetivo es predecir la transformación 
+    \item Tarea de clasificación donde el objetivo es predecir la transformación 
 \end{itemize}
 
-\vfill
-
-\begin{block}{Información Odométrica}
-Información sobre el cambio de posición respecto a un punto inicial.
-\end{block}
 \vfill
 \end{frame}
 %---------------------------------------------------------
@@ -725,7 +732,7 @@ Información sobre el cambio de posición respecto a un punto inicial.
 \begin{frame}[plain]
 \frametitle{Automovimiento}
 
-¿Como sabemos si cuando son buenas representaciones?\\\pause
+¿Como sabemos si son buenas representaciones?\\\pause
 
 \vfill
 \begin{enumerate}
@@ -767,13 +774,18 @@ El problema puede ser planteado con redes siamesas\\
 \begin{frame}[plain]
 \frametitle{\textit{Slow Feature Analysis}}
 
+\vfill
 Técnica de aprendizaje no supervisado:
+\vfill
 \begin{itemize}
     \item \textit{features} cambian poco en una ventana de tiempo pequeña \pause
-	\end{itemize}
+\end{itemize}
+\vfill
 
-	Sean \(x_{t_1}\) y \(x_{t_2}\) representaciones de imágenes en tiempos \(t_1\) y \(t_2\)\\
-Sea \(D\) una medida de similitud. Podemos definir una función de costo:
+\(x_{t_1}\) y \(x_{t_2}\) representaciones de imágenes
+\vfill
+\(D\) una medida de similitud
+\vfill
 
 \begin{equation}
 L(x_{t_1}, x_{t_2}, W) = \begin{cases}
@@ -781,9 +793,7 @@ L(x_{t_1}, x_{t_2}, W) = \begin{cases}
                            \max{(0, m - D(x_{t_1}, x_{t_2}))},& \text{si} |t_1 - t_2| > T
                          \end{cases}
 \end{equation}
-
-\(W\) son los parámetros compartidos de las redes siamesas\\
-\(m\) es el margen mínimo que debe separar a las representaciones distintas.
+\vfill
 \end{frame}
 %---------------------------------------------------------
 
@@ -941,7 +951,7 @@ Accuracy, Función de costo durante entrenamiento
 Desde cero & 0.42 & 0.70 & 0.82 & 0.97\\
 SFA(m=10) & 0.52 & 0.71 & 0.77 & 0.82\\
 SFA(m=100) & 0.58 & 0.73 & 0.80 & 0.88\\
-Automovimiento & 0.75 & 0.90 & 0.92 & 0.99\\
+Automovimiento & \B 0.75 &  \B 0.90 &  \B 0.92 & \B  0.99\\
 \hline
 \end{tabular}
 \end{table}
@@ -1089,10 +1099,11 @@ Accuracy:
 & \multicolumn{1}{c}{L5} \\ \cline{1-14}
 \hline
 
-ALEX-1000 & 1M & 5 & 3.73 & 5.07 & 5.07 & 8.53 & 10.40 & 20 & 9.07 & 12.53 & 16.27 & 17.60 & 10.67\\
-ALEX-20 & 20K & 5 & 2.93 & 1.87 & 3.73 & 5.07 & 3.20 & 20 & 6.13 & 5.33 & 5.33 & 4.53 & 5.07\\
-KITTI-SFA & 20.7K & 5 & 2.13 & 3.20 & 2.40 & 1.60 & 1.87 & 20 & 4.53 & 3.73 & 2.13 & 2.40 & 2.93\\
-KITTI-AUT & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.87 & 9.33 & 4.00\\
+\rowcolor{Gray}
+ALEX-1000 & 1M    & 5 & 3.73 &  5.07 &  5.07 &  8.53 &  10.40 & 20 &  9.07 &  12.53 &  16.27 &  17.60 &  10.67\\
+ALEX-20   & 20K   & 5 & \B 2.93 & \B 1.87 & \B 3.73 & 5.07 & \B 3.20 & 20 & 6.13 & 5.33 & 5.33 & 4.53 & \B 5.07\\
+KITTI-SFA & 20.7K & 5 & 2.13    & 3.20 & 2.40 & 1.60 & 1.87 & 20 & 4.53 & 3.73 & 2.13 & 2.40 & 2.93\\
+KITTI-AUT & 20.7K & 5 & \B 2.93 & \B 1.87 & 3.20 & \B 5.87 & 1.33 & 20 & \B 6.67 & \B 7.47 & \B 9.87 & \B 9.33 & 4.00\\
 
 \hline
 \end{tabular}
@@ -1157,7 +1168,7 @@ Accuracy:
 & \multicolumn{1}{c}{1000} \\ \cline{1-6}
 \hline
 
-KITTI-AUT & 0.49 & 1.27 & 2.14 & 4.13 & 20.8\\
+KITTI-AUT & \B 0.49 & \B 1.27 & \B 2.14 & \B 4.13 & \B 20.8\\
 KITTI-SFA & 0.35 & 0.75 & 1.34 & 2.64 & 11.83\\
 ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 
