@@ -11,8 +11,7 @@
 
 La generacion de figuras de matplotlib esta desactivada para generar
 el reporte mas rapido (algunos code blocks incluyen tareas de
-clasificacion REALES hechas con scipy/numpy y tardan un toque en
-evaluarse).
+clasificacion REALES hechas con scipy/numpy.
 
 Como consecuencia, para exportar este documento usando Emacs org-mode
 es necesario primero generar todas las figuras de matplotlib mediante
@@ -27,14 +26,25 @@ para generar y abrir el pdf.
 
 Una vez generadas las figuras, ya no es necesario correr los code
 blocks de nuevo.
+
+Tal vez se deba agregar lo siguiente a su .emacs para que lo anterior 
+funcione:
+
+(require 'org-install)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t) (sh . t) (latex . t))
+ )
+(setq org-latex-create-formula-image-program 'dvipng)
 #####################################################################
 #+END_COMMENT
+
 
 #+LATEX_HEADER: \hypersetup{colorlinks=true,linkcolor=black!60!blue}
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage{ifthen,figlatex}
-#+LATEX_HEADER: \usepackage[spanish,es-noquoting]{babel}
+#+LATEX_HEADER: \usepackage[spanish,es-noquoting,english]{babel}
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{wrapfig}
@@ -94,6 +104,12 @@ blocks de nuevo.
 #+LATEX_HEADER: {\large Director: Jorge Adrián Sánchez\par}
 #+LATEX_HEADER: \vfill
 #+LATEX_HEADER: {\normalsize Agosto 2017\par}
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER: \centering
+#+LATEX_HEADER: \href{http://creativecommons.org/licenses/by-nc-sa/4.0/}{\includegraphics[width=70pt]{images/cc.png}}
+#+LATEX_HEADER: \vfill
+#+LATEX_HEADER: \centering
+#+LATEX_HEADER: {\small Entrenamiento de modelos de aprendizaje profundo mediante autosupervisión por Rubén Ezequiel Torti López se distribuye bajo una \href{http://creativecommons.org/licenses/by-nc-sa/4.0/}{Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional}}
 #+LATEX_HEADER: \end{titlepage}
 #+LATEX_HEADER: \newpage
 #+LATEX_HEADER: \endgroup}
@@ -115,7 +131,7 @@ costosa. Se propone en este trabajo una manera alternativa al
 entrenamiento de esta clase de modelos inspirada en cómo los
 organismos vivientes desarrollan habilidades de percepción visual:
 moviéndose e interactuando con el mundo que los rodea. Partiendo de la
-hipótesis de que se puede usar la información del movimiento propio
+hipótesis de que un agente puede usar la información del movimiento propio
 (rotación y traslación en los ejes X,Y,Z) como método de supervisión,
 Agrawal et al. \cite{DBLP:journals/corr/AgrawalCM15} ya han demostrado que es posible obtener
 buenos resultados entrenando con menos imágenes anotadas que lo usual.
@@ -123,6 +139,29 @@ Se validan experimentalmente los resultados de este método de
 entrenamiento con respecto a los del estado del arte en tareas de
 clasificación en distintos dominios.
 #+END_abstract
+
+#+LATEX: \newpage
+
+#+LATEX: \selectlanguage{english}
+#+BEGIN_abstract
+Within the field of machine learning, a class of techniques
+known as Deep Learning (DL) have become particularly relevant
+since their use have achieved
+significant improvements compared to traditional methods. A disadvantage of
+DL-based models is that they usually have much more parameters
+than elements in the training datasets. Despite the fact that there exist large annotated datasets for the 
+task of image classification by content, the generation of new datasets for problems in other domains is very
+costly. There is an alternative way
+to train this kind of models inspired by how the
+living organisms develop visual perception skills:
+by moving and interacting with the world that surrounds them. By hypothesizing that an agent can use its own movement information
+(rotation and translation in the X, Y, Z axes) as a method of supervision,
+Agrawal et al. \cite{DBLP:journals/corr/AgrawalCM15} have already shown that it is possible to obtain
+good results when training with fewer annotated images than usual.
+In this work, the results of this method are validated with respect to the state of the art algorithms
+in tasks of classification in different domains.
+#+END_abstract
+
 #+LATEX: \newpage
 #+LATEX: \tableofcontents
 #+LATEX: \newpage
@@ -347,6 +386,30 @@ categorías de antemano y el algoritmo debe encontrar los patrones en
 los datos).
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\subparagraph{Aprendizaje supervisado}
+
+Cuando se poseen anotaciones o alguna clase de etiqueta sobre los
+datos a aprender, hablamos de aprendizaje supervisado. Retomando el
+caso del verificador de rostros, las etiquetas serían el nombre o
+algún identificador de cada persona y nuestro clasificador aprendería
+a diferenciar las caras tomando como referencia las anotaciones.
+
+\subparagraph{Aprendizaje no supervisado}
+
+Cuando los datos no están categorizados de antemano hablamos de
+aprendizaje no supervisado. Por ejemplo, si se contara con una lista
+de casas con sus respectivos precios, su área en metros cúbicos y
+cantidad de habitaciones y quisiéramos encontrar alguna relación entre
+ellas. Si tomamos como ejemplo la tarea de clasificación, en la Figura
+\ref{fig:machine-learning} se puede observar la diferencia entre los
+datos utilizados en aprendizaje supervisado (dos clases de elementos)
+y los datos de aprendizaje no supervisado (no se conocen las
+categorías de antemano y el algoritmo debe encontrar los patrones en
+los datos).
+#+END_LaTeX
+
 #+name: mean-substraction
 #+begin_src python :session :exports none :results silent :cache yes :eval no-export
 import matplotlib
@@ -432,6 +495,25 @@ plot_norm_circle(x1, y1, x2, y2, 'lightslategrey', '2')
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/machinelearning1.pdf}
+        \caption{Aprendizaje supervisado}
+        \label{fig:machine1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/machinelearning2.pdf}
+        \caption{Aprendizaje no supervisado}
+        \label{fig:machine2}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Ejemplos simples de la organización de los datos en problemas de aprendizaje supervisado vs. no supervisado.}\label{fig:machine-learning}
+\end{figure}
+#+END_LaTeX
+
 #+begin_src latex
 \subparagraph{Aprendizaje por refuerzo}
 
@@ -442,6 +524,18 @@ objetivo (por ejemplo manejar un vehículo
 las recompensas y penalizaciones que surgen mientras explora el
 espacio del problema.
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\subparagraph{Aprendizaje por refuerzo}
+
+Cuando el agente debe interactuar con su entorno para cumplir algún
+objetivo (por ejemplo manejar un vehículo
+\cite{DBLP:journals/corr/Shalev-ShwartzS16a} o ganar un videojuego
+\cite{DBLP:journals/corr/MnihKSGAWR13}) y debe aprender a partir de
+las recompensas y penalizaciones que surgen mientras explora el
+espacio del problema.
+#+END_LaTeX
 
 *** El problema de clasificación
 
@@ -1030,6 +1124,26 @@ plt.savefig('images/relu1.pdf')
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/relu1.pdf}
+        \caption{\textit{ReLU}}
+        \label{fig:relu1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{images/relu2.pdf}
+        \caption{\textit{Leaky ReLU}}
+        \label{fig:relu2}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont \textit{ReLU} vs. \textit{Leaky
+     ReLU}. Se puede observar la pendiente negativa en \ref{fig:relu2} para \(x<0\), la cual produce un gradiente \(\neq 0\) y evita la muerte de neuronas.}\label{fig:relu}
+\end{figure}
+#+END_LaTeX
+
 ** Entrenamiento de redes neuronales artificiales
 
 Entrenar una red neuronal artificial no es muy distinto a entrenar un
@@ -1142,6 +1256,33 @@ plot_norm(x3, y3, 'firebrick', '3')
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean1.pdf}
+        \caption{Original}
+        \label{fig:mean1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean2.pdf}
+        \caption{Substraer media}
+        \label{fig:mean2}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/mean3.pdf}
+        \caption{Normalizacion}
+        \label{fig:mean3}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Se puede observar en \ref{fig:mean2}
+     cómo al substraer la media de \ref{fig:mean1} logramos ``centrar'' nuestro
+     conjunto de datos. En \ref{fig:mean3} podemos apreciar los resultados de la normalización de datos, logrando que todos los elementos pertenezcan al mismo rango de valores.}\label{fig:mean}
+\end{figure}
+#+END_LaTeX
+
 **** Normalización
 
 Una manera de normalizar los datos es dividir cada dimensión por su
@@ -1205,6 +1346,41 @@ como se puede observar en la Figura \ref{fig:augm}.
      usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-original.jpg}
+        \caption{Original}
+        \label{fig:forig}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-aligned.jpg}
+        \caption{Alineacion}
+        \label{fig:falign}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-augmented1.jpg}
+        \caption{Color}
+        \label{fig:faug1}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{images/face-augmented2.jpg}
+        \caption{Traslaciones}
+        \label{fig:faug2}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Diferentes formas de aumentar datos.
+     Si trabajamos con rostros es muy común alinearlos, por ejemplo, sobre el
+     eje que conforman los ojos \ref{fig:falign}. Traslaciones, recortes en la
+     imagen y cambios en el brillo, contraste y color son otras técnicas muy
+     usadas (\ref{fig:faug1} y \ref{fig:faug2}).}\label{fig:augm}
+\end{figure}
+#+END_LaTeX
 
 *** Inicialización de pesos
 
@@ -1385,6 +1561,33 @@ explore_fitting_boundaries(model=model, n_neighbors=[1], datasets=datasets, widt
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting1.pdf}
+        \caption{\textit{Underfitting}}
+        \label{fig:over1}
+    \end{subfigure}
+\quad
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting2.pdf}
+        \caption{Aceptable}
+        \label{fig:over2}
+    \end{subfigure}
+\quad
+   \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{images/overfitting3.pdf}
+        \caption{\textit{Overfitting}}
+        \label{fig:over3}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de \textit{overfitting}
+    \ref{fig:over1}, \textit{underfitting} \ref{fig:over2} y un buen ajuste al
+    conjunto de datos \ref{fig:over3}.}\label{fig:overfit}
+\end{figure}
+#+END_LaTeX
+
 Queremos elegir los mejores parámetros de \weights{} para evitar estos
 problemas, y eso lo podemos hacer agregando una penalidad de
 regularización \(R(W)\). Lo que buscamos con esto es poner
@@ -1545,6 +1748,15 @@ denominadas \textit{capas ocultas} (Figura \ref{fig:nnet}).
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/neural-net.pdf}
+    \caption{\fontsize{9}{11}\selectfont Diagrama de una red neuronal con entrada de dimensión \(D=3\), una capa oculta completamente conectada y dos neuronas de salida.}\label{fig:nnet}
+\end{figure}
+#+END_LaTeX
+
 Las redes neuronales se entrenan partiendo del principio del descenso
 del gradiente que se explicó en la Sección [[sec:sgd]]. Notemos que
 \loss{} es una función que depende de las imágenes de entrada \img{},
@@ -1688,6 +1900,50 @@ Estocástico que ya vimos.
     \caption{\fontsize{9}{11}\selectfont Grafo de computación durante la aplicación de \textit{backpropagation}.}\label{fig:backprop}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}[H]
+    \centering
+    \tikzstyle{vertex}=[circle,fill=black!25,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{input}=[circle,draw=black,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{empty}=[circle,draw=white,minimum size=20pt,inner sep=0pt]
+    \tikzstyle{emptyred}=[circle,draw=white,minimum size=20pt,inner sep=0pt,text=black!50!red]
+    \tikzstyle{edgeup} = [draw,thick,->,above,sloped,color=black!50!green,text=black!50!green]
+    \tikzstyle{arrow} = [->]
+    \tikzstyle{edgedown} = [draw,thick,<-,below,sloped,color=black!50!red,text=black!50!red]
+    %\resizebox{\textwidth}{!}{
+        \begin{tikzpicture}[scale=1.5, auto,swap]
+            % vertices
+            \node[input] (x) at (-2,1) {$x$};
+            \node[vertex] (div) at (2,1) {$/$};
+            \node[vertex] (sum) at (4,1) {$+$};
+            \node[empty] (output) at (5.7,1) {};
+            \node[vertex] (pow) at (0,-1) {$\_^2$};
+            \node[input] (y) at (-2,-1) {$y$};
+            \node[input] (z) at (2,-1.5) {$z$};
+            % edges forward
+            \path[edgeup] (x.15) -- node[arrow] {$-3$} (div.165);
+            \path[edgeup] (div.15) -- node[arrow] {$-0.75$} (sum.165);
+            \path[edgeup] (pow.50) -- node[arrow] {$4$} (div.230);
+            \path[edgeup] (z.50) -- node[arrow] {$4$} (sum.230);
+            \path[edgeup] (y.15) -- node[arrow] {$2$} (pow.165);
+            \path[edgeup] (sum) -- node[arrow] {$3.25$} (output);
+            % edges backward
+            \path[edgedown] (x.355) -- node[arrow] {$\frac{\partial q}{\partial x} = \frac{1}{y^2} = 0.25$} (div.185);
+            \path[edgedown] (div.355) -- node[arrow] {$\frac{\partial g}{\partial q} = 1$} (sum.185);
+            \path[edgedown] (pow.30) -- node[arrow] {$\frac{\partial q}{\partial p} = \frac{-x}{p^2} = -0.187$} (div.250);
+            \path[edgedown] (z.30) -- node[arrow] {$\frac{\partial g}{\partial z} = 1$} (sum.250);
+            \path[edgedown] (y.355) -- node[arrow] {$\frac{\partial p}{\partial y} = 2y = 4$} (pow.185);
+            % final gradients
+            \node[emptyred] (xback) at (-3.3,1) {$\frac{\partial g}{\partial x} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial x} = 0.25$};
+            \node[emptyred] (yback) at (-3.58,-1) {$\frac{\partial g}{\partial y} = \frac{\partial g}{\partial q} \frac{\partial q}{\partial p} \frac{\partial p}{\partial y} = -0.748$};
+            \node[emptyred] (zback) at (1.35,-1.5) {$\frac{\partial g}{\partial z} = 1$};
+        \end{tikzpicture}
+    %}
+    \caption{\fontsize{9}{11}\selectfont Grafo de computación durante la aplicación de \textit{backpropagation}.}\label{fig:backprop}
+\end{figure}
+#+END_LaTeX
 
 Una vez que contamos con el gradiente, actualizamos los parámetros de
 \loss{} restándole un porcentaje del gradiente negativo calculado
@@ -1965,6 +2221,168 @@ intensidad de cada píxel está representada con un número.
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
+    \colorlet{gre}{green!40}
+    \colorlet{blu}{blue!40}
+    \node[fill=gre] at (-0.25,2.25)  {};
+    \node[fill=gre] at (-0.25,1.75)  {};
+    \node[fill=gre] at (-0.25,1.25)  {};
+    \node[fill=gre] at (0.25,2.25)  {};
+    \node[fill=gre] at (0.25,1.75)  {};
+    \node[fill=gre] at (0.25,1.25)  {};
+    \node[fill=gre] at (0.75,2.25)  {};
+    \node[fill=gre] at (0.75,1.75)  {};
+    \node[fill=gre] at (0.75,1.25)  {};
+    % result fill
+    \node[fill=blu] at (7.25, 2.25) {};
+    \draw[step=0.5cm,color=black] (-1,-1) grid (3, 3);
+    % first row
+    \node at (-0.75,2.75) {\tiny 45};
+    \node at (-0.25,2.75) {\tiny 60};
+    \node at (0.25,2.75) {\tiny 98};
+    \node at (0.75,2.75) {\tiny 127};
+    \node at (1.25,2.75) {\tiny 132};
+    \node at (1.75,2.75) {\tiny 133};
+    \node at (2.25,2.75) {\tiny 137};
+    \node at (2.75,2.75) {\tiny 133};
+    % second row
+    \node at (-0.75,2.25) {\tiny 46};
+    \node at (-0.25,2.25) {\tiny 65};
+    \node at (0.25,2.25) {\tiny 98};
+    \node at (0.75,2.25) {\tiny 123};
+    \node at (1.25,2.25) {\tiny 126};
+    \node at (1.75,2.25) {\tiny 128};
+    \node at (2.25,2.25) {\tiny 131};
+    \node at (2.75,2.25) {\tiny 133};
+    % third row
+    \node at (-0.75,1.75) {\tiny 47};
+    \node at (-0.25,1.75) {\tiny 65};
+    \node at (0.25,1.75) {\tiny 96};
+    \node at (0.75,1.75) {\tiny 115};
+    \node at (1.25,1.75) {\tiny 119};
+    \node at (1.75,1.75) {\tiny 123};
+    \node at (2.25,1.75) {\tiny 135};
+    \node at (2.75,1.75) {\tiny 137};
+    % fourth row
+    \node at (-0.75,1.25) {\tiny 47};
+    \node at (-0.25,1.25) {\tiny 63};
+    \node at (0.25,1.25) {\tiny 91};
+    \node at (0.75,1.25) {\tiny 107};
+    \node at (1.25,1.25) {\tiny 113};
+    \node at (1.75,1.25) {\tiny 122};
+    \node at (2.25,1.25) {\tiny 138};
+    \node at (2.75,1.25) {\tiny 134};
+    % fifth row
+    \node at (-0.75,0.75) {\tiny 50};
+    \node at (-0.25,0.75) {\tiny 59};
+    \node at (0.25,0.75) {\tiny 80};
+    \node at (0.75,0.75) {\tiny 97};
+    \node at (1.25,0.75) {\tiny 110};
+    \node at (1.75,0.75) {\tiny 123};
+    \node at (2.25,0.75) {\tiny 133};
+    \node at (2.75,0.75) {\tiny 134};
+    % sixth row
+    \node at (-0.75,0.25) {\tiny 49};
+    \node at (-0.25,0.25) {\tiny 53};
+    \node at (0.25,0.25) {\tiny 68};
+    \node at (0.75,0.25) {\tiny 83};
+    \node at (1.25,0.25) {\tiny 97};
+    \node at (1.75,0.25) {\tiny 113};
+    \node at (2.25,0.25) {\tiny 128};
+    \node at (2.75,0.25) {\tiny 133};
+    % seventh row
+    \node at (-0.75,-0.25) {\tiny 50};
+    \node at (-0.25,-0.25) {\tiny 50};
+    \node at (0.25,-0.25) {\tiny 58};
+    \node at (0.75,-0.25) {\tiny 70};
+    \node at (1.25,-0.25) {\tiny 84};
+    \node at (1.75,-0.25) {\tiny 102};
+    \node at (2.25,-0.25) {\tiny 116};
+    \node at (2.75,-0.25) {\tiny 126};
+    % eight row
+    \node at (-0.75,-0.75) {\tiny 50};
+    \node at (-0.25,-0.75) {\tiny 50};
+    \node at (0.25,-0.75) {\tiny 52};
+    \node at (0.75,-0.75) {\tiny 58};
+    \node at (1.25,-0.75) {\tiny 69};
+    \node at (1.75,-0.75) {\tiny 86};
+    \node at (2.25,-0.75) {\tiny 101};
+    \node at (2.75,-0.75) {\tiny 120};
+    % Convolution operator
+    \node[text width=6cm, anchor=west, right] at (3.29,1.25) {$*$};
+    % Filter (end right, end down)grid(start left, start up)
+    \draw[step=0.5cm,color=black] (5.50,0.5) grid (3.994,2);
+    % first row
+    \node at (4.25, 1.75) {\tiny 0.1};
+    \node at (4.75, 1.75) {\tiny 0.1};
+    \node at (5.25, 1.75) {\tiny 0.1};
+    % second row
+    \node at (4.25, 1.25) {\tiny 0.1};
+    \node at (4.75, 1.25) {\tiny 0.2};
+    \node at (5.25, 1.25) {\tiny 0.1};
+    % third row
+    \node at (4.25, 0.75) {\tiny 0.1};
+    \node at (4.75, 0.75) {\tiny 0.1};
+    \node at (5.25, 0.75) {\tiny 0.1};
+    % Equal
+    \node[text width=6cm, anchor=west, right] at (5.75,1.25) {$=$};
+    % Result
+    \draw[step=0.5cm,color=black] (9.50,0) grid (6.4999,3);
+    % first row
+    \node at (6.75, 2.75) {\tiny 69};
+    \node at (7.25, 2.75) {\tiny 95};
+    \node at (7.75, 2.75) {\tiny 116};
+    \node at (8.25, 2.75) {\tiny 125};
+    \node at (8.75, 2.75) {\tiny 129};
+    \node at (9.25, 2.75) {\tiny 132};
+    % second row
+    \node at (6.75, 2.25) {\tiny 68};
+    \node at (7.25, 2.25) {\tiny 92};
+    \node at (7.75, 2.25) {\tiny 110};
+    \node at (8.25, 2.25) {\tiny 120};
+    \node at (8.75, 2.25) {\tiny 126};
+    \node at (9.25, 2.25) {\tiny 132};
+    % third row
+    \node at (6.75, 1.75) {\tiny 66};
+    \node at (7.25, 1.75) {\tiny 86};
+    \node at (7.75, 1.75) {\tiny 104};
+    \node at (8.25, 1.75) {\tiny 114};
+    \node at (8.75, 1.75) {\tiny 124};
+    \node at (9.25, 1.75) {\tiny 132};
+    % fourth row
+    \node at (6.75, 1.25) {\tiny 62};
+    \node at (7.25, 1.25) {\tiny 78};
+    \node at (7.75, 1.25) {\tiny 94};
+    \node at (8.25, 1.25) {\tiny 108};
+    \node at (8.75, 1.25) {\tiny 120};
+    \node at (9.25, 1.25) {\tiny 129};
+    % fifth row
+    \node at (6.75, 0.75) {\tiny 57};
+    \node at (7.25, 0.75) {\tiny 69};
+    \node at (7.75, 0.75) {\tiny 83};
+    \node at (8.25, 0.75) {\tiny 98};
+    \node at (8.75, 0.75) {\tiny 112};
+    \node at (9.25, 0.75) {\tiny 124};
+    % sixth row
+    \node at (6.75, 0.25) {\tiny 53};
+    \node at (7.25, 0.25) {\tiny 60};
+    \node at (7.75, 0.25) {\tiny 71};
+    \node at (8.25, 0.25) {\tiny 85};
+    \node at (8.75, 0.25) {\tiny 100};
+    \node at (9.25, 0.25) {\tiny 114};
+    % Captions
+    \node[text width=6cm, anchor=west, right] at (0.25,-1.30) {\scriptsize $f(i,j)$};
+    \node[text width=6cm, anchor=west, right] at (4.30,-1.30) {\scriptsize $h(i,j)$};
+    \node[text width=6cm, anchor=west, right] at (7.50,-1.30) {\scriptsize $g(i,j)$};
+\end{tikzpicture}
+\caption{\fontsize{9}{11}\selectfont Convolución. La imagen en la izquierda se convoluciona con el filtro $h$ para dar lugar a la imagen de la derecha. El píxel marcado en azul es el resultado de la combinación lineal de $h$ con el \textit{parche} verde en la imagen original.}\label{fig:convmatrix}
+\end{figure}
+#+END_LaTeX
+
 Dado que la convolución en el caso discreto es una combinación lineal,
 su resultado para cada elemento \(f(i,j) \in \mathbb{R}^n\) es un
 escalar en \(\mathbb{R}\). Notar que la Ecuación \ref{eq:conv} puede
@@ -2011,6 +2429,34 @@ que se agrega un borde artificial mediante la técnicas de
     \caption{\fontsize{9}{11}\selectfont Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/conv-orig.png}
+        \caption{\(A\)}
+        \label{fig:conv-orig}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \(\begin{bmatrix}
+         0  &  1 & 0 \\
+         1  & -4 & 1 \\
+         0  &  1 & 0 \\
+        \end{bmatrix}\)
+        \caption{\textit{Kernel} \(K\)}
+        \label{fig:K}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/conv-edge.png}
+        \caption{\(A * K\)}
+        \label{fig:conv-edge}
+    \end{subfigure}
+    \caption{\fontsize{9}{11}\selectfont Es muy común convolucionar imágenes con ciertos \textit{kernels} para detectar bordes en las mismas.}\label{fig:conv}
+\end{figure}
+#+END_LaTeX
 
 Una buena propiedad de la convolución es que toma ventaja de la
 \textit{localidad} (vecinos) de cada píxel, que usualmente son los más
@@ -2108,6 +2554,15 @@ con ceros o \textit{zero-padding}, donde se le agrega un ``marco'' de
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/conv-layer.pdf}
+    \caption{Ejemplo de una capa convolucional cuyo volumen de entrada es una imagen (\(x\)) con 3 canales RGB. La capa cuenta con 6 filtros y cada uno convoluciona con la imagen a lo largo y ancho.}\label{fig:conv-lay}
+\end{figure}
+#+END_LaTeX
+
 **** \textit{Pooling}
 
 Con el objetivo de reducir la cantidad de parámetros y en consecuencia
@@ -2179,6 +2634,59 @@ reduce espacialmente la entrada, pero no su profundidad.
      mantiene intacta. En \ref{fig:pool2} observamos cómo funciona una capa \textit{MAX Pooling} con un un \textit{stride} de 2.}\label{fig:pool}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}
+        \includegraphics[width=\textwidth]{images/pool-layer.pdf}
+        \caption{}
+        \label{fig:pool1}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+
+        \colorlet{yel}{yellow!40}
+        \colorlet{re}{red!40}
+        \colorlet{gre}{green!40}
+        \colorlet{blu}{blue!40}
+
+        \begin{tikzpicture}[every node/.style={minimum size=.5cm-\pgflinewidth, outer sep=0pt}]
+        \draw[step=0.5cm,color=gray] (-1,-1) grid (1,1);
+        \node[fill=yel] at (-0.75,+0.75) {1};
+        \node[fill=yel] at (-0.75,+0.25) {2};
+        \node[fill=yel] at (-0.25,+0.75) {3};
+        \node[fill=yel] at (-0.25,+0.25) {4};
+        \node[fill=re] at (-0.75,-0.25) {8};
+        \node[fill=re] at (-0.75,-0.75) {7};
+        \node[fill=re] at (-0.25,-0.25) {5};
+        \node[fill=re] at (-0.25,-0.75) {4};
+        \node[fill=gre] at (+0.75,-0.25) {2};
+        \node[fill=gre] at (+0.75,-0.75) {3};
+        \node[fill=gre] at (+0.25,-0.25) {2};
+        \node[fill=gre] at (+0.25,-0.75) {1};
+        \node[fill=blu] at (+0.75,+0.25) {0};
+        \node[fill=blu] at (+0.75,+0.75) {7};
+        \node[fill=blu] at (+0.25,+0.25) {4};
+        \node[fill=blu] at (+0.25,+0.75) {3};
+        \draw[black, -latex ] (1.1,0) -- (3.9,0) node [pos=0.46,above,font=\footnotesize] {\textit{MAX Pooling}};
+        \draw[step=0.5cm,color=gray] (4,4) grid (4,4);
+        \node[fill=yel] at (+4.25,+0.25) {4};
+        \node[fill=blu] at (+4.75,+0.25) {7};
+        \node[fill=gre] at (+4.75,-0.25) {3};
+        \node[fill=re] at (+4.25,-0.25) {8};
+        \end{tikzpicture}
+
+        \caption{}
+        \label{fig:pool2}
+    \end{subfigure}
+    \caption{Las capas de \textit{Pooling} reducen las dimensiones
+     espaciales. Notar en \ref{fig:pool1} que la profundidad del volumen se
+     mantiene intacta. En \ref{fig:pool2} observamos cómo funciona una capa \textit{MAX Pooling} con un un \textit{stride} de 2.}\label{fig:pool}
+\end{figure}
+#+END_LaTeX
 
 **** Capas Completamente Conectadas (Fully-Connected)
 
@@ -2366,6 +2874,15 @@ de clasificación \cite{Koch2015SiameseNN} y recomendación de productos
     \caption{\fontsize{9}{11}\selectfont Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/siamese-diagram.pdf}
+    \caption{\fontsize{9}{11}\selectfont Esquema de la arquitectura de una red siamesa. \(G_W\) es un conjunto de funciones, en este caso una red convolucional, con parámetros \(W\). Ambas redes comparten los parámetros. Luego una función de pérdida \(L\) analiza la similitud entre \(X_1\) y \(X_2\)}\label{fig:siamese-diagram}
+\end{figure}
+#+END_LaTeX
 
 *** Funciones de costo aplicadas a redes siamesas
 
@@ -2617,6 +3134,25 @@ fue usada para entrenar la red siamesa.
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccccc}
+\includegraphics[width = 1.5in]{./images/mnist/a1.png} &
+\includegraphics[width = 1.5in]{./images/mnist/a.png} &
+\includegraphics[width = 1.5in]{./images/mnist/b1.png} &
+\includegraphics[width = 1.5in]{./images/mnist/b.png} &
+\includegraphics[width = 1.5in]{./images/mnist/c.png} &
+\includegraphics[width = 1.5in]{./images/mnist/c1.png}\\
+\end{tabular}
+}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de transformaciones aplicadas a las imagenes de MNIST. Cada par contiene la imagen original y la transformada con traslaciones en los ejes X e Y, y con rotación en Z.}
+\label{fig:mnist-sample}
+\end{figure}
+#+END_LaTeX
+
 *** Nomenclatura
 
 Cada componente de la red siamesa se denotará con BCNN por sus siglas
@@ -2635,6 +3171,15 @@ arquitectura en la Figura \ref{fig:siamese-example}.
     \caption{\fontsize{9}{11}\selectfont Esquema de una red siamesa que tiene como objetivo aprender las transformaciones en los caracteres de MNIST.}\label{fig:siamese-example}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/siamese-example.pdf}
+    \caption{\fontsize{9}{11}\selectfont Esquema de una red siamesa que tiene como objetivo aprender las transformaciones en los caracteres de MNIST.}\label{fig:siamese-example}
+\end{figure}
+#+END_LaTeX
 
 Para dar una idea de las arquitecturas de cada red de manera sencilla vamos a
 usar las siguientes abreviaciones:
@@ -2660,6 +3205,15 @@ una red definida como C96-P-C256-P-F500-F10.
     \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/net_example.pdf}
+    \caption{\fontsize{9}{11}\selectfont Ejemplo de una arquitectura de red convolucional definida como C96-P-C256-F500-Op, donde la cantidad de clases de salida es 10. Recordar que luego de cada capa convolucional se utilizan unidades ReLU y luego de cada capa completamente conectada se agrega una capa de \textit{Dropout}.}\label{fig:examplenotation}
+\end{figure}
+#+END_LaTeX
 
 *** Descripción de la red
 
@@ -2719,6 +3273,30 @@ Automovimiento & 75 & 90 & 92 & 99\\
 \caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud porcentual de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento) de acuerdo a la cantidad de elementos de entrenamiento: 100, 300, 1000 y 10000.}
 \end{table*}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{table*}[htb]
+\centering
+\begin{tabular}{l|rrrr}
+\hline
+\multicolumn{1}{r}{}
+& \multicolumn{4}{c}{datos entrenamiento}
+& \multicolumn{1}{l}{Método}
+& \multicolumn{1}{r}{100}
+& \multicolumn{1}{r}{300}
+& \multicolumn{1}{r}{1000}
+& \multicolumn{1}{r}{10000} \\ \cline{1-5}
+\hline
+Desde cero & 42 & 70 & 82 & 97\\
+SFA(m=10) & 52 & 71 & 77 & 82\\
+SFA(m=100) & 58 & 73 & 80 & 88\\
+Automovimiento & 75 & 90 & 92 & 99\\
+\hline
+\end{tabular}%
+\caption{\fontsize{9}{11}\selectfont \label{tab:one} Exactitud porcentual de los dos métodos de pre-entrenamiento utilizados (SFA y automovimiento) de acuerdo a la cantidad de elementos de entrenamiento: 100, 300, 1000 y 10000.}
+\end{table*}
+#+END_LaTeX
 
 Se puede observar que entrenar mediante automovimiento presenta una
 performance claramente superior a entrenar una red desde cero con la
@@ -2788,6 +3366,25 @@ imágenes utilizados durante el entrenamiento de las redes siamesas.
 \label{fig:kitti-sample}
 \end{figure}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccccc}
+\includegraphics[width = 1.5in]{./images/kitti/a.png} &
+\includegraphics[width = 1.5in]{./images/kitti/a1.png} &
+\includegraphics[width = 1.5in]{./images/kitti/b.png} &
+\includegraphics[width = 1.5in]{./images/kitti/b1.png} &
+\includegraphics[width = 1.5in]{./images/kitti/c.png} &
+\includegraphics[width = 1.5in]{./images/kitti/c1.png}\\
+\end{tabular}
+}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de imágenes extraídos de KITTI. Las transformaciones en X, Y y Z se obtuvieron de las anotaciones provistas por los creadores del conjunto de datos. Para las rotaciones en el eje Y se calculó el ángulo de Euler correspondiente al cambio entre dos \textit{frames}.}
+\label{fig:kitti-sample}
+\end{figure}
+#+END_LaTeX
 
 *** Odometria 
 
@@ -2859,6 +3456,31 @@ algunas de las clases que provee este conjunto de datos.
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccc}
+\includegraphics[width = 1.5in]{./images/sun397/mountain_snowy.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/oilrig.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/nuclear_power_plant.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/rock_arch.jpg} \\
+\includegraphics[width = 1.5in]{./images/sun397/subway_station.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/kennel.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/pilothouse.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/abbey.jpg} \\
+\includegraphics[width = 1.5in]{./images/sun397/vegetable_garden.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/music_studio.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/waterfall.jpg} &
+\includegraphics[width = 1.5in]{./images/sun397/building.jpg}\\
+\end{tabular}
+}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos SUN-397: paisajes exteriores, interiores, construcciones, etc.}
+\label{fig:sun-sample}
+\end{figure}
+#+END_LaTeX
+
 La evaluación se hizo midiendo la exactitud de clasificadores
 \textit{Softmax} utilizando las \textit{features} obtenidas de las
 salidas de las primeras 5 capas convolucionales (nombradas L1-L5). Los
@@ -2908,6 +3530,41 @@ KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.
 \caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397. La columna \textit{finet} indica la cantidad de elementos por clase que se utilizaron de SUN397 para realizar la transferencia de aprendizaje de los pesos previamente optimizados.}
 \end{table*}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{table*}[htb]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l|r|r|ccccc|r|ccccc}
+\hline
+\multicolumn{1}{l}{Método}
+& \multicolumn{1}{r}{\#preentr.}
+& \multicolumn{1}{r}{\#finet.}
+& \multicolumn{1}{c}{L1}
+& \multicolumn{1}{c}{L2}
+& \multicolumn{1}{c}{L3}
+& \multicolumn{1}{c}{L4}
+& \multicolumn{1}{c}{L5}
+& \multicolumn{1}{r}{\#finet.}
+& \multicolumn{1}{c}{L1}
+& \multicolumn{1}{c}{L2}
+& \multicolumn{1}{c}{L3}
+& \multicolumn{1}{c}{L4}
+& \multicolumn{1}{c}{L5} \\ \cline{1-14}
+\hline
+
+ALEX-1000 & 1M & 5 & 3.73 & 5.07 & 5.07 & 8.53 & 10.40 & 20 & 9.07 & 12.53 & 16.27 & 17.60 & 10.67\\
+ALEX-20 & 20K & 5 & 2.93 & 1.87 & 3.73 & 5.07 & 3.20 & 20 & 6.13 & 5.33 & 5.33 & 4.53 & 5.07\\
+KITTI-SFA & 20.7K & 5 & 2.13 & 3.20 & 2.40 & 1.60 & 1.87 & 20 & 4.53 & 3.73 & 2.13 & 2.40 & 2.93\\
+KITTI-EGO & 20.7K & 5 & 2.93 & 1.87 & 3.20 & 5.87 & 1.33 & 20 & 6.67 & 7.47 & 9.87 & 9.33 & 4.00\\
+
+\hline
+\end{tabular}%
+}
+\caption{\fontsize{9}{11}\selectfont \label{tab:two}Exactitud de pre-entramiento con Egomotion y SFA comparado con un entrenamiendo de cero de AlexNet utilizando el conjunto de datos ILSVRC'12. L1-L5 significa que se agregó un clasificador a la salida de las capas convolucionales 1 a 5. Se reporta la exactitud de cada clasificador utilizando el conjunto de datos SUN397. La columna \textit{finet} indica la cantidad de elementos por clase que se utilizaron de SUN397 para realizar la transferencia de aprendizaje de los pesos previamente optimizados.}
+\end{table*}
+#+END_LaTeX
 
 Del Cuadro \ref{tab:two} también concluimos que el pre-entrenamiento
 con automoviento no supera la performance que se obtiene al
@@ -2968,6 +3625,31 @@ clases en este conjunto de datos se pueden ver en la Figura
 \end{figure}
 #+end_src
 
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{figure}[H]
+\centering
+\resizebox{.9\linewidth}{!}{
+\begin{tabular}{cccc}
+\includegraphics[width = 1.5in]{./images/imagenet/n01531178_108.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01675722_126.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01753488_177.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n01773797_48.JPEG} \\
+\includegraphics[width = 1.5in]{./images/imagenet/n02859443_1229.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03000134_789.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03017168_743.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03085013_2149.JPEG} \\
+\includegraphics[width = 1.5in]{./images/imagenet/n03089624_632.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03207941_946.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n03218198_298.JPEG} &
+\includegraphics[width = 1.5in]{./images/imagenet/n04154565_5799.JPEG} \\
+\end{tabular}
+}
+\caption{\fontsize{9}{11}\selectfont Ejemplo de clases del conjunto de datos ILSVRC'12.}
+\label{fig:imagenet-sample}
+\end{figure}
+#+END_LaTeX
+
 Para el entrenamiento de las redes se utilizaron subconjuntons de
 todas las clases con 1, 5, 10, 20 y 1000 elementos por cada una.  Los
 resultados se muestran en el Cuadro \ref{tab:three}. Se puede observar
@@ -2998,6 +3680,30 @@ ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
 \caption{\fontsize{9}{11}\selectfont \label{tab:three}Exactitud de los modelos aprendidos mediante redes siamesas (KITTI-EGO corresponde a la red de automovimiento, KITTI-SFA a la que utiliza \textit{slow feature analysis}) contra una red cuyos pesos fueron inicializados aleatoriamente (ALEXNET). Se entrenaron las 3 redes utilizando el conjunto de datos ILSVRC 2012 con 1, 5, 10, 20 y 1000 imágenes por clase.}
 \end{table*}
 #+end_src
+
+#+RESULTS:
+#+BEGIN_LaTeX
+\begin{table*}[htb]
+\centering
+\begin{tabular}{l|ccccc}
+\hline
+\multicolumn{1}{l}{Método}
+& \multicolumn{1}{c}{1}
+& \multicolumn{1}{c}{5}
+& \multicolumn{1}{c}{10}
+& \multicolumn{1}{c}{20}
+& \multicolumn{1}{c}{1000} \\ \cline{1-6}
+\hline
+
+KITTI-EGO & 0.49 & 1.27 & 2.14 & 4.13 & 20.8\\
+KITTI-SFA & 0.35 & 0.75 & 1.34 & 2.64 & 11.83\\
+ALEXNET & 0.45 & 0.95 & 1.91 & 3.69 & 18.35\\
+
+\hline
+\end{tabular}%
+\caption{\fontsize{9}{11}\selectfont \label{tab:three}Exactitud de los modelos aprendidos mediante redes siamesas (KITTI-EGO corresponde a la red de automovimiento, KITTI-SFA a la que utiliza \textit{slow feature analysis}) contra una red cuyos pesos fueron inicializados aleatoriamente (ALEXNET). Se entrenaron las 3 redes utilizando el conjunto de datos ILSVRC 2012 con 1, 5, 10, 20 y 1000 imágenes por clase.}
+\end{table*}
+#+END_LaTeX
 
 #+LaTeX: \newpage
 
@@ -3054,6 +3760,10 @@ dominios de problemas queda como trabajo a futuro.
 
 #+LaTeX: \bibliographystyle{babplain}
 #+LaTeX: \bibliography{draft}
+
+#+LATEX: \newpage
+
+#+LATEX: Los abajo firmantes, miembros del Tribunal de Evaluación de tesis, damos Fe que el presente ejemplar impreso, se corresponde con el aprobado por éste Tribunal.
 
 * Plan de Trabajo                                :noexport:
 ** Backlog
